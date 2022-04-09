@@ -2,6 +2,7 @@ package me.agronaut.springrest.Model;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ import java.util.Date;
 @Table(name = "user")
 @Getter
 @Setter
+@ToString
 public class User {
     @NotNull
     @Id
