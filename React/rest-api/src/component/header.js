@@ -1,5 +1,6 @@
 import React from "react";
 import {Navbar, Container, Nav} from "react-bootstrap";
+import axios from "axios";
 
 class Header extends React.Component {
     constructor(props) {
@@ -7,13 +8,26 @@ class Header extends React.Component {
         this.token = sessionStorage.getItem("token");
     }
 
+    handleLogout() {
+        let token = sessionStorage.getItem("token");
+        axios.post("http://localhost:8081/logout", null, {headers: {"Authorization": token}})
+            .then(() => {
+                sessionStorage.clear();
+                window.location.pathname = "/";
+            })
+            .catch(e => {
+                console.log(e.data.message)
+            });
+
+    }
+
     render() {
-        if(this.token != null){
-            return  <div>
+        if (this.token == null) {
+            return <div>
                 <Navbar collapseOnSelect fixed={"top"} expand={'sm'} variant={'dark'} bg={'dark'}>
                     <Container>
-                        <Navbar.Toggle aria-controls={'responsive-navbar-nav'} />
-                        <Navbar.Collapse id={'responsive-navbar-nav'} >
+                        <Navbar.Toggle aria-controls={'responsive-navbar-nav'}/>
+                        <Navbar.Collapse id={'responsive-navbar-nav'}>
                             <Nav activeKey={window.location.pathname}>
                                 <Nav.Link href={"/"}>Home</Nav.Link>
                                 <Nav.Link href={'/login'}>Login</Nav.Link>
@@ -24,15 +38,15 @@ class Header extends React.Component {
                     </Container>
                 </Navbar>
             </div>
-        } else{
+        } else {
             return <div>
                 <Navbar collapseOnSelect fixed={"top"} expand={'sm'} variant={'dark'} bg={'dark'}>
                     <Container>
-                        <Navbar.Toggle aria-controls={'responsive-navbar-nav'} />
-                        <Navbar.Collapse id={'responsive-navbar-nav'} >
+                        <Navbar.Toggle aria-controls={'responsive-navbar-nav'}/>
+                        <Navbar.Collapse id={'responsive-navbar-nav'}>
                             <Nav activeKey={window.location.pathname}>
                                 <Nav.Link href={"/"}>Home</Nav.Link>
-                                <Nav.Link href={'/logout'}>Logout</Nav.Link>
+                                <Nav.Link onClick={this.handleLogout}>Logout</Nav.Link>
                                 <Nav.Link href={'/users'}>Users</Nav.Link>
                             </Nav>
                         </Navbar.Collapse>

@@ -23,7 +23,6 @@ public class UserService {
     UserRepository userRepo;
     @Autowired
     SessionUserRepository sessionRepo;
-
     @Autowired
     PasswordEncoder encoder;
 

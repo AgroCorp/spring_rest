@@ -13,10 +13,7 @@ class LoginForm extends React.Component {
         this.password = "";
 
         const queryParams = new URLSearchParams(window.location.search);
-        const history = new History();
-        this.next = queryParams.get("next");
-
-
+        this.next = queryParams.has("next") ? queryParams.get("next") : "/";
 
         this.handleClick = this.handleClick.bind(this);
         this.handleTextChange = this.handleTextChange.bind(this);
@@ -37,13 +34,12 @@ class LoginForm extends React.Component {
             this.loading = false;
             window.sessionStorage.setItem('token', r.data);
 
-            history.push(this.next);
+            window.location.pathname = this.next;
+
         }).catch(e => {
-            console.log(e.response.data.message);
-            this.error = e.response.data.message;
+            console.log(e);
         });
     }
-
 
     handleTextChange(event) {
         if (event.target.id === "username") {

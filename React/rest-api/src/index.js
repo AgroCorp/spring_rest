@@ -17,7 +17,6 @@ render(
             <Route path={'login'} element={<LoginForm/>} />
             <Route path={'register'} element={<RegisterForm/>} />
             <Route path={'users'} element={<Users/>} />
-            <Route path={'logout'} element={<Logout/>} />
         </Routes>
     </BrowserRouter>,
   document.getElementById('root')
