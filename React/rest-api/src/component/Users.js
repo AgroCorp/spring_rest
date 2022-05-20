@@ -23,23 +23,25 @@ class Users extends LoginRequiredComponent {
 
     componentDidMount() {
         this.setState({loading:true});
-        axios.get("http://localhost:8081/users", { headers: {"Authorization" : this.token} }).then(r=>{
+        axios.post("http://localhost:8081/users",  JSON.stringify(this.searchForm), { headers: {"Authorization" : this.token, 'content-type': 'application/x-www-form-urlencoded'} }).then(r=>{
             this.setState({loading:false});
             this.setState({data:r.data});
         }).catch(e => {
-            this.setState({error:e.response.data});
+            console.log(e.error);
+            this.setState({error:e.error});
+            this.setState({loading: false})
         })
     }
 
     search() {
         this.setState({loading: true});
-        axios.post("http://localhost:8081/users", this.searchForm, { headers: {"Authorization" : this.token} })
+        axios.post("http://localhost:8081/users", JSON.stringify(this.searchForm), { headers: {"Authorization" : this.token} })
             .then(r=>{
                 this.setState({loading:false});
                 this.setState({data:r.data});
             })
             .catch(e => {
-                this.setState({error:e.response.data});
+                this.setState({error:e});
             })
     }
 
@@ -53,16 +55,16 @@ class Users extends LoginRequiredComponent {
         {
             return <div>
             <Header />
-                <h2>Hiba: {this.state.error}</h2>
+                <h2 style={{paddingTop: 55}}>Hiba: {this.state.error}</h2>
             </div>
         }
         if(this.state.loading) {
             return <div>
                 <Header />
-                <h1>Nincs talalat</h1>
+                <h1 style={{paddingTop: 55}}>Nincs talalat</h1>
             </div>
         }
-        if (this.token != null)
+        if (this.isAuthenticated())
         {
             return <>
                 <Header />
@@ -83,7 +85,7 @@ class Users extends LoginRequiredComponent {
                         </tr>
                         </tbody>
                     </table>
-                    <Button variant={"primary"} onClick={this.search}  >Kereses</Button>
+                    <Button variant={"primary"} onClick={this.search} >Kereses</Button>
                 </div>
                 <div>
                     {this.state.data ? <ResultTable data = {this.state.data}/> : "Nincs adat"}

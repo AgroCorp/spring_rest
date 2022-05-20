@@ -1,6 +1,5 @@
 import React from "react";
 import {Navbar, Container, Nav} from "react-bootstrap";
-import axios from "axios";
 
 class Header extends React.Component {
     constructor(props) {
@@ -9,16 +8,8 @@ class Header extends React.Component {
     }
 
     handleLogout() {
-        let token = sessionStorage.getItem("token");
-        axios.post("http://localhost:8081/logout", null, {headers: {"Authorization": token}})
-            .then(() => {
-                sessionStorage.clear();
-                window.location.pathname = "/";
-            })
-            .catch(e => {
-                console.log(e.data.message)
-            });
-
+        sessionStorage.clear();
+        window.location.pathname = "/";
     }
 
     render() {

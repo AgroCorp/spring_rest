@@ -1,5 +1,8 @@
 package me.agronaut.springrest.Config;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import liquibase.pro.packaged.W;
 import me.agronaut.springrest.Exception.ApiError;
 import org.springframework.core.Ordered;
@@ -24,9 +27,40 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex, WebRequest request)
     {
         ApiError error = new ApiError();
-        error.setStatus(HttpStatus.UNAUTHORIZED);
+        error.setStatus(HttpStatus.NOT_FOUND);
         error.setMessage(ex.getMessage());
         error.setDebugMessage("Cannot find requested entity");
+        error.setTimestamp(LocalDateTime.now());
+
+        return handleExceptionInternal(ex,error,new HttpHeaders(), error.getStatus(), request);
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(ExpiredJwtException.class)
+    protected ResponseEntity<Object> handleExpired(ExpiredJwtException ex, WebRequest request) {
+        ApiError error = new ApiError();
+        error.setStatus(HttpStatus.FORBIDDEN);
+        error.setMessage(ex.getMessage());
+        error.setDebugMessage("Token expired please login again for new token");
+        error.setTimestamp(LocalDateTime.now());
+
+        return handleExceptionInternal(ex,error,new HttpHeaders(), error.getStatus(), request);
+    }
+    @org.springframework.web.bind.annotation.ExceptionHandler(ExpiredJwtException.class)
+    protected ResponseEntity<Object> handleExpired(UnsupportedJwtException ex, WebRequest request) {
+        ApiError error = new ApiError();
+        error.setStatus(HttpStatus.FORBIDDEN);
+        error.setMessage(ex.getMessage());
+        error.setDebugMessage("Token is unsupported");
+        error.setTimestamp(LocalDateTime.now());
+
+        return handleExceptionInternal(ex,error,new HttpHeaders(), error.getStatus(), request);
+    }
+    @org.springframework.web.bind.annotation.ExceptionHandler(ExpiredJwtException.class)
+    protected ResponseEntity<Object> handleExpired(MalformedJwtException ex, WebRequest request) {
+        ApiError error = new ApiError();
+        error.setStatus(HttpStatus.FORBIDDEN);
+        error.setMessage(ex.getMessage());
+        error.setDebugMessage("Token is malformed");
         error.setTimestamp(LocalDateTime.now());
 
         return handleExceptionInternal(ex,error,new HttpHeaders(), error.getStatus(), request);

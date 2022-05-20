@@ -2,29 +2,38 @@ package me.agronaut.springrest.Service;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import me.agronaut.springrest.Model.SessionUsers;
 import me.agronaut.springrest.Model.User;
-import me.agronaut.springrest.Repository.SessionUserRepository;
 import me.agronaut.springrest.Repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 public class UserService {
+    private final Logger log = LoggerFactory.getLogger(UserService.class);
     @Autowired
     UserRepository userRepo;
     @Autowired
-    SessionUserRepository sessionRepo;
-    @Autowired
     PasswordEncoder encoder;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public User save(User newUser)
     {
@@ -40,15 +49,8 @@ public class UserService {
         {
             if (encoder.matches(loginUser.getPassword(), login.getPassword()))
             {
-                String token = getJWTToken(login.getUsername());
                 // insert session table
-                SessionUsers session = new SessionUsers();
-                session.setUser(login);
-                session.setToken(token);
-
-                sessionRepo.save(session);
-
-                return token;
+                return getJWTToken(login.getUsername());
             }
             else {
                 throw new EntityNotFoundException("Password is incorrect");
@@ -58,9 +60,26 @@ public class UserService {
         }
     }
 
-    public List<User> getall()
+    public List<User> getAll(MultiValueMap<String, String> formData)
     {
-        return userRepo.findAll();
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+        CriteriaQuery<User> query = builder.createQuery(User.class);
+
+        Root<User> root = query.from(User.class);
+
+        if (formData != null && !formData.isEmpty()) {
+            for (Map.Entry<String, List<String>> iter : formData.entrySet()) {
+                log.info("key: " + iter.getKey() + "\tvalue: " + iter.getValue());
+                if(!iter.getKey().equals("{}") && !iter.getValue().get(0).equals("[]")) {
+                    query.where(builder.and(builder.equal(root.get(iter.getKey()), iter.getValue().get(0))));
+                }
+            }
+        }
+
+        TypedQuery<User> typedQuery = entityManager.createQuery(query);
+
+        return  typedQuery.getResultList();
     }
 
     private String getJWTToken(String username){
@@ -78,16 +97,5 @@ public class UserService {
                 .signWith(SignatureAlgorithm.HS512, secretKey.getBytes()).compact();
 
         return "Bearer " + token;
-    }
-
-    public Boolean logout(String token)
-    {
-        SessionUsers session = sessionRepo.getByToken(token);
-        if(session != null) {
-            sessionRepo.delete(session);
-            return true;
-        } else {
-            return false;
-        }
     }
 }

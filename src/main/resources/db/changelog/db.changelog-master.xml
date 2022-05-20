@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <include file="db/changelog/2022/05/20-01-changelog.xml"/>
+    <changeSet id="1653061256278-1" author="gabor (generated)">
+        <createSequence cycle="false" incrementBy="1" maxValue="9223372036854775806" minValue="1"
+                        sequenceName="hibernate_sequence" startValue="1"/>
+    </changeSet>
+    <changeSet id="1653061256278-2" author="gabor (generated)">
+        <createTable tableName="SPRING_SESSION">
+            <column name="PRIMARY_ID" type="CHAR(36)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PRIMARY"/>
+            </column>
+            <column name="SESSION_ID" type="CHAR(36)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="CREATION_TIME" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="LAST_ACCESS_TIME" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="MAX_INACTIVE_INTERVAL" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="EXPIRY_TIME" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PRINCIPAL_NAME" type="VARCHAR(100)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1653061256278-3" author="gabor (generated)">
+        <createTable tableName="SPRING_SESSION_ATTRIBUTES">
+            <column name="SESSION_PRIMARY_ID" type="CHAR(36)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PRIMARY"/>
+            </column>
+            <column name="ATTRIBUTE_NAME" type="VARCHAR(200)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PRIMARY"/>
+            </column>
+            <column name="ATTRIBUTE_BYTES" type="BLOB(65535)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1653061256278-4" author="gabor (generated)">
+        <createTable tableName="session_users">
+            <column name="session_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PRIMARY"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="access_token" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1653061256278-5" author="gabor (generated)">
+        <createTable tableName="user">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PRIMARY"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints unique="true"/>
+            </column>
+            <column name="first_name" type="VARCHAR(255)"/>
+            <column name="last_name" type="VARCHAR(255)"/>
+            <column name="password" type="VARCHAR(255)"/>
+            <column defaultValueComputed="NULL" name="registration_date" type="datetime"/>
+            <column name="username" type="VARCHAR(255)">
+                <constraints unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1653061256278-7" author="gabor (generated)">
+        <createIndex indexName="SPRING_SESSION_IX2" tableName="SPRING_SESSION">
+            <column name="EXPIRY_TIME"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="1653061256278-8" author="gabor (generated)">
+        <createIndex indexName="SPRING_SESSION_IX3" tableName="SPRING_SESSION">
+            <column name="PRINCIPAL_NAME"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="1653061256278-9" author="gabor (generated)">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="session_users"
+                                 constraintName="FK_SESSION_USERS_ON_USER" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="user_id" referencedTableName="user"/>
+
+        <createIndex indexName="FK_SESSION_USERS_ON_USER" tableName="session_users">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="1653061256278-10" author="gabor (generated)">
+        <addForeignKeyConstraint baseColumnNames="SESSION_PRIMARY_ID" baseTableName="SPRING_SESSION_ATTRIBUTES"
+                                 constraintName="SPRING_SESSION_ATTRIBUTES_FK" onDelete="CASCADE" onUpdate="RESTRICT"
+                                 referencedColumnNames="PRIMARY_ID" referencedTableName="SPRING_SESSION"/>
+    </changeSet>
+
+</databaseChangeLog>
