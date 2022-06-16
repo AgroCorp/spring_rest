@@ -45,7 +45,7 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
 
         return handleExceptionInternal(ex,error,new HttpHeaders(), error.getStatus(), request);
     }
-    @org.springframework.web.bind.annotation.ExceptionHandler(ExpiredJwtException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(UnsupportedJwtException.class)
     protected ResponseEntity<Object> handleExpired(UnsupportedJwtException ex, WebRequest request) {
         ApiError error = new ApiError();
         error.setStatus(HttpStatus.FORBIDDEN);
@@ -55,7 +55,7 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
 
         return handleExceptionInternal(ex,error,new HttpHeaders(), error.getStatus(), request);
     }
-    @org.springframework.web.bind.annotation.ExceptionHandler(ExpiredJwtException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(MalformedJwtException.class)
     protected ResponseEntity<Object> handleExpired(MalformedJwtException ex, WebRequest request) {
         ApiError error = new ApiError();
         error.setStatus(HttpStatus.FORBIDDEN);
