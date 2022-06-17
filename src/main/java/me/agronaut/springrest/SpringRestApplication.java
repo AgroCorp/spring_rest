@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages={"me.*", "com.*", "org.*"})
 public class SpringRestApplication {
 
     public static void main(String[] args) {

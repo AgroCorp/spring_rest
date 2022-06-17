@@ -1,17 +1,23 @@
 package me.agronaut.springrest;
 
-import lombok.extern.log4j.Log4j2;
+
 import me.agronaut.springrest.Model.User;
 import me.agronaut.springrest.Service.UserService;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.util.Assert;
+import org.springframework.test.context.ContextConfiguration;
 
+import javax.persistence.EntityNotFoundException;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@DataJpaTest
+@ContextConfiguration(classes = {UserService.class})
+@AutoConfigurationPackage
 @SpringBootTest
-@Log4j2
 public class UserServiceTests {
     @Autowired
     UserService userSD;
@@ -25,7 +31,19 @@ public class UserServiceTests {
 
         Long insertedId = userSD.save(testUser).getId();
 
-        log.info("\n\t[insertedId]\t{}", insertedId);
-        Assert.notNull(insertedId, "Id is not null after insert");
+        assertNotNull(insertedId);
+    }
+
+    @Test
+    public void testLogin() {
+        User testUser = new User();
+        testUser.setUsername("testUser");
+        testUser.setPassword("testUser");
+
+        assertDoesNotThrow(() -> userSD.login(testUser));
+        assertThrows(EntityNotFoundException.class,()-> userSD.login(null));
+        assertThrows(EntityNotFoundException.class, ()->userSD.login(new User()));
+
+
     }
 }
