@@ -4,7 +4,9 @@ import {Navbar, Container, Nav} from "react-bootstrap";
 class Header extends React.Component {
     constructor(props) {
         super(props);
-        this.token = sessionStorage.getItem("token");
+        this.state = {
+            token: sessionStorage.getItem("token")
+        };
     }
 
     handleLogout() {
@@ -13,7 +15,7 @@ class Header extends React.Component {
     }
 
     render() {
-        if (this.token == null) {
+        if (this.state.token == null) {
             return <div>
                 <Navbar collapseOnSelect fixed={"top"} expand={'sm'} variant={'dark'} bg={'dark'}>
                     <Container>

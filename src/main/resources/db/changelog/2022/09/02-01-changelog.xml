@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1662105834073-1" author="gabor (generated)">
+        <createTable tableName="roles">
+            <column autoIncrement="true" name="role_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_roles"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1662105834073-2" author="gabor (generated)">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="roles" constraintName="FK_ROLES_ON_USER"
+                                 referencedColumnNames="user_id" referencedTableName="user"/>
+    </changeSet>
+
+</databaseChangeLog>

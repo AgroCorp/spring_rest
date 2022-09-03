@@ -2,6 +2,7 @@ package me.agronaut.springrest.Service;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import me.agronaut.springrest.Model.Role;
 import me.agronaut.springrest.Model.User;
 import me.agronaut.springrest.Repository.UserRepository;
 import org.slf4j.Logger;
@@ -48,10 +49,11 @@ public class UserService {
         User login = userRepo.getUserByUsername(loginUser.getUsername());
         if (login != null)
         {
+            log.info("user not null");
             if (encoder.matches(loginUser.getPassword(), login.getPassword()))
             {
-                // insert session table
-                return getJWTToken(login.getUsername());
+                log.info("username and password match!");
+                return getJWTToken(login.getUsername(), login.getRoles());
             }
             else {
                 throw new EntityNotFoundException("Password is incorrect");
@@ -83,9 +85,9 @@ public class UserService {
         return  typedQuery.getResultList();
     }
 
-    private String getJWTToken(String username){
+    private String getJWTToken(String username, List<Role> roles){
         String secretKey = "v4j4s.k3ny3r?HaGyMa$VaL!";
-        List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER");
+        List<GrantedAuthority> grantedAuthorities = AuthorityUtils.createAuthorityList(roles.stream().map(Role::getName).collect(Collectors.joining(", ")));
 
         String token = Jwts
                 .builder()
