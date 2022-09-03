@@ -24,3 +24,21 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package -Dmaven.test.skip=true --file pom.xml
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Shutdown Ubuntu MySQL (SUDO)
+        run: sudo service mysql stop
+
+      - name: Set up MariaDB
+        uses: getong/mariadb-action@v1.1
+        with:
+          mysql database: 'java'
+          mysql root password: ${{secrets.databaseRootPassword}}
+          mysql user: 'admin'
+          mysql password: ${{secrets.databasePassword}}
+
+      - name: Replace ip address in applications config
+        run: sed -i 's/192.168.2.55/127.0.0.1/g' ./src/main/java/resources/application.properties
