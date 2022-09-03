@@ -42,6 +42,6 @@ jobs:
           mysql password: ${{secrets.databasePassword}}
 
       - name: Replace ip address in applications config
-        run: sed -i 's/192.168.2.55/127.0.0.1/g' ./src/main/java/resources/application.properties
+        run: sed -i 's/192.168.2.55/127.0.0.1/g' ./src/main/resources/application.properties
       - name: Test application
         run: mvn -B verify --file pom.xml
