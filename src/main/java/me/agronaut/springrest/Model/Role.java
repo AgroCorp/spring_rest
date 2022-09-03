@@ -8,22 +8,20 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "ROLES")
+@Table(name = "roles")
 @Getter
 @Setter
 @Component
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ROLE_ID")
-    @NotNull
+    @Column(name = "role_id", nullable = false)
     private Long id;
 
-    @Column(name = "NAME")
-    @NotNull
+    @Column(name = "name", nullable = false)
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "USER_ID",nullable = false)
+    @JoinColumn(name = "user_id",nullable = false)
     private User user;
 }

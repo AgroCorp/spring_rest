@@ -13,13 +13,12 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "USER")
+@Table(name = "user")
 @Getter
 @Setter
 @ToString
 @Component
 public class User {
-    @NotNull
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", nullable = false)

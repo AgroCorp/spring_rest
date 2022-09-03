@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -32,8 +33,7 @@ public class UserService {
     private final Logger log = LoggerFactory.getLogger(UserService.class);
     @Autowired
     UserRepository userRepo;
-    @Autowired
-    PasswordEncoder encoder;
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -46,6 +46,10 @@ public class UserService {
 
     public String login(User loginUser)
     {
+        if (loginUser == null) {
+            throw new EntityNotFoundException("login user is null");
+        }
+
         User login = userRepo.getUserByUsername(loginUser.getUsername());
         if (login != null)
         {
@@ -87,7 +91,12 @@ public class UserService {
 
     private String getJWTToken(String username, List<Role> roles){
         String secretKey = "v4j4s.k3ny3r?HaGyMa$VaL!";
-        List<GrantedAuthority> grantedAuthorities = AuthorityUtils.createAuthorityList(roles.stream().map(Role::getName).collect(Collectors.joining(", ")));
+        List<GrantedAuthority> grantedAuthorities = null;
+        if (roles != null) {
+            grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(roles.stream().map(Role::getName).collect(Collectors.joining(", ")));
+        } else {
+            grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList("");
+        }
 
         String token = Jwts
                 .builder()
