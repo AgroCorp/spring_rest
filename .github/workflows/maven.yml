@@ -29,6 +29,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v3
       - name: Shutdown Ubuntu MySQL (SUDO)
         run: sudo service mysql stop
 
@@ -42,3 +43,5 @@ jobs:
 
       - name: Replace ip address in applications config
         run: sed -i 's/192.168.2.55/127.0.0.1/g' ./src/main/java/resources/application.properties
+      - name: Test application
+        run: mvn -B verify --file pom.xml
