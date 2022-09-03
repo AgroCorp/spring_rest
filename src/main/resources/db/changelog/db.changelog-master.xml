@@ -5,6 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd"
         objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <include file="db/changelog/2022/09/02-01-changelog.xml"/>
     <changeSet id="1653061256278-1" author="gabor (generated)">
         <createSequence cycle="false" incrementBy="1" maxValue="9223372036854775806" minValue="1"
                         sequenceName="hibernate_sequence" startValue="1"/>
