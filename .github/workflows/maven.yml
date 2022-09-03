@@ -44,12 +44,11 @@ jobs:
         uses: getong/mariadb-action@v1.1
         with:
           mysql database: 'java'
-          mysql root password: ${{secrets.databaseRootPassword}}
           mysql user: 'admin'
           mysql password: ${{secrets.databasePassword}}
 
       - name: Replace ip address in applications config
-        run: sed -i 's/192.168.2.55/127.0.0.1/g' ./src/main/resources/application.properties
+        run: sed -i 's/192.168.2.55/127.17.0.1/g' ./src/main/resources/application.properties
 
       - name: Test application
         run: mvn -B verify --file pom.xml
