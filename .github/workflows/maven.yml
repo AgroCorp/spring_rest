@@ -90,5 +90,10 @@ jobs:
         - name: increment version number
           run: mvn validate -DbumpPatch
 
-        - name: push back
+        - name: Commit new version
+          run: |
+            git config --global user.name 'Gabor Horvath'
+            git config --global user.email 'gaborka812@gmail.com'
+            git commit -am "Increment pom version"
+            git push
 
