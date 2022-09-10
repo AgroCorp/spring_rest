@@ -20,18 +20,18 @@
         <changelog-file>/db/changelog/db.changelog-master.xml</changelog-file>
         <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
         <jdbc.url>jdbc:mariadb://192.168.2.55:3306/java</jdbc.url>
-        <jdbc.username>%DB_USER%</jdbc.username>
-        <jdbc.password>%DB_PASSWORD%</jdbc.password>
+        <jdbc.username>admin</jdbc.username>
+        <jdbc.password>Gaborka11</jdbc.password>
     </properties>
 
     <distributionManagement>
         <snapshotRepository>
             <id>maven-snapshots</id>
-            <url>%NEXUS_URL%repository/maven-snapshots/</url>
+            <url>https://nexus.sativus.space/repository/maven-snapshots/</url>
         </snapshotRepository>
         <repository>
             <id>maven-releases</id>
-            <url>%NEXUS_URL%repository/maven-releases/</url>
+            <url>https://nexus.sativus.space/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
 
@@ -181,7 +181,7 @@
                 </executions>
                 <configuration>
                     <serverId>nexus</serverId>
-                    <nexusUrl>%NEXUS_URL%</nexusUrl>
+                    <nexusUrl>https://nexus.sativus.space/</nexusUrl>
                     <skipStaging>true</skipStaging>
                 </configuration>
             </plugin>

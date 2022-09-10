@@ -1,7 +1,7 @@
 <servers>
     <server>
         <id>nexus-snapshots</id>
-        <username>%USER%</username>
-        <password>%PASSWORD%</password>
+        <username>admin</username>
+        <password>Gaborka11</password>
     </server>
 </servers>
