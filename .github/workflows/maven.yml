@@ -24,9 +24,9 @@ jobs:
 
     - name: replace db credentials in pom.xml
       run: |
-        sed -i "s/%DB_USER%/${{secrets.DB_USER}}/g" pom.xml && sed -i "s/%DB_PASSWORD%/${{secrets.databasePassword}}/g" pom.xml && sed -i "s/%NEXUS_URL%/${{secrets.NEXUS_URL}}/g" pom.xml && \
-        sed -i "s/192.168.2.55/127.17.0.1/g" ./src/main/resources/application.properties && \
-        sed -i "s/%DB_USER%/${{secrets.DB_USER}}/g" src/main/resources/application.properties && sed -i "s/%DB_PASSWORD%/${{secrets.databasePassword}}/g" src/main/resources/application.properties
+        sed -i 's/%DB_USER%/${{secrets.DB_USER}}/g' pom.xml && sed -i 's/%DB_PASSWORD%/${{secrets.databasePassword}}/g' pom.xml && sed -i 's/%NEXUS_URL%/${{secrets.NEXUS_URL}}/g' pom.xml && \
+        sed -i 's/192.168.2.55/127.17.0.1/g' ./src/main/resources/application.properties && \
+        sed -i 's/%DB_USER%/${{secrets.DB_USER}}/g' src/main/resources/application.properties && sed -i 's/%DB_PASSWORD%/${{secrets.databasePassword}}/g' src/main/resources/application.properties
 
     - run: mkdir staging && cp target/*.jar staging
     - uses: actions/upload-artifact@v3
@@ -58,9 +58,9 @@ jobs:
 
       - name: replace db credentials in pom.xml
         run: | 
-            sed -i "s/%DB_USER%/${{secrets.DB_USER}}/g" pom.xml && sed -i "s/%DB_PASSWORD%/${{secrets.DATABASEPASSWORD}}/g" pom.xml && sed -i "s/%NEXUS_URL%/${{secrets.NEXUS_URL}}/g" pom.xml && \
-            sed -i "s/192.168.2.55/127.17.0.1/g" ./src/main/resources/application.properties && \
-            sed -i "s/%DB_USER%/${{secrets.DB_USER}}/g" src/main/resources/application.properties && sed -i "s/%DB_PASSWORD%/${{secrets.databasePassword}}/g" src/main/resources/application.properties
+            sed -i 's/%DB_USER%/${{secrets.DB_USER}}/g' pom.xml && sed -i 's/%DB_PASSWORD%/${{secrets.DATABASEPASSWORD}}/g' pom.xml && sed -i 's/%NEXUS_URL%/${{secrets.NEXUS_URL}}/g' pom.xml && \
+            sed -i 's/192.168.2.55/127.17.0.1/g' ./src/main/resources/application.properties && \
+            sed -i 's/%DB_USER%/${{secrets.DB_USER}}/g' src/main/resources/application.properties && sed -i 's/%DB_PASSWORD%/${{secrets.databasePassword}}/g' src/main/resources/application.properties
 
       - name: Test application
         run: mvn -B verify --file pom.xml
@@ -80,9 +80,9 @@ jobs:
             cache: maven
         - name: replace db credentials in pom.xml
           run: |
-            sed -i "s/%DB_USER%/${{secrets.DB_USER}}/g" pom.xml && sed -i "s/%DB_PASSWORD%/${{secrets.DATABASEPASSWORD}}/g" pom.xml && sed -i "s/%NEXUS_URL%/${{secrets.NEXUS_URL}}/g" pom.xml && \
-            sed -i "s/192.168.2.55/127.17.0.1/g" ./src/main/resources/application.properties && \
-            sed -i "s/%DB_USER%/${{secrets.DB_USER}}/g" src/main/resources/application.properties && sed -i "s/%DB_PASSWORD%/${{secrets.databasePassword}}/g" src/main/resources/application.properties
+            sed -i 's/%DB_USER%/${{secrets.DB_USER}}/g' pom.xml && sed -i 's/%DB_PASSWORD%/${{secrets.DATABASEPASSWORD}}/g' pom.xml && sed -i 's/%NEXUS_URL%/${{secrets.NEXUS_URL}}/g' pom.xml && \
+            sed -i 's/192.168.2.55/127.17.0.1/g' ./src/main/resources/application.properties && \
+            sed -i 's/%DB_USER%/${{secrets.DB_USER}}/g' src/main/resources/application.properties && sed -i 's/%DB_PASSWORD%/${{secrets.databasePassword}}/g' src/main/resources/application.properties
 
         - name: deploy to nexus
           run: mvn clean deploy -Dmaven.test.skip=true
