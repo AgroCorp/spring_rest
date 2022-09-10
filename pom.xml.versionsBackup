@@ -11,27 +11,26 @@
 
     <groupId>hu.AgroCorp</groupId>
     <artifactId>springRest</artifactId>
-    <version>2.3.12346</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>springRest</name>
     <description>springRest</description>
-    <packaging>jar</packaging>
     <properties>
         <java.version>17</java.version>
         <changelog-file>/db/changelog/db.changelog-master.xml</changelog-file>
         <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
         <jdbc.url>jdbc:mariadb://192.168.2.55:3306/java</jdbc.url>
-        <jdbc.username>%DB_USER%</jdbc.username>
-        <jdbc.password>%DB_PASSWORD%</jdbc.password>
+        <jdbc.username>admin</jdbc.username>
+        <jdbc.password>Gaborka11</jdbc.password>
     </properties>
 
     <distributionManagement>
         <snapshotRepository>
             <id>maven-snapshots</id>
-            <url>%NEXUS_URL%repository/maven-snapshots/</url>
+            <url>http://192.168.2.55:8083/repository/maven-snapshots/</url>
         </snapshotRepository>
         <repository>
             <id>maven-releases</id>
-            <url>%NEXUS_URL%repository/maven-releases/</url>
+            <url>http://192.168.2.55:8083/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
 
@@ -144,79 +143,13 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>parse-version</id>
-                        <goals>
-                            <goal>parse-version</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
                 <version>2.8.1</version>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>${maven-deploy-plugin.version}</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.5.1</version>
-                <executions>
-                    <execution>
-                        <id>default-deploy</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>deploy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <serverId>nexus</serverId>
-                    <nexusUrl>%NEXUS_URL%</nexusUrl>
-                    <skipStaging>true</skipStaging>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>bump-patch</id>
-            <activation>
-                <property>
-                    <name>bumpPatch</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>versions-maven-plugin</artifactId>
-
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>set</goal>
-                                </goals>
-                                <phase>validate</phase>
-                                <configuration>
-                                    <newVersion>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.nextIncrementalVersion}</newVersion>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
 </project>
