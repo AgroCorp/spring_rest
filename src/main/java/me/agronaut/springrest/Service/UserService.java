@@ -2,6 +2,8 @@ package me.agronaut.springrest.Service;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.Value;
+import lombok.extern.log4j.Log4j2;
 import me.agronaut.springrest.Model.Role;
 import me.agronaut.springrest.Model.User;
 import me.agronaut.springrest.Repository.UserRepository;
@@ -14,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Base64Utils;
 import org.springframework.util.MultiValueMap;
 
 import javax.persistence.EntityManager;
@@ -26,13 +29,18 @@ import javax.persistence.criteria.Root;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@Log4j2
 public class UserService {
-    private final Logger log = LoggerFactory.getLogger(UserService.class);
     @Autowired
     UserRepository userRepo;
+
+    @Autowired
+    private EmailService emailService;
+
     BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     @PersistenceContext
     private EntityManager entityManager;
@@ -44,7 +52,7 @@ public class UserService {
         return userRepo.save(newUser);
     }
 
-    public String login(User loginUser)
+    public User login(User loginUser)
     {
         if (loginUser == null) {
             throw new EntityNotFoundException("login user is null");
@@ -57,7 +65,8 @@ public class UserService {
             if (encoder.matches(loginUser.getPassword(), login.getPassword()))
             {
                 log.info("username and password match!");
-                return getJWTToken(login.getUsername(), login.getRoles());
+                login.setToken(getJWTToken(login.getUsername(), login.getRoles()));
+                return login;
             }
             else {
                 throw new EntityNotFoundException("Password is incorrect");
@@ -108,6 +117,38 @@ public class UserService {
                 .setExpiration(new Date(System.currentTimeMillis() + 600000))
                 .signWith(SignatureAlgorithm.HS512, secretKey.getBytes()).compact();
 
-        return "Bearer " + token;
+        return token;
+    }
+
+    public void reset_password(String email) {
+        User user = userRepo.getUserByEmail(email);
+
+        if(user != null) {
+            String token = Base64Utils.encodeToUrlSafeString(user.getId().toString().getBytes());
+
+            emailService.sendEmail(emailService.NO_REPLY_ADDRESS, user.getEmail(), "Password Reset",
+            "Hello " + user.getUsername() + "\n\n"
+                + "This is a password resetting e-mail.\n"
+                + "Please click to link below to reset your password!\n"
+                + "https://www.sativus.space/set_new_password/" + token);
+        } else {
+            throw new EntityNotFoundException("This email not associated for any user");
+        }
+    }
+
+    public User set_new_password(String newPassword, String token) {
+        Long userId = Long.parseLong(String.valueOf(Base64Utils.decodeFromUrlSafeString(token)));
+
+        User user = userRepo.getById(userId);
+
+        if(user != null) {
+            user.setPassword(encoder.encode(newPassword));
+
+            userRepo.save(user);
+
+            return user;
+        } else {
+            throw new EntityNotFoundException("The reset token not valid pls require new reset email");
+        }
     }
 }

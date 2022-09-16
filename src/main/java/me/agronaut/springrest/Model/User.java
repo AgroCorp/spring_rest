@@ -35,4 +35,7 @@ public class User {
     @OneToMany(mappedBy = "user")
     @ToString.Exclude
     private List<Role> roles;
+
+    @Transient
+    private String token;
 }
