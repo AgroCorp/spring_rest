@@ -30,7 +30,7 @@ class LoginForm extends React.Component {
 
         this.setState({validated : true, loading : true});
 
-        axios.post("http://localhost:8081/login", {"username": this.username, "password": this.password}, ).then(r => {
+        axios.post("http://localhost:8081/auth/login", {"username": this.username, "password": this.password}, ).then(r => {
             console.log(r.data);
             this.setState({loading: false});
             window.sessionStorage.setItem('token', r.data);

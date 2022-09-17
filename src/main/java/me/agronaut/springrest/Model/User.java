@@ -31,6 +31,7 @@ public class User {
     @Column(name = "password") @NotNull private String password;
     @Column(name = "email", unique = true) @NotNull @Email private String email;
     @Column(name = "registration_date") @NotNull @CreatedDate private Date registrationDate;
+    @Column(name = "activ") @NotNull private Boolean activ;
 
     @OneToMany(mappedBy = "user")
     @ToString.Exclude

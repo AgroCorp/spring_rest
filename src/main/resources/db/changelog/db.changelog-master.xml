@@ -50,4 +50,6 @@
                                  referencedColumnNames="user_id" referencedTableName="user"/>
     </changeSet>
 
+    <include file="db/changelog/2022/09/17-01-changelog.xml"/>
+
 </databaseChangeLog>
