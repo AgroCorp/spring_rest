@@ -15,7 +15,9 @@ class Header extends React.Component {
     }
 
     render() {
-        if (this.state.token == null) {
+        const users = this.state.user !== null ? <Nav.Link href={'/users'}>Users</Nav.Link> : "";
+
+        if (this.state.user == null) {
             return <div>
                 <Navbar collapseOnSelect fixed={"top"} expand={'sm'} variant={'dark'} bg={'dark'}>
                     <Container>
@@ -25,7 +27,11 @@ class Header extends React.Component {
                                 <Nav.Link href={"/"}>Home</Nav.Link>
                                 <Nav.Link href={'/login'}>Login</Nav.Link>
                                 <Nav.Link href={'/register'}>Register</Nav.Link>
-                                <Nav.Link href={'/users'}>Users</Nav.Link>
+                                {users}
+
+                                {this.state.user &&
+                                    <Nav.Link href={'/users'}>Users</Nav.Link>
+                                }
                             </Nav>
                         </Navbar.Collapse>
                     </Container>

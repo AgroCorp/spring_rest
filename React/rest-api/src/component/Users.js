@@ -21,7 +21,7 @@ class Users extends React.Component {
 
     componentDidMount() {
         this.setState({loading:true});
-        axios.post("http://localhost:8081/users",  JSON.stringify(this.searchForm), { headers: {"Authorization" : this.token, 'content-type': 'application/x-www-form-urlencoded'} }).then(r=>{
+        axios.post("http://localhost:8081/users",  JSON.stringify(this.searchForm), { headers: {'content-type': 'application/x-www-form-urlencoded'} }).then(r=>{
             this.setState({loading:false});
             this.setState({data:r.data});
         }).catch(e => {
@@ -74,6 +74,10 @@ class Users extends React.Component {
                         <td><input type={"text"} name={"lastName"} onChange={e => { this.searchForm.set("lastName", e.target.value)}} /></td>
                         <td>Email: </td>
                         <td><input type={"text"} name={"email"} onChange={event => this.searchForm.set("email", event.target.value)} /></td>
+                    </tr>
+                    <tr>
+                        <td>Active: </td>
+                        <td><input type={"checkbox"} name={"active"} onChange={e=>this.searchForm.set("active", e.target.value)} /></td>
                     </tr>
                     </tbody>
                 </table>

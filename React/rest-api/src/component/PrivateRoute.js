@@ -4,11 +4,9 @@ import decode from 'jwt-decode';
 
 const isAuthenticated = () => {
     const token = localStorage.getItem('token');
-    const refreshToken = localStorage.getItem('refreshToken');
     try {
         decode(token);
-        decode(refreshToken);
-        console.log([decode(token),decode(refreshToken)])
+        console.log([decode(token)])
         return true;
     } catch (error) {
         return false;

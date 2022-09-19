@@ -16,7 +16,7 @@ public class EmailService {
     @Autowired
     private JavaMailSender sender;
 
-    @Value("${email.noreply}")
+    @Value("email.noreply")
     public static String NO_REPLY_ADDRESS;
 
     public void sendEmail(String from, String to, String subject, String msg) {

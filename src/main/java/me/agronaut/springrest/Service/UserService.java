@@ -2,19 +2,14 @@ package me.agronaut.springrest.Service;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import me.agronaut.springrest.Model.Role;
 import me.agronaut.springrest.Model.User;
 import me.agronaut.springrest.Repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.MultiValueMap;
@@ -26,10 +21,10 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,11 +40,22 @@ public class UserService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public User save(User newUser)
+    public User register(User newUser)
     {
         newUser.setPassword(encoder.encode(newUser.getPassword()));
         newUser.setRegistrationDate(new Date());
-        return userRepo.save(newUser);
+        newUser.setActive(false);
+        log.debug("new user", newUser);
+        User registeredUser = userRepo.save(newUser);
+
+        String token = Arrays.toString(Base64Utils.encode(registeredUser.getId().toString().getBytes()));
+
+        emailService.sendEmail(EmailService.NO_REPLY_ADDRESS, registeredUser.getEmail(), "Confirm Registration",
+                "Hello" + registeredUser.getUsername() + "!\n\n" +
+                "Please click the link below to activate your account" +
+                "http://www.sativus.space/auth/activate/" + token);
+
+        return registeredUser;
     }
 
     public User login(User loginUser)
@@ -100,14 +106,12 @@ public class UserService {
 
     private String getJWTToken(String username, List<Role> roles){
         String secretKey = "v4j4s.k3ny3r?HaGyMa$VaL!";
-        List<GrantedAuthority> grantedAuthorities = null;
-        if (roles != null) {
-            grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(roles.stream().map(Role::getName).collect(Collectors.joining(", ")));
-        } else {
-            grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList("");
-        }
+        List<GrantedAuthority> grantedAuthorities = roles != null ?
+                AuthorityUtils.commaSeparatedStringToAuthorityList(roles.stream().map(Role::getName).collect(Collectors.joining(", "))) :
+                AuthorityUtils.commaSeparatedStringToAuthorityList("");
 
-        String token = Jwts
+
+        return Jwts
                 .builder()
                 .setId("RestAgroTest")
                 .setSubject(username)
@@ -116,8 +120,6 @@ public class UserService {
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 600000))
                 .signWith(SignatureAlgorithm.HS512, secretKey.getBytes()).compact();
-
-        return token;
     }
 
     public void reset_password(String email) {
@@ -126,7 +128,7 @@ public class UserService {
         if(user != null) {
             String token = Base64Utils.encodeToUrlSafeString(user.getId().toString().getBytes());
 
-            emailService.sendEmail(emailService.NO_REPLY_ADDRESS, user.getEmail(), "Password Reset",
+            emailService.sendEmail(EmailService.NO_REPLY_ADDRESS, user.getEmail(), "Password Reset",
             "Hello " + user.getUsername() + "\n\n"
                 + "This is a password resetting e-mail.\n"
                 + "Please click to link below to reset your password!\n"
@@ -137,18 +139,14 @@ public class UserService {
     }
 
     public User set_new_password(String newPassword, String token) {
-        Long userId = Long.parseLong(String.valueOf(Base64Utils.decodeFromUrlSafeString(token)));
+        Long userId = Long.parseLong(Arrays.toString(Base64Utils.decodeFromUrlSafeString(token)));
 
         User user = userRepo.getById(userId);
 
-        if(user != null) {
-            user.setPassword(encoder.encode(newPassword));
+        user.setPassword(encoder.encode(newPassword));
 
-            userRepo.save(user);
+        userRepo.save(user);
 
-            return user;
-        } else {
-            throw new EntityNotFoundException("The reset token not valid pls require new reset email");
-        }
+        return user;
     }
 }

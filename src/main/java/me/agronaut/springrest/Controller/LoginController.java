@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,10 +31,12 @@ public class LoginController {
 
 
     @PostMapping("/register")
-    public User register(@RequestBody User newUser)
+    public ResponseEntity<User> register(@RequestBody User newUser)
     {
-        System.out.println(newUser.toString());
-        return service.save(newUser);
+        log.debug("START");
+        User registeredUser = service.register(newUser);
+
+        return new ResponseEntity<>(registeredUser, HttpStatus.OK);
     }
 
     @PostMapping("/login")
@@ -52,6 +56,8 @@ public class LoginController {
         return new ResponseEntity<>(service.set_new_password(newPassword, token), HttpStatus.OK);
     }
 
+//    @PreAuthorize("hasRole('ADMIN')")
+    @Secured("ADMIN")
     @PostMapping("/list_all_user")
     public List<User> getAll(@RequestBody MultiValueMap<String, String> formData) {
         log.info("getUsers called");

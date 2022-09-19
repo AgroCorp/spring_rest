@@ -5,13 +5,13 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd"
         objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
-    <changeSet id="1663395916681-1" author="gabor (generated)">
+    <changeSet id="1663521622643-1" author="gabor (generated)">
         <addColumn tableName="user">
-            <column name="activ" type="BOOLEAN"/>
+            <column name="active" type="BOOLEAN"/>
         </addColumn>
     </changeSet>
-    <changeSet id="1663395916681-2" author="gabor (generated)">
-        <addNotNullConstraint columnDataType="BOOLEAN" columnName="activ" tableName="user"/>
+    <changeSet id="1663521622643-2" author="gabor (generated)">
+        <addNotNullConstraint columnDataType="BOOLEAN" columnName="active" tableName="user"/>
     </changeSet>
 
 </databaseChangeLog>

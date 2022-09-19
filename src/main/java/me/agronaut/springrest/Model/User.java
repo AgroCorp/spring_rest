@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -18,7 +19,7 @@ import java.util.List;
 @Setter
 @ToString
 @Component
-public class User {
+public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", nullable = false)
@@ -31,7 +32,7 @@ public class User {
     @Column(name = "password") @NotNull private String password;
     @Column(name = "email", unique = true) @NotNull @Email private String email;
     @Column(name = "registration_date") @NotNull @CreatedDate private Date registrationDate;
-    @Column(name = "activ") @NotNull private Boolean activ;
+    @Column(name = "active", nullable = false) @NotNull private Boolean active;
 
     @OneToMany(mappedBy = "user")
     @ToString.Exclude
