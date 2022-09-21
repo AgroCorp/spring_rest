@@ -1,23 +1,25 @@
 import React from "react";
 import {Button, Form, FormGroup} from "react-bootstrap";
-import { ToastContainer, toast } from 'react-toastify';
+
 import axios from "axios";
 import {setAuthToken} from "./axiosDefault";
-import BaseSite from "./baseSite";
+import BaseSite, {showNotification} from "./baseSite";
 
 import 'react-toastify/dist/ReactToastify.css';
 
 class LoginForm extends React.Component {
+    queryParams = new URLSearchParams(window.location.search);
+    username = "";
+    password = "";
+    next = this.queryParams.has("next") ? this.queryParams.get("next") : "/";
     constructor(props) {
         super(props);
-        const queryParams = new URLSearchParams(window.location.search);
         this.state = {
             loading : false,
             validated : true,
             error : "",
-            username : "",
-            password : "",
-            next : queryParams.has("next") ? queryParams.get("next") : "/"
+            usernameError: "",
+            passwordError: ""
         };
 
         this.handleClick = this.handleClick.bind(this);
@@ -34,99 +36,58 @@ class LoginForm extends React.Component {
 
         this.setState({validated : true, loading : true});
 
-        axios.post("http://localhost:8081/auth/login", {"username": this.username, "password": this.password}, ).then(r => {
-            console.log(r.data);
+        axios.post("http://localhost:8081/auth/login", {"username": this.username, "password": this.password}, {headers: {'Content-type': 'application/json'}} ).then(r => {
             this.setState({loading: false});
-            localStorage.setItem('user', r.data);
+            localStorage.setItem('user', JSON.stringify(r.data));
 
+            console.log(r.data.token);
             setAuthToken(r.data.token);
 
             window.location.pathname = this.next;
 
         }).catch(e => {
-            e.response ?
-                this.setState({error: e.response.data.message}) :
-                this.setState({error: "Keresre nem erkezett valasz"});
+            const errorMessage = e.response ? e.response.data.debugMessage : e;
+            errorMessage.toLowerCase().includes("user") ?
+                this.setState({usernameError: errorMessage}) :
+                this.setState({passwordError : errorMessage});
+
             this.setState({loading: false});
-            this.showNotification("error", this.state.error);
+            showNotification("error", "Login failed!");
         });
     }
 
     handleTextChange(event) {
         if (event.target.id === "username") {
-            this.setState({username : event.target.value});
+            this.username = event.target.value;
         } else {
-            this.setState({password : event.target.value});
+            this.password = event.target.value;
         }
-    }
 
-    showNotification(type, msg) {
-        switch (type) {
-            case "error":
-                toast.error(msg, {
-                    position: "bottom-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                })
-                break;
-            case "info":
-                toast.info(msg, {
-                    position: "bottom-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
-                break;
-            case "success":
-                toast.success(msg, {
-                    position: "bottom-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
-                break;
-        }
-    }
+        this.username.length === 0 ?
+            this.setState({usernameError: "this field is required"})
+            : this.setState({usernameError: ""});
 
+        this.password.length === 0 ?
+            this.setState({passwordError: "this field is required"})
+            : this.setState({passwordError: ""});
+    }
 
     render() {
-        const {error, username,  password} = this.state;
         return(
         <BaseSite>
-            <Form style={{paddingTop: 55, width: 500}} onSubmit={this.handleClick}>
+            <Form onSubmit={this.handleClick}>
                          <Form.Group className="mb-3">
                              <Form.Label>Felhasznalonev:</Form.Label>
-                             <Form.Control isInvalid={(error.includes("username") || username.length === 0)} isValid={!error.includes("username") && username.length > 0} id={"username"} type={"text"} placeholder={"Felhasznalonev"} onChange={this.handleTextChange} required/>
-                             <Form.Control.Feedback type={"invalid"}>{error.includes("username") ? error : ""}</Form.Control.Feedback>
+                             <Form.Control isInvalid={this.state.usernameError.length > 0} isValid={this.state.usernameError.length === 0} id={"username"} type={"text"} placeholder={"Felhasznalonev"} onChange={this.handleTextChange} required/>
+                             <Form.Control.Feedback type={"invalid"}>{this.state.usernameError}</Form.Control.Feedback>
                          </Form.Group>
                          <FormGroup className={"mb-3"}>
                              <Form.Label>Jelszo:</Form.Label>
-                             <Form.Control isInvalid={password.length < 8} isValid={password.length >= 8} id={"password"} type={"password"} onChange={this.handleTextChange} required/>
-                             <Form.Control.Feedback type={"invalid"}>{error.includes("password") ? error : ""}</Form.Control.Feedback>
+                             <Form.Control isInvalid={this.state.passwordError.length > 0} isValid={this.state.passwordError.length === 0} id={"password"} type={"password"} onChange={this.handleTextChange} required/>
+                             <Form.Control.Feedback type={"invalid"}>{this.state.passwordError}</Form.Control.Feedback>
                          </FormGroup>
                          <Button type={"submit"} variant={"primary"}>Belep</Button>
                      </Form>
-            <ToastContainer
-                position="bottom-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-            />
         </BaseSite>
         )
     }

@@ -6,6 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import me.agronaut.springrest.Model.Role;
 import me.agronaut.springrest.Model.User;
 import me.agronaut.springrest.Repository.UserRepository;
+import org.hibernate.internal.ExceptionConverterImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
@@ -20,11 +22,9 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,16 +40,22 @@ public class UserService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public User register(User newUser)
+    public User register(User newUser) throws UserExistByEmailException
     {
         newUser.setPassword(encoder.encode(newUser.getPassword()));
         newUser.setRegistrationDate(new Date());
         newUser.setActive(false);
-        log.debug("new user", newUser);
+        log.debug("new user save to the database: \n\t{}", newUser);
+
+        if (userRepo.existsUserByEmail(newUser.getEmail())) {
+            log.warn("Email cim mar foglalat!!");
+            throw new UserExistByEmailException("User exists with given email address!");
+        }
+
         User registeredUser = userRepo.save(newUser);
 
         String token = Arrays.toString(Base64Utils.encode(registeredUser.getId().toString().getBytes()));
-
+        log.debug("token: \n\t{}", token);
         emailService.sendEmail(EmailService.NO_REPLY_ADDRESS, registeredUser.getEmail(), "Confirm Registration",
                 "Hello" + registeredUser.getUsername() + "!\n\n" +
                 "Please click the link below to activate your account" +
@@ -58,8 +64,7 @@ public class UserService {
         return registeredUser;
     }
 
-    public User login(User loginUser)
-    {
+    public User login(User loginUser) throws NotActiveUserException {
         if (loginUser == null) {
             throw new EntityNotFoundException("login user is null");
         }
@@ -67,7 +72,9 @@ public class UserService {
         User login = userRepo.getUserByUsername(loginUser.getUsername());
         if (login != null)
         {
-            log.info("user not null");
+            if (!login.getActive()) {
+                throw new NotActiveUserException("user is not activated");
+            }
             if (encoder.matches(loginUser.getPassword(), login.getPassword()))
             {
                 log.info("username and password match!");
@@ -82,7 +89,7 @@ public class UserService {
         }
     }
 
-    public List<User> getAll(MultiValueMap<String, String> formData)
+    public List<User> getAll(User user)
     {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
@@ -90,14 +97,20 @@ public class UserService {
 
         Root<User> root = query.from(User.class);
 
-        if (formData != null && !formData.isEmpty()) {
-            for (Map.Entry<String, List<String>> iter : formData.entrySet()) {
-                log.info("key: " + iter.getKey() + "\tvalue: " + iter.getValue());
-                if(!iter.getKey().equals("{}") && !iter.getValue().get(0).equals("[]")) {
-                    query.where(builder.and(builder.equal(root.get(iter.getKey()), iter.getValue().get(0))));
-                }
+        LinkedList<Predicate> whereCauses = new LinkedList<>();
+        if (user != null) {
+            if (user.getFirstName() != null && !user.getFirstName().isBlank()) {
+                whereCauses.add(builder.like(root.get("firstName"), "%" + user.getFirstName() + "%"));
+            }
+            if(user.getLastName() != null && !user.getLastName().isBlank()) {
+                whereCauses.add(builder.like(root.get("lastName"), "%" + user.getLastName() + "%"));
+            }
+            if (user.getUsername() != null && !user.getUsername().isBlank()) {
+                whereCauses.add(builder.equal(root.get("username"), user.getUsername()));
             }
         }
+
+        query.where(whereCauses.toArray(new Predicate[0]));
 
         TypedQuery<User> typedQuery = entityManager.createQuery(query);
 
@@ -148,5 +161,17 @@ public class UserService {
         userRepo.save(user);
 
         return user;
+    }
+
+    public static class NotActiveUserException extends Exception {
+        public NotActiveUserException(String cause) {
+            super(cause);
+        }
+    }
+
+    public static class UserExistByEmailException extends Exception {
+        public UserExistByEmailException(String cause) {
+            super(cause);
+        }
     }
 }

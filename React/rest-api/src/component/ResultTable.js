@@ -1,10 +1,14 @@
 import React from "react";
-import {Table} from "react-bootstrap"
+import {Table, Container} from "react-bootstrap"
 
 class ResultTable extends React.Component {
+    showModal() {
+        console.log("hello")
+    }
+
     render(){
-        return <div style={{justifyContent: "center", alignItems: "center", display: "flex"}}>
-            <Table variant={"dark"} bg={"dark"} style={{width:"50%"}}>
+        return <Container >
+            <Table variant={"light"}>
                 <thead>
                     <tr>
                         <th>#</th>
@@ -19,19 +23,19 @@ class ResultTable extends React.Component {
                 {
                     this.props.data.map(row => {
                         return (
-                            <tr key={row.id}>
+                            <tr key={row.id} onDoubleClick={this.showModal()}>
                                 <td>{row.id}</td>
-                                <td>{row.username}</td>
-                                <td>{row.email}</td>
                                 <td>{row.firstName}</td>
                                 <td>{row.lastName}</td>
+                                <td>{row.username}</td>
+                                <td>{row.email}</td>
                             </tr>
                         )
                     })
                 }
                 </tbody>
             </Table>
-        </div>
+        </Container>
     }
 }
 

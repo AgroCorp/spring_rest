@@ -17,8 +17,10 @@ render(
             <Route path={'/'} element={<App/>} />
             <Route path={'login'} element={<LoginForm/>} />
             <Route path={'register'} element={<RegisterForm/>} />
-            <Route path={'users'} element={<PrivateRoute/>} >
-                <Route path={'users'} element={<Users/>} />
+            <Route path={'users'} element={<PrivateRoute>
+                <Users/>
+            </PrivateRoute>} >
+
             </Route>
         </Routes>
     </BrowserRouter>,

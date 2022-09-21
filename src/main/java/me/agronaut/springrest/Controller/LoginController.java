@@ -2,6 +2,7 @@ package me.agronaut.springrest.Controller;
 
 import lombok.extern.log4j.Log4j2;
 import me.agronaut.springrest.Model.User;
+import me.agronaut.springrest.Model.UserDao;
 import me.agronaut.springrest.Service.UserService;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")
@@ -31,18 +33,19 @@ public class LoginController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User newUser)
+    public UserDao register(@RequestBody User newUser) throws UserService.UserExistByEmailException
     {
         log.debug("START");
         User registeredUser = service.register(newUser);
 
-        return new ResponseEntity<>(registeredUser, HttpStatus.OK);
+        return new UserDao(registeredUser);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody User loginUser)
+    public UserDao login(@RequestBody User loginUser) throws UserService.NotActiveUserException
     {
-        return new ResponseEntity<>(service.login(loginUser), HttpStatus.OK);
+        log.info("requestben kapott user: \n\t{}", loginUser);
+        return new UserDao(service.login(loginUser));
     }
 
     @PostMapping("/forgot_password")
@@ -52,17 +55,15 @@ public class LoginController {
     }
 
     @PostMapping("/set_new_password/{token}")
-    public ResponseEntity<User> setNewPassword(@PathVariable String token, @RequestBody String newPassword) {
-        return new ResponseEntity<>(service.set_new_password(newPassword, token), HttpStatus.OK);
+    public UserDao setNewPassword(@PathVariable String token, @RequestBody String newPassword) {
+        return new UserDao(service.set_new_password(newPassword, token));
     }
 
-//    @PreAuthorize("hasRole('ADMIN')")
     @Secured("ADMIN")
-    @PostMapping("/list_all_user")
-    public List<User> getAll(@RequestBody MultiValueMap<String, String> formData) {
-        log.info("getUsers called");
-        log.info("formdata: " + formData);
+    @PostMapping(value = "/list_all_user", consumes = "application/json", produces = "application/json")
+    public List<UserDao> getAll(@RequestBody User user) {
+        log.info("user to search: " + user);
 
-        return service.getAll(formData);
+        return service.getAll(user).stream().map(UserDao::new).collect(Collectors.toList());
     }
 }

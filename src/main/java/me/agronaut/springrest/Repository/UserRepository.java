@@ -13,4 +13,6 @@ import java.util.Map;
 public interface UserRepository extends JpaRepository<User, Long> {
     User getUserByUsername(String username);
     User getUserByEmail(String email);
+
+    Boolean existsUserByEmail(String email);
 }

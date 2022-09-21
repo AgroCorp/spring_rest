@@ -4,13 +4,12 @@ import {Form, Button, FormGroup} from "react-bootstrap";
 import BaseSite from "./baseSite";
 
 class RegisterForm extends React.Component {
-    tempPassword;
-    tempRePassword;
-
     username;
     password;
     rePassword;
     email;
+    firstName;
+    lastName;
 
     constructor(props) {
         super(props);
@@ -41,11 +40,12 @@ class RegisterForm extends React.Component {
         axios.post("http://localhost:8081/auth/register", {"username": this.username,
             "password": this.password,
             "email": this.email}).then(r => {
-            console.log(r.data);
-            this.setState({loading: false});
-            window.sessionStorage.setItem('token', r.data);
 
         }).catch(e => {
+            if(e.response.data.message === "User exists with given email address!") {
+                this.setState({emailError: e.response.data.debugMessage});
+            }
+
             this.setState({error: e.response.data.message});
             this.setState({loading: false});
         });
@@ -70,7 +70,7 @@ class RegisterForm extends React.Component {
                 this.setState({usernameError: "Felhasznalonevet kotelezo megadni"}) :
                 this.setState({usernameError: ""});
         }
-        if (key === "password") {
+        else if (key === "password") {
             this.password = event.target.value
             let errors = []
             if(this.password.length < 8){
@@ -87,7 +87,7 @@ class RegisterForm extends React.Component {
                 this.setState({rePasswordError: ""});
             }
         }
-        if (key === "rePassword") {
+        else if (key === "rePassword") {
             this.rePassword = event.target.value
             if (this.password !== this.rePassword) {
                 this.setState({rePasswordError: "A jelszo nem egyezik!"});
@@ -95,12 +95,18 @@ class RegisterForm extends React.Component {
                 this.setState({rePasswordError: ""});
             }
         }
+        else if (key === "firtName") {
+            this.firstName = event.target.value;
+        }
+        else if (key === "lastName") {
+            this.lastName = event.target.value;
+        }
     }
 
     render() {
         return (
         <BaseSite>
-            <Form style={{paddingTop: 55, width: 500}} onSubmit={this.handleClick}>
+            <Form onSubmit={this.handleClick}>
                 <Form.Group className="mb-3">
                     <Form.Label>Felhasználónév:</Form.Label>
                     <Form.Control isInvalid={this.state.usernameError.length !== 0} isValid={this.state.usernameError.length === 0} id={"username"} type={"text"} placeholder={"Felhasznalonev"} onChange={this.handleTextChange} required/>
@@ -125,6 +131,15 @@ class RegisterForm extends React.Component {
                     <Form.Control isInvalid={this.state.emailError.length > 0} isValid={this.state.emailError.length === 0} id={"email"} type={"email"} onChange={this.handleTextChange} required/>
                     <Form.Control.Feedback type={"invalid"}>{this.state.emailError}</Form.Control.Feedback>
                 </FormGroup>
+
+                <FormGroup>
+                    <Form.Label>Vezetéknév: </Form.Label>
+                    <Form.Control id={"lastName"} type={"text"} onChange={this.handleTextChange} />
+
+                    <Form.Label>Keresztnév: </Form.Label>
+                    <Form.Control id={"firstName"} type={"text"} onChange={this.handleTextChange} />
+                </FormGroup>
+
                 <Button type={"submit"} variant={"primary"}>Regisztáció</Button>
                 {this.state.loading ? <span>Regisztráció folyamatban...</span> : ""}
             </Form>

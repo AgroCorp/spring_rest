@@ -1,9 +1,11 @@
 package me.agronaut.springrest.Model;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -19,7 +21,7 @@ import java.util.List;
 @Setter
 @ToString
 @Component
-public class User implements Serializable {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", nullable = false)
@@ -30,11 +32,11 @@ public class User implements Serializable {
     @Column(name = "username", unique = true)
     @NotNull private String username;
     @Column(name = "password") @NotNull private String password;
-    @Column(name = "email", unique = true) @NotNull @Email private String email;
+    @Column(name = "email", unique = true) @NotNull @Email  private String email;
     @Column(name = "registration_date") @NotNull @CreatedDate private Date registrationDate;
     @Column(name = "active", nullable = false) @NotNull private Boolean active;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     @ToString.Exclude
     private List<Role> roles;
 
