@@ -49,6 +49,9 @@
         <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="roles" constraintName="FK_ROLES_ON_USER"
                                  referencedColumnNames="user_id" referencedTableName="user"/>
     </changeSet>
+
     <include file="db/changelog/2022/09/18-01-changelog.xml"/>
+    <include file="db/changelog/2022/09/24-01-changelog.xml"/>
+    <include file="db/changelog/2022/09/24-02-changelog.xml"/>
 
 </databaseChangeLog>

@@ -1,17 +1,14 @@
 package me.agronaut.springrest.Model;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Component;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -20,7 +17,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-@Component
+@EntityListeners(AuditingEntityListener.class)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,7 +34,6 @@ public class User {
     @Column(name = "active", nullable = false) @NotNull private Boolean active;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    @ToString.Exclude
     private List<Role> roles;
 
     @Transient
