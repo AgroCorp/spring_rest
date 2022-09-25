@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -24,15 +26,13 @@ public class LoginController {
     @PostMapping("/register")
     public User register(@RequestBody User newUser) throws UserService.UserExistByEmailException
     {
-        log.debug("START");
-
         return service.register(newUser);
     }
 
     @PostMapping("/login")
     public User login(@RequestBody User loginUser) throws UserService.NotActiveUserException
     {
-        log.info("requestben kapott user: \n\t{}", loginUser);
+        log.debug("requestben kapott user: \n\t{}", loginUser);
         return service.login(loginUser);
     }
 
@@ -44,7 +44,8 @@ public class LoginController {
 
     @PostMapping("/set_new_password/{token}")
     public User setNewPassword(@PathVariable String token, @RequestBody String newPassword) {
-        return service.set_new_password(newPassword, token);
+        Long userId = Long.parseLong(URLDecoder.decode(token, StandardCharsets.UTF_8));
+        return service.set_new_password(newPassword, userId);
     }
 
     @Secured("ADMIN")

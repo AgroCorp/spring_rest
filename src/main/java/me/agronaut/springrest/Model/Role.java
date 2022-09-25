@@ -1,5 +1,6 @@
 package me.agronaut.springrest.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +24,7 @@ public class Role {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonIgnoreProperties
+    @JsonBackReference
     private User user;
 
 }

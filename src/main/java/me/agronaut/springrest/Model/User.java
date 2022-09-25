@@ -1,5 +1,6 @@
 package me.agronaut.springrest.Model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -34,6 +35,7 @@ public class User {
     @Column(name = "active", nullable = false) @NotNull private Boolean active;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @JsonManagedReference
     private List<Role> roles;
 
     @Transient

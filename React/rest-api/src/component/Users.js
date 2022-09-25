@@ -1,14 +1,15 @@
 import React from "react";
-import Header from "./header";
 import axios from "axios";
 import ResultTable from "./ResultTable";
 import {Button, Container, Row} from "react-bootstrap";
 import BaseSite from "./baseSite";
 
 class Users extends React.Component {
-    searchForm = {};
     constructor(props) {
         super(props);
+
+        this.searchForm = {};
+        this.initForm();
 
         this.state = {
             data: props.data,
@@ -21,7 +22,7 @@ class Users extends React.Component {
 
     componentDidMount() {
         this.setState({loading:true});
-        axios.post("http://localhost:8081/auth/list_all_user",  JSON.stringify(this.searchForm), { headers: {'content-type': 'application/x-www-form-urlencoded'} }).then(r=>{
+        axios.post("http://localhost:8081/auth/list_all_user",  this.searchForm).then(r=>{
             this.setState({loading:false});
             this.setState({data:r.data});
         }).catch(e => {
@@ -33,7 +34,7 @@ class Users extends React.Component {
 
     search() {
         this.setState({loading: true});
-        axios.post("http://localhost:8081/auth/list_all_user", this.searchForm, { headers: {'content-type': 'application/json'} } )
+        axios.post("http://localhost:8081/auth/list_all_user", this.searchForm)
             .then(r=>{
                 console.log(r.data);
                 this.setState({loading:false});
@@ -44,6 +45,13 @@ class Users extends React.Component {
             })
     }
 
+    initForm() {
+        this.searchForm['lastName'] = null;
+        this.searchForm['firstName'] = null;
+        this.searchForm['email'] = null;
+        this.searchForm['username'] = null;
+        this.searchForm['active'] = true;
+    }
 
     render() {
         return <>
@@ -66,7 +74,7 @@ class Users extends React.Component {
                             </tr>
                             <tr>
                                 <td>Active: </td>
-                                <td><input type={"checkbox"} name={"active"} onChange={e => this.searchForm[e.target.name] = e.target.value} /></td>
+                                <td><input type={"checkbox"} name={"active"} defaultChecked={true} onChange={e => {this.searchForm[e.target.name] = e.target.checked; console.log(e.target.checked);}} /></td>
                             </tr>
                             </tbody>
                         </table>

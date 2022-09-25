@@ -10,6 +10,7 @@ import LoginForm from "./component/loginForm";
 import RegisterForm from "./component/RegisterForm";
 import Users from "./component/Users";
 import PrivateRoute from "./component/PrivateRoute";
+import {PasswordList} from "./component/password/PasswordList";
 
 render(
     <BrowserRouter>
@@ -19,9 +20,10 @@ render(
             <Route path={'register'} element={<RegisterForm/>} />
             <Route path={'users'} element={<PrivateRoute>
                 <Users/>
-            </PrivateRoute>} >
-
-            </Route>
+            </PrivateRoute>}></Route>
+            <Route path={'passwords'} element={<PrivateRoute>
+                <PasswordList/>
+            </PrivateRoute>}></Route>
         </Routes>
     </BrowserRouter>,
   document.getElementById('root')

@@ -3,9 +3,7 @@ import {Button, Form, FormGroup} from "react-bootstrap";
 
 import axios from "axios";
 import {setAuthToken} from "./axiosDefault";
-import BaseSite, {showNotification} from "./baseSite";
-
-import 'react-toastify/dist/ReactToastify.css';
+import BaseSite, {apiUrl, showNotification} from "./baseSite";
 
 class LoginForm extends React.Component {
     queryParams = new URLSearchParams(window.location.search);
@@ -36,11 +34,11 @@ class LoginForm extends React.Component {
 
         this.setState({validated : true, loading : true});
 
-        axios.post("http://localhost:8081/auth/login", {"username": this.username, "password": this.password}, {headers: {'Content-type': 'application/json'}} ).then(r => {
+        axios.post(`${apiUrl}/auth/login`, {"username": this.username, "password": this.password}).then(r => {
             this.setState({loading: false});
             localStorage.setItem('user', JSON.stringify(r.data));
 
-            console.log(r.data.token);
+
             setAuthToken(r.data.token);
 
             window.location.pathname = this.next;

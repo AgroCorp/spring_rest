@@ -2,7 +2,11 @@ import React from "react";
 import {Navbar, Container, Nav} from "react-bootstrap";
 
 class Header extends React.Component {
-    user = localStorage.getItem("user");
+    constructor(props) {
+        super(props);
+
+        this.user = JSON.parse(localStorage.getItem("user"));
+    }
 
     handleLogout() {
         localStorage.removeItem("user");
@@ -14,7 +18,7 @@ class Header extends React.Component {
             return <div style={{paddingBottom: 10}}>
                 <Navbar collapseOnSelect fixed={"top"} expand={'sm'} variant={'dark'} bg={'dark'}>
                     <Container>
-                        <Navbar.Brand href={'/'}>CashApp</Navbar.Brand>
+                        <Navbar.Brand href={'/'}>Password Manager</Navbar.Brand>
                         <Navbar.Toggle aria-controls={'responsive-navbar-nav'}/>
                         <Navbar.Collapse id={'responsive-navbar-nav'}>
                             <Nav activeKey={window.location.pathname}>
@@ -33,7 +37,7 @@ class Header extends React.Component {
             return <div style={{paddingBottom: 10}}>
                 <Navbar collapseOnSelect fixed={"top"} expand={'sm'} variant={'dark'} bg={'dark'}>
                     <Container>
-                        <Navbar.Brand href={'/'}>CashApp</Navbar.Brand>
+                        <Navbar.Brand href={'/'}>Password Manager</Navbar.Brand>
                         <Navbar.Toggle aria-controls={'responsive-navbar-nav'}/>
                         <Navbar.Collapse id={'responsive-navbar-nav'}>
                             <Nav activeKey={window.location.pathname}>
@@ -42,6 +46,7 @@ class Header extends React.Component {
                                 <Nav.Link href={'/users'}>Users</Nav.Link>
                             </Nav>
                         </Navbar.Collapse>
+                        <Navbar.Text>{this.user.username}</Navbar.Text>
                     </Container>
                 </Navbar>
             </div>

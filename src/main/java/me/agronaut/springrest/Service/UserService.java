@@ -8,6 +8,7 @@ import me.agronaut.springrest.Model.User;
 import me.agronaut.springrest.Repository.UserRepository;
 import org.hibernate.internal.ExceptionConverterImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,24 +25,32 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @Log4j2
 public class UserService {
-    @Autowired
     UserRepository userRepo;
+    private final EmailService emailService;
 
     @Autowired
-    private EmailService emailService;
+    public UserService(UserRepository userRepo, EmailService emailService) {
+        this.userRepo = userRepo;
+        this.emailService = emailService;
+    }
 
     BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     @PersistenceContext
     private EntityManager entityManager;
 
-    public User register(User newUser) throws UserExistByEmailException
-    {
+    @Value("${apiUrl}")
+    private String apiUrl;
+
+    public User register(User newUser) throws UserExistByEmailException {
         newUser.setPassword(encoder.encode(newUser.getPassword()));
         newUser.setRegistrationDate(new Date());
         newUser.setActive(false);
@@ -58,8 +67,8 @@ public class UserService {
         log.debug("token: \n\t{}", token);
         emailService.sendEmail(EmailService.NO_REPLY_ADDRESS, registeredUser.getEmail(), "Confirm Registration",
                 "Hello" + registeredUser.getUsername() + "!\n\n" +
-                "Please click the link below to activate your account" +
-                "http://www.sativus.space/auth/activate/" + token);
+                        "Please click the link below to activate your account" +
+                        "http://www.sativus.space/auth/activate/" + token);
 
         return registeredUser;
     }
@@ -70,18 +79,15 @@ public class UserService {
         }
 
         User login = userRepo.getUserByUsername(loginUser.getUsername());
-        if (login != null)
-        {
+        if (login != null) {
             if (!login.getActive()) {
                 throw new NotActiveUserException("user is not activated");
             }
-            if (encoder.matches(loginUser.getPassword(), login.getPassword()))
-            {
+            if (encoder.matches(loginUser.getPassword(), login.getPassword())) {
                 log.info("username and password match!");
                 login.setToken(getJWTToken(login.getUsername(), login.getRoles()));
                 return login;
-            }
-            else {
+            } else {
                 throw new EntityNotFoundException("Password is incorrect");
             }
         } else {
@@ -89,8 +95,7 @@ public class UserService {
         }
     }
 
-    public List<User> getAll(User user)
-    {
+    public List<User> getAll(User user) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
         CriteriaQuery<User> query = builder.createQuery(User.class);
@@ -102,11 +107,17 @@ public class UserService {
             if (user.getFirstName() != null && !user.getFirstName().isBlank()) {
                 whereCauses.add(builder.like(root.get("firstName"), "%" + user.getFirstName() + "%"));
             }
-            if(user.getLastName() != null && !user.getLastName().isBlank()) {
+            if (user.getLastName() != null && !user.getLastName().isBlank()) {
                 whereCauses.add(builder.like(root.get("lastName"), "%" + user.getLastName() + "%"));
             }
             if (user.getUsername() != null && !user.getUsername().isBlank()) {
                 whereCauses.add(builder.equal(root.get("username"), user.getUsername()));
+            }
+            if(user.getEmail() != null && !user.getEmail().isBlank()) {
+                whereCauses.add(builder.equal(root.get("email"), user.getEmail()));
+            }
+            if(user.getActive() != null) {
+                whereCauses.add(builder.equal(root.get("active"), user.getActive()));
             }
         }
 
@@ -114,10 +125,10 @@ public class UserService {
 
         TypedQuery<User> typedQuery = entityManager.createQuery(query);
 
-        return  typedQuery.getResultList();
+        return typedQuery.getResultList();
     }
 
-    private String getJWTToken(String username, List<Role> roles){
+    private String getJWTToken(String username, List<Role> roles) {
         String secretKey = "v4j4s.k3ny3r?HaGyMa$VaL!";
         List<GrantedAuthority> grantedAuthorities = roles != null ?
                 AuthorityUtils.commaSeparatedStringToAuthorityList(roles.stream().map(Role::getName).collect(Collectors.joining(", "))) :
@@ -138,22 +149,19 @@ public class UserService {
     public void reset_password(String email) {
         User user = userRepo.getUserByEmail(email);
 
-        if(user != null) {
-            String token = Base64Utils.encodeToUrlSafeString(user.getId().toString().getBytes());
-
+        if (user != null) {
+            String token = URLEncoder.encode(user.getId().toString(), StandardCharsets.UTF_8);
             emailService.sendEmail(EmailService.NO_REPLY_ADDRESS, user.getEmail(), "Password Reset",
-            "Hello " + user.getUsername() + "\n\n"
-                + "This is a password resetting e-mail.\n"
-                + "Please click to link below to reset your password!\n"
-                + "https://www.sativus.space/set_new_password/" + token);
+                    "Hello " + user.getUsername() + "\n\n"
+                            + "This is a password resetting e-mail.\n"
+                            + "Please click to link below to reset your password!\n"
+                            + apiUrl + "/set_new_password/" + token);
         } else {
             throw new EntityNotFoundException("This email not associated for any user");
         }
     }
 
-    public User set_new_password(String newPassword, String token) {
-        Long userId = Long.parseLong(Arrays.toString(Base64Utils.decodeFromUrlSafeString(token)));
-
+    public User set_new_password(String newPassword, Long userId) {
         User user = userRepo.getById(userId);
 
         user.setPassword(encoder.encode(newPassword));
@@ -161,6 +169,10 @@ public class UserService {
         userRepo.save(user);
 
         return user;
+    }
+
+    public User getByUsername(String name) {
+        return userRepo.getUserByUsername(name);
     }
 
     public static class NotActiveUserException extends Exception {
