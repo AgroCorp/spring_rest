@@ -73,6 +73,15 @@ public class UserService {
         return registeredUser;
     }
 
+    public void activate(Long userId) {
+        log.info("activate methos - START");
+        User user = userRepo.getById(userId);
+
+        user.setActive(true);
+
+        userRepo.save(user);
+    }
+
     public User login(User loginUser) throws NotActiveUserException {
         if (loginUser == null) {
             throw new EntityNotFoundException("login user is null");

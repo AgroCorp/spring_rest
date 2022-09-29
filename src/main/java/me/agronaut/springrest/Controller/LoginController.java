@@ -4,6 +4,8 @@ import lombok.extern.log4j.Log4j2;
 import me.agronaut.springrest.Model.User;
 import me.agronaut.springrest.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +29,15 @@ public class LoginController {
     public User register(@RequestBody User newUser) throws UserService.UserExistByEmailException
     {
         return service.register(newUser);
+    }
+
+    @GetMapping("/activate/{token}")
+    public ResponseEntity<?> activate(@PathVariable String token) {
+        Long userId = Long.parseLong(URLDecoder.decode(token, StandardCharsets.UTF_8));
+
+        service.activate(userId);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/login")
