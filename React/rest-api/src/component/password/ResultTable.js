@@ -7,17 +7,20 @@ class ResultTable extends React.Component {
     }
 
     render(){
+        if (this.props.data === null) {
+            return (<Container>
+                <h2>Nincs találat</h2>
+            </Container>)
+        }
         return <Container >
             <Table variant={"light"}>
                 <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>First name</th>
-                        <th>Last name</th>
-                        <th>username</th>
-                        <th>email</th>
-                    </tr>
-
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Password</th>
+                    <th>Image</th>
+                </tr>
                 </thead>
                 <tbody>
                 {
@@ -25,10 +28,8 @@ class ResultTable extends React.Component {
                         return (
                             <tr key={row.id} onDoubleClick={this.showModal()}>
                                 <td>{row.id}</td>
-                                <td>{row.firstName}</td>
-                                <td>{row.lastName}</td>
-                                <td>{row.username}</td>
-                                <td>{row.email}</td>
+                                <td>{row.name}</td>
+                                <td>{row.password}</td>
                             </tr>
                         )
                     })

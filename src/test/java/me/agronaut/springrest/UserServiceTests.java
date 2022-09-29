@@ -1,7 +1,9 @@
 package me.agronaut.springrest;
 
 
+import me.agronaut.springrest.Model.Role;
 import me.agronaut.springrest.Model.User;
+import me.agronaut.springrest.Service.EmailService;
 import me.agronaut.springrest.Service.UserService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
@@ -14,11 +16,14 @@ import org.springframework.test.context.ContextConfiguration;
 
 import javax.persistence.EntityNotFoundException;
 
+import java.util.stream.Collectors;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-@DataJpaTest
-@ContextConfiguration(classes = {UserService.class})
-@AutoConfigurationPackage
+//@DataJpaTest
+//@ContextConfiguration(classes = {UserService.class, EmailService.class})
+//@AutoConfigurationPackage
+@SpringBootTest
 public class UserServiceTests {
     @Autowired
     UserService userSD;
@@ -26,36 +31,30 @@ public class UserServiceTests {
 
     @Test
     @Order(1)
-    public void testRegister() {
+    public void testRegister() throws UserService.UserExistByEmailException {
         User testUser = new User();
         testUser.setUsername("testUser");
         testUser.setPassword("testUser");
         testUser.setEmail("test@user.com");
 
-        Long insertedId = userSD.save(testUser).getId();
+        Long insertedId = userSD.register(testUser).getId();
 
         assertNotNull(insertedId);
     }
 
     @Test
     @Order(2)
-    public void testLogin() {
-        User InserTestUser = new User();
-        InserTestUser.setUsername("testUser");
-        InserTestUser.setPassword("testUser");
-        InserTestUser.setEmail("test@user.com");
-
-        Long insertedId = userSD.save(InserTestUser).getId();
-
-
+    public void testLogin() throws UserService.UserExistByEmailException, UserService.NotActiveUserException {
         User testUser = new User();
-        testUser.setUsername("testUser");
-        testUser.setPassword("testUser");
+        testUser.setUsername("gaborka98");
+        testUser.setPassword("asdasd123");
 
         assertDoesNotThrow(() -> userSD.login(testUser));
         assertThrows(EntityNotFoundException.class,()-> userSD.login(null));
         assertThrows(EntityNotFoundException.class, ()->userSD.login(new User()));
 
+        User loggedin = userSD.login(testUser);
 
+        System.out.println(loggedin.getRoles().stream().map(Role::getName).collect(Collectors.toSet()));
     }
 }

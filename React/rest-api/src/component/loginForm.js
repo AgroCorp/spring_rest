@@ -1,19 +1,23 @@
 import React from "react";
 import {Button, Form, FormGroup} from "react-bootstrap";
+
 import axios from "axios";
-import Header from "./header";
+import {setAuthToken} from "./axiosDefault";
+import BaseSite, {apiUrl, showNotification} from "./baseSite";
 
 class LoginForm extends React.Component {
+    queryParams = new URLSearchParams(window.location.search);
+    username = "";
+    password = "";
+    next = this.queryParams.has("next") ? this.queryParams.get("next") : "/";
     constructor(props) {
         super(props);
-        const queryParams = new URLSearchParams(window.location.search);
         this.state = {
             loading : false,
             validated : true,
             error : "",
-            username : "",
-            password : "",
-            next : queryParams.has("next") ? queryParams.get("next") : "/"
+            usernameError: "",
+            passwordError: ""
         };
 
         this.handleClick = this.handleClick.bind(this);
@@ -30,47 +34,60 @@ class LoginForm extends React.Component {
 
         this.setState({validated : true, loading : true});
 
-        axios.post("http://localhost:8081/login", {"username": this.username, "password": this.password}, ).then(r => {
-            console.log(r.data);
+        axios.post(`${apiUrl}/auth/login`, {"username": this.username, "password": this.password}).then(r => {
             this.setState({loading: false});
-            window.sessionStorage.setItem('token', r.data);
+            localStorage.setItem('user', JSON.stringify(r.data));
+
+
+            setAuthToken(r.data.token);
 
             window.location.pathname = this.next;
 
         }).catch(e => {
-            this.setState({error: e.response.data.message});
+            const errorMessage = e.response ? e.response.data.debugMessage : e;
+            errorMessage.toLowerCase().includes("user") ?
+                this.setState({usernameError: errorMessage}) :
+                this.setState({passwordError : errorMessage});
+
             this.setState({loading: false});
+            showNotification("error", "Login failed!");
         });
     }
 
     handleTextChange(event) {
         if (event.target.id === "username") {
-            this.setState({username : event.target.value});
+            this.username = event.target.value;
         } else {
-            this.setState({password : event.target.value});
+            this.password = event.target.value;
         }
+
+        this.username.length === 0 ?
+            this.setState({usernameError: "this field is required"})
+            : this.setState({usernameError: ""});
+
+        this.password.length === 0 ?
+            this.setState({passwordError: "this field is required"})
+            : this.setState({passwordError: ""});
     }
 
-
     render() {
-        const {error, loading, username,  password} = this.state;
-        return <div style={{justifyContent: "center", alignItems: "center", display: "flex"}}>
-            <Header/>
-            <Form style={{paddingTop: 55, width: 500}} onSubmit={this.handleClick}>
-                <Form.Group className="mb-3">
-                    <Form.Label>Felhasznalonev:</Form.Label>
-                    <Form.Control isInvalid={(error.includes("username") || username.length === 0)} isValid={!error.includes("username") && username.length > 0} id={"username"} type={"text"} placeholder={"Felhasznalonev"} onChange={this.handleTextChange} required/>
-                    <Form.Control.Feedback type={"invalid"}>{error.includes("username") ? error : ""}</Form.Control.Feedback>
-                </Form.Group>
-                <FormGroup className={"mb-3"}>
-                    <Form.Label>Jelszo:</Form.Label>
-                    <Form.Control isInvalid={password.length < 8} isValid={password.length >= 8} id={"password"} type={"password"} onChange={this.handleTextChange} required/>
-                    <Form.Control.Feedback type={"invalid"}>{error.includes("password") ? error : ""}</Form.Control.Feedback>
-                </FormGroup>
-                <Button type={"submit"} variant={"primary"}>Belep</Button>
-                {loading ? <span>Belepes folyamatban...</span> : ""}
-            </Form>
-        </div>
+        return(
+        <BaseSite>
+            <Form onSubmit={this.handleClick}>
+                         <Form.Group className="mb-3">
+                             <Form.Label>Felhasznalonev:</Form.Label>
+                             <Form.Control isInvalid={this.state.usernameError.length > 0} isValid={this.state.usernameError.length === 0} id={"username"} type={"text"} placeholder={"Felhasznalonev"} onChange={this.handleTextChange} required/>
+                             <Form.Control.Feedback type={"invalid"}>{this.state.usernameError}</Form.Control.Feedback>
+                         </Form.Group>
+                         <FormGroup className={"mb-3"}>
+                             <Form.Label>Jelszo:</Form.Label>
+                             <Form.Control isInvalid={this.state.passwordError.length > 0} isValid={this.state.passwordError.length === 0} id={"password"} type={"password"} onChange={this.handleTextChange} required/>
+                             <Form.Control.Feedback type={"invalid"}>{this.state.passwordError}</Form.Control.Feedback>
+                         </FormGroup>
+                         <Button type={"submit"} variant={"primary"}>Belep</Button>
+                     </Form>
+        </BaseSite>
+        )
     }
 }
 export default LoginForm;

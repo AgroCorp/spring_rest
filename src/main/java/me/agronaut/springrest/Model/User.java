@@ -1,10 +1,11 @@
 package me.agronaut.springrest.Model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.stereotype.Component;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -17,7 +18,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-@Component
+@EntityListeners(AuditingEntityListener.class)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,10 +30,14 @@ public class User {
     @Column(name = "username", unique = true)
     @NotNull private String username;
     @Column(name = "password") @NotNull private String password;
-    @Column(name = "email", unique = true) @NotNull @Email private String email;
+    @Column(name = "email", unique = true) @NotNull @Email  private String email;
     @Column(name = "registration_date") @NotNull @CreatedDate private Date registrationDate;
+    @Column(name = "active", nullable = false) @NotNull private Boolean active;
 
-    @OneToMany(mappedBy = "user")
-    @ToString.Exclude
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @JsonManagedReference
     private List<Role> roles;
+
+    @Transient
+    private String token;
 }

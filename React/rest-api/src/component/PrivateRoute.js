@@ -1,22 +1,13 @@
-import React from 'react'
-import { Navigate, Outlet } from 'react-router-dom'
-import decode from 'jwt-decode';
+import {Navigate} from "react-router-dom";
 
-const isAuthenticated = () => {
-    const token = localStorage.getItem('token');
-    const refreshToken = localStorage.getItem('refreshToken');
-    try {
-        decode(token);
-        decode(refreshToken);
-        console.log([decode(token),decode(refreshToken)])
-        return true;
-    } catch (error) {
-        return false;
+
+function PrivateRoute({ children }) {
+    const token = JSON.parse(localStorage.getItem('user')).token;
+    if (!token) {
+        // not logged in so redirect to login page with the return url
+        return <Navigate to={"/login?next=" + window.location.pathname} />
     }
-}
-
-const PrivateRoute = () => {
-    return isAuthenticated() ? <Outlet /> : <Navigate to={"/login?next=" + window.location.pathname} />
+    return children;
 }
 
 export default PrivateRoute;

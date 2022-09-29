@@ -1,49 +1,69 @@
 package me.agronaut.springrest.Controller;
 
+import lombok.extern.log4j.Log4j2;
 import me.agronaut.springrest.Model.User;
 import me.agronaut.springrest.Service.UserService;
-import org.eclipse.paho.client.mqttv3.IMqttClient;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.MultiValueMap;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
+@RequestMapping("/auth")
+@CrossOrigin
+@Log4j2
 public class LoginController {
+    private final UserService service;
     @Autowired
-    private UserService service;
-
-    private final Logger log = LoggerFactory.getLogger(UserService.class);
-
-    @CrossOrigin
-    @PostMapping("/register")
-    User register(@RequestBody User newUser)
-    {
-        System.out.println(newUser.toString());
-        return service.save(newUser);
+    public LoginController(UserService service) {
+        this.service = service;
     }
 
-    @CrossOrigin
-    @PostMapping("/login")
-    String login(@RequestBody User loginUser)
+
+    @PostMapping("/register")
+    public User register(@RequestBody User newUser) throws UserService.UserExistByEmailException
     {
+        return service.register(newUser);
+    }
+
+    @GetMapping("/activate/{token}")
+    public ResponseEntity<?> activate(@PathVariable String token) {
+        Long userId = Long.parseLong(URLDecoder.decode(token, StandardCharsets.UTF_8));
+
+        service.activate(userId);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/login")
+    public User login(@RequestBody User loginUser) throws UserService.NotActiveUserException
+    {
+        log.debug("requestben kapott user: \n\t{}", loginUser);
         return service.login(loginUser);
     }
 
-    @CrossOrigin
-    @PostMapping("/users")
-    List<User> getAll(@RequestBody MultiValueMap<String, String> formData) {
-        log.info("getUsers called");
-        log.info("formdata: " + formData);
+    @PostMapping("/forgot_password")
+    public String forgotPassword(@RequestBody String email) {
+        service.reset_password(email);
+        return "OK";
+    }
 
-        return service.getAll(formData);
+    @PostMapping("/set_new_password/{token}")
+    public User setNewPassword(@PathVariable String token, @RequestBody String newPassword) {
+        Long userId = Long.parseLong(URLDecoder.decode(token, StandardCharsets.UTF_8));
+        return service.set_new_password(newPassword, userId);
+    }
+
+    @Secured("ADMIN")
+    @PostMapping(value = "/list_all_user", consumes = "application/json", produces = "application/json")
+    public List<User> getAll(@RequestBody User user) {
+        log.info("user to search: " + user);
+
+        return service.getAll(user);
     }
 }

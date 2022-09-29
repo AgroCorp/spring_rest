@@ -4,37 +4,40 @@ import {Navbar, Container, Nav} from "react-bootstrap";
 class Header extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            token: sessionStorage.getItem("token")
-        };
+
+        this.user = JSON.parse(localStorage.getItem("user"));
     }
 
     handleLogout() {
-        sessionStorage.clear();
+        localStorage.removeItem("user");
         window.location.pathname = "/";
     }
 
     render() {
-        if (this.state.token == null) {
-            return <div>
+        if (this.user == null) {
+            return <div style={{paddingBottom: 10}}>
                 <Navbar collapseOnSelect fixed={"top"} expand={'sm'} variant={'dark'} bg={'dark'}>
                     <Container>
+                        <Navbar.Brand href={'/'}>Password Manager</Navbar.Brand>
                         <Navbar.Toggle aria-controls={'responsive-navbar-nav'}/>
                         <Navbar.Collapse id={'responsive-navbar-nav'}>
                             <Nav activeKey={window.location.pathname}>
                                 <Nav.Link href={"/"}>Home</Nav.Link>
                                 <Nav.Link href={'/login'}>Login</Nav.Link>
                                 <Nav.Link href={'/register'}>Register</Nav.Link>
-                                <Nav.Link href={'/users'}>Users</Nav.Link>
+                                {this.user &&
+                                    <Nav.Link href={'/users'}>Users</Nav.Link>
+                                }
                             </Nav>
                         </Navbar.Collapse>
                     </Container>
                 </Navbar>
             </div>
         } else {
-            return <div>
+            return <div style={{paddingBottom: 10}}>
                 <Navbar collapseOnSelect fixed={"top"} expand={'sm'} variant={'dark'} bg={'dark'}>
                     <Container>
+                        <Navbar.Brand href={'/'}>Password Manager</Navbar.Brand>
                         <Navbar.Toggle aria-controls={'responsive-navbar-nav'}/>
                         <Navbar.Collapse id={'responsive-navbar-nav'}>
                             <Nav activeKey={window.location.pathname}>
@@ -43,6 +46,7 @@ class Header extends React.Component {
                                 <Nav.Link href={'/users'}>Users</Nav.Link>
                             </Nav>
                         </Navbar.Collapse>
+                        <Navbar.Text>{this.user.username}</Navbar.Text>
                     </Container>
                 </Navbar>
             </div>

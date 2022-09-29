@@ -9,8 +9,8 @@
     </database-infos>
   </component>
   <component name="JpaLiquibaseChangesConfig">
-    <exclude-change idName="SPRING_SESSION_ATTRIBUTES_FK" tagName="dropForeignKeyConstraint" />
     <exclude-change idName="SPRING_SESSION" tagName="dropTable" />
     <exclude-change idName="SPRING_SESSION_ATTRIBUTES" tagName="dropTable" />
+    <exclude-change idName="SPRING_SESSION_ATTRIBUTES_FK" tagName="dropForeignKeyConstraint" />
   </component>
 </project>
