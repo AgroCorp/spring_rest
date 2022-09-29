@@ -49,12 +49,14 @@ public class UserService {
 
     @Value("${apiUrl}")
     private String apiUrl;
+    @Value("${jwt.secret}")
+    private String secretKey;
 
     public User register(User newUser) throws UserExistByEmailException {
         newUser.setPassword(encoder.encode(newUser.getPassword()));
         newUser.setRegistrationDate(new Date());
         newUser.setActive(false);
-        log.debug("new user save to the database: \n\t{}", newUser);
+        log.info("new user save to the database: \n\t{}", newUser);
 
         if (userRepo.existsUserByEmail(newUser.getEmail())) {
             log.warn("Email cim mar foglalat!!");
@@ -63,12 +65,12 @@ public class UserService {
 
         User registeredUser = userRepo.save(newUser);
 
-        String token = Arrays.toString(Base64Utils.encode(registeredUser.getId().toString().getBytes()));
-        log.debug("token: \n\t{}", token);
+        String token = URLEncoder.encode(registeredUser.getId().toString(), StandardCharsets.UTF_8);
+        log.info("token: \n\t{}", token);
         emailService.sendEmail(EmailService.NO_REPLY_ADDRESS, registeredUser.getEmail(), "Confirm Registration",
                 "Hello" + registeredUser.getUsername() + "!\n\n" +
-                        "Please click the link below to activate your account" +
-                        "http://www.sativus.space/auth/activate/" + token);
+                "Please click the link below to activate your account" +
+                apiUrl + "/auth/activate/" + token);
 
         return registeredUser;
     }
@@ -122,23 +124,20 @@ public class UserService {
             if (user.getUsername() != null && !user.getUsername().isBlank()) {
                 whereCauses.add(builder.equal(root.get("username"), user.getUsername()));
             }
-            if(user.getEmail() != null && !user.getEmail().isBlank()) {
+            if (user.getEmail() != null && !user.getEmail().isBlank()) {
                 whereCauses.add(builder.equal(root.get("email"), user.getEmail()));
             }
-            if(user.getActive() != null) {
+            if (user.getActive() != null) {
                 whereCauses.add(builder.equal(root.get("active"), user.getActive()));
             }
         }
 
-        query.where(whereCauses.toArray(new Predicate[0]));
+        query.select(root).where(builder.and(whereCauses.toArray(new Predicate[0])));
 
-        TypedQuery<User> typedQuery = entityManager.createQuery(query);
-
-        return typedQuery.getResultList();
+        return entityManager.createQuery(query).getResultList();
     }
 
     private String getJWTToken(String username, List<Role> roles) {
-        String secretKey = "v4j4s.k3ny3r?HaGyMa$VaL!";
         List<GrantedAuthority> grantedAuthorities = roles != null ?
                 AuthorityUtils.commaSeparatedStringToAuthorityList(roles.stream().map(Role::getName).collect(Collectors.joining(", "))) :
                 AuthorityUtils.commaSeparatedStringToAuthorityList("");
