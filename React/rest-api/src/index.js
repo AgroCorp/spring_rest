@@ -11,6 +11,8 @@ import RegisterForm from "./component/RegisterForm";
 import Users from "./component/Users";
 import PrivateRoute from "./component/PrivateRoute";
 import {PasswordList} from "./component/password/PasswordList";
+import ActivateRegistration from "./component/ActivateRegistration";
+
 
 render(
     <BrowserRouter>
@@ -18,6 +20,9 @@ render(
             <Route path={'/'} element={<App/>} />
             <Route path={'login'} element={<LoginForm/>} />
             <Route path={'register'} element={<RegisterForm/>} />
+            <Route path={'activate'} element={<ActivateRegistration />} >
+                <Route path={":token"} element={<ActivateRegistration />} />
+            </Route>
             <Route path={'users'} element={<PrivateRoute>
                 <Users/>
             </PrivateRoute>}></Route>

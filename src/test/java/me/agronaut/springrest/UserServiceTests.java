@@ -3,16 +3,11 @@ package me.agronaut.springrest;
 
 import me.agronaut.springrest.Model.Role;
 import me.agronaut.springrest.Model.User;
-import me.agronaut.springrest.Service.EmailService;
 import me.agronaut.springrest.Service.UserService;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
 
 import javax.persistence.EntityNotFoundException;
 

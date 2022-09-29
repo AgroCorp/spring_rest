@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -33,7 +35,8 @@ public class LoginController {
 
     @GetMapping("/activate/{token}")
     public ResponseEntity<?> activate(@PathVariable String token) {
-        Long userId = Long.parseLong(URLDecoder.decode(token, StandardCharsets.UTF_8));
+        log.debug("{}:\n\t[{}]\t{}","raw token", "token", token);
+        Long userId = Long.valueOf(new String(Base64Utils.decodeFromUrlSafeString(token)));
 
         service.activate(userId);
 
@@ -55,7 +58,7 @@ public class LoginController {
 
     @PostMapping("/set_new_password/{token}")
     public User setNewPassword(@PathVariable String token, @RequestBody String newPassword) {
-        Long userId = Long.parseLong(URLDecoder.decode(token, StandardCharsets.UTF_8));
+        Long userId = Long.valueOf(Arrays.toString(Base64Utils.decodeFromUrlSafeString(token)));
         return service.set_new_password(newPassword, userId);
     }
 

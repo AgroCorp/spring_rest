@@ -29,6 +29,16 @@ export function showNotification(type, msg) {
                 progress: undefined,
             });
             break;
+        case "info":
+            toast.info(msg, {
+                position: "bottom-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            })
         default:
             toast.info(msg, {
                 position: "bottom-right",

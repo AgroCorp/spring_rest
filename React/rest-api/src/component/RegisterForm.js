@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 import {Form, Button, FormGroup} from "react-bootstrap";
-import BaseSite from "./baseSite";
+import BaseSite, {showNotification} from "./baseSite";
 
 class RegisterForm extends React.Component {
     username;
@@ -18,8 +18,8 @@ class RegisterForm extends React.Component {
             validated : true,
             error : "",
             usernameError: "Kotelezo megadni",
-            passwordError: [],
-            rePasswordError: "",
+            passwordError: ["kotelezo megadni"],
+            rePasswordError: "Kotelezo megadni",
             emailError: "Kotelezo megadni",
         };
 
@@ -38,9 +38,14 @@ class RegisterForm extends React.Component {
         this.setState({validated : true, loading : true});
 
         axios.post("http://localhost:8081/auth/register", {"username": this.username,
-            "password": this.password,
-            "email": this.email}).then(r => {
-
+        "password": this.password,
+        "email": this.email,
+        "firstName": this.firstName,
+        "lastName": this.lastName})
+        .then(r => {
+            console.log(r.data);
+            this.setState({loading: false});
+            showNotification('success', 'Sikeres regisztracio');
         }).catch(e => {
             if(e.response.data.message === "User exists with given email address!") {
                 this.setState({emailError: e.response.data.debugMessage});
@@ -95,7 +100,7 @@ class RegisterForm extends React.Component {
                 this.setState({rePasswordError: ""});
             }
         }
-        else if (key === "firtName") {
+        else if (key === "firstName") {
             this.firstName = event.target.value;
         }
         else if (key === "lastName") {
@@ -140,7 +145,7 @@ class RegisterForm extends React.Component {
                     <Form.Control id={"firstName"} type={"text"} onChange={this.handleTextChange} />
                 </FormGroup>
 
-                <Button type={"submit"} variant={"primary"}>Regisztáció</Button>
+                <Button type={"submit"} style={{marginTop: 10}} variant={"primary"}>Regisztáció</Button>
                 {this.state.loading ? <span>Regisztráció folyamatban...</span> : ""}
             </Form>
         </BaseSite>
