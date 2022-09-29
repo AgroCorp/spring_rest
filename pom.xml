@@ -11,7 +11,7 @@
 
     <groupId>hu.AgroCorp</groupId>
     <artifactId>springRest</artifactId>
-    <version>2.3.12346</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>springRest</name>
     <description>springRest</description>
     <packaging>jar</packaging>
@@ -20,8 +20,8 @@
         <changelog-file>/db/changelog/db.changelog-master.xml</changelog-file>
         <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
         <jdbc.url>jdbc:mariadb://192.168.2.55:3306/java</jdbc.url>
-        <jdbc.username>admin</jdbc.username>
-        <jdbc.password>Gaborka11</jdbc.password>
+        <jdbc.username>DB_USER</jdbc.username>
+        <jdbc.password>DB_PASSWORD</jdbc.password>
     </properties>
 
     <distributionManagement>
@@ -205,7 +205,35 @@
                                 </goals>
                                 <phase>validate</phase>
                                 <configuration>
-                                    <newVersion>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.nextIncrementalVersion}</newVersion>
+                                    <newVersion>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.nextIncrementalVersion}-SNAPSHOT</newVersion>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>drop-snapshot</id>
+            <activation>
+                <property>
+                    <name>dropSnapshot</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>versions-maven-plugin</artifactId>
+
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>set</goal>
+                                </goals>
+                                <phase>validate</phase>
+                                <configuration>
+                                    <newVersion>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.IncrementalVersion}</newVersion>
                                 </configuration>
                             </execution>
                         </executions>
