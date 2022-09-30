@@ -38,7 +38,8 @@ export function showNotification(type, msg) {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-            })
+            });
+            break;
         default:
             toast.info(msg, {
                 position: "bottom-right",

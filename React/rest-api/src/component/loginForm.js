@@ -1,5 +1,6 @@
 import React from "react";
-import {Button, Form, FormGroup} from "react-bootstrap";
+import {Button, Form, FormGroup, Container, Row, Col} from "react-bootstrap";
+import {Link} from 'react-router-dom';
 
 import axios from "axios";
 import {setAuthToken} from "./axiosDefault";
@@ -73,19 +74,31 @@ class LoginForm extends React.Component {
     render() {
         return(
         <BaseSite>
-            <Form onSubmit={this.handleClick}>
-                         <Form.Group className="mb-3">
-                             <Form.Label>Felhasznalonev:</Form.Label>
-                             <Form.Control isInvalid={this.state.usernameError.length > 0} isValid={this.state.usernameError.length === 0} id={"username"} type={"text"} placeholder={"Felhasznalonev"} onChange={this.handleTextChange} required/>
-                             <Form.Control.Feedback type={"invalid"}>{this.state.usernameError}</Form.Control.Feedback>
-                         </Form.Group>
-                         <FormGroup className={"mb-3"}>
-                             <Form.Label>Jelszo:</Form.Label>
-                             <Form.Control isInvalid={this.state.passwordError.length > 0} isValid={this.state.passwordError.length === 0} id={"password"} type={"password"} onChange={this.handleTextChange} required/>
-                             <Form.Control.Feedback type={"invalid"}>{this.state.passwordError}</Form.Control.Feedback>
-                         </FormGroup>
-                         <Button type={"submit"} variant={"primary"}>Belep</Button>
-                     </Form>
+            <Container>
+                <Row className="justify-content-md-center">
+                    <Col xs lg="3">
+                        <Form onSubmit={this.handleClick}>
+                            <FormGroup className="mb-3">
+                                <Form.Label>Felhasznalonev:</Form.Label>
+                                <Form.Control isInvalid={this.state.usernameError.length > 0} isValid={this.state.usernameError.length === 0} id={"username"} type={"text"} placeholder={"Felhasznalonev"} onChange={this.handleTextChange} required/>
+                                <Form.Control.Feedback type={"invalid"}>{this.state.usernameError}</Form.Control.Feedback>
+                            </FormGroup>
+                            <FormGroup className={"mb-3"}>
+                                <Form.Label>Jelszo:</Form.Label>
+                                <Form.Control isInvalid={this.state.passwordError.length > 0} isValid={this.state.passwordError.length === 0} id={"password"} type={"password"} onChange={this.handleTextChange} required/>
+                                <Form.Control.Feedback type={"invalid"}>{this.state.passwordError}</Form.Control.Feedback>
+                            </FormGroup>
+                            <Button type={"submit"} variant={"primary"}>Belep</Button>
+                        </Form>
+                    </Col>
+                </Row>
+                <Row className="justify-content-md-center">
+                    <Col xs lg="3">
+                        <Link to={'/passwordReset'}>Reset your password</Link>
+                    </Col>
+                </Row>
+            </Container>
+
         </BaseSite>
         )
     }

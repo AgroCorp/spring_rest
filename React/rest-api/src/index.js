@@ -12,6 +12,8 @@ import Users from "./component/Users";
 import PrivateRoute from "./component/PrivateRoute";
 import {PasswordList} from "./component/password/PasswordList";
 import ActivateRegistration from "./component/ActivateRegistration";
+import PasswordReset from "./component/PasswordReset";
+import {GetPasswordReset} from "./component/getPasswordReset";
 
 
 render(
@@ -23,12 +25,16 @@ render(
             <Route path={'activate'} element={<ActivateRegistration />} >
                 <Route path={":token"} element={<ActivateRegistration />} />
             </Route>
+            <Route path={'set_new_password/:token'} element={<PasswordReset />}>
+            </Route>
+            <Route path={'passwordReset'} element={<GetPasswordReset />} />
             <Route path={'users'} element={<PrivateRoute>
                 <Users/>
             </PrivateRoute>}></Route>
             <Route path={'passwords'} element={<PrivateRoute>
                 <PasswordList/>
-            </PrivateRoute>}></Route>
+            </PrivateRoute>}>
+            </Route>
         </Routes>
     </BrowserRouter>,
   document.getElementById('root')

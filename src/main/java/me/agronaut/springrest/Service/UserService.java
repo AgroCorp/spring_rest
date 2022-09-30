@@ -21,8 +21,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -155,7 +153,7 @@ public class UserService {
 
         if (user != null) {
             String token = Base64Utils.encodeToUrlSafeString(user.getId().toString().getBytes());
-            log.debug("\n\t[token]\t" + token);
+            log.debug("{}\n\t[{}]\t{}","token after encode:", "token", token);
             emailService.sendEmail(null, user.getEmail(), "Password Reset",
                     "Hello " + user.getUsername() + "<br /><br />"
                             + "This is a password resetting e-mail.<br />"
@@ -167,7 +165,7 @@ public class UserService {
     }
 
     public User set_new_password(String newPassword, Long userId) {
-        User user = userRepo.getById(userId);
+        User user = userRepo.getUserById(userId);
 
         user.setPassword(encoder.encode(newPassword));
 

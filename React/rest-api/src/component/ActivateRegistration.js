@@ -14,11 +14,11 @@ export default function ActivateRegistration(){
                 console.log(error.message);
             })
 
-        const timer = setTimeout(() => {
+        setTimeout(() => {
             window.location.pathname = "/";
         }, 5000);
         return () => clearTimeout();
-    }, []);
+    });
 
     return (
         <BaseSite>
