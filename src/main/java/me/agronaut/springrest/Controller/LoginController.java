@@ -5,13 +5,17 @@ import me.agronaut.springrest.Model.User;
 import me.agronaut.springrest.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -33,7 +37,8 @@ public class LoginController {
 
     @GetMapping("/activate/{token}")
     public ResponseEntity<?> activate(@PathVariable String token) {
-        Long userId = Long.parseLong(URLDecoder.decode(token, StandardCharsets.UTF_8));
+        log.debug("{}:\n\t[{}]\t{}","raw token", "token", token);
+        Long userId = Long.valueOf(new String(Base64Utils.decodeFromUrlSafeString(token)));
 
         service.activate(userId);
 
@@ -48,15 +53,17 @@ public class LoginController {
     }
 
     @PostMapping("/forgot_password")
-    public String forgotPassword(@RequestBody String email) {
+    public ResponseEntity<?> forgotPassword(@RequestBody String email) {
+        log.debug("{}\n\t[{}]\t{}", "requestben kapott email", "email",email);
         service.reset_password(email);
-        return "OK";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/set_new_password/{token}")
-    public User setNewPassword(@PathVariable String token, @RequestBody String newPassword) {
-        Long userId = Long.parseLong(URLDecoder.decode(token, StandardCharsets.UTF_8));
-        return service.set_new_password(newPassword, userId);
+    @PostMapping ("/set_new_password")
+    public User setNewPassword(@RequestBody Map<String,String> jsonData) {
+        log.debug("{}\n\t[{}]\t{}\n\t[{}]\t{}", "requestben kapott adatok", "token",jsonData.get("token"), "password", jsonData.get("password"));
+        Long userId = Long.valueOf(new String(Base64Utils.decodeFromUrlSafeString(jsonData.get("token"))));
+        return service.set_new_password(jsonData.get("password"), userId);
     }
 
     @Secured("ADMIN")

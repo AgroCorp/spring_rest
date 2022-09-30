@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
-import {Form, Button, FormGroup} from "react-bootstrap";
-import BaseSite from "./baseSite";
+import {Form, Button, FormGroup, Container, Row, Col} from "react-bootstrap";
+import BaseSite, {apiUrl, showNotification} from "./baseSite";
 
 class RegisterForm extends React.Component {
     username;
@@ -18,8 +18,8 @@ class RegisterForm extends React.Component {
             validated : true,
             error : "",
             usernameError: "Kotelezo megadni",
-            passwordError: [],
-            rePasswordError: "",
+            passwordError: ["kotelezo megadni"],
+            rePasswordError: "Kotelezo megadni",
             emailError: "Kotelezo megadni",
         };
 
@@ -37,10 +37,15 @@ class RegisterForm extends React.Component {
 
         this.setState({validated : true, loading : true});
 
-        axios.post("http://localhost:8081/auth/register", {"username": this.username,
-            "password": this.password,
-            "email": this.email}).then(r => {
-
+        axios.post(`${apiUrl}/auth/register`, {"username": this.username,
+        "password": this.password,
+        "email": this.email,
+        "firstName": this.firstName,
+        "lastName": this.lastName})
+        .then(r => {
+            console.log(r.data);
+            this.setState({loading: false});
+            showNotification('success', 'Sikeres regisztracio');
         }).catch(e => {
             if(e.response.data.message === "User exists with given email address!") {
                 this.setState({emailError: e.response.data.debugMessage});
@@ -95,7 +100,7 @@ class RegisterForm extends React.Component {
                 this.setState({rePasswordError: ""});
             }
         }
-        else if (key === "firtName") {
+        else if (key === "firstName") {
             this.firstName = event.target.value;
         }
         else if (key === "lastName") {
@@ -106,43 +111,51 @@ class RegisterForm extends React.Component {
     render() {
         return (
         <BaseSite>
-            <Form onSubmit={this.handleClick}>
-                <Form.Group className="mb-3">
-                    <Form.Label>Felhasználónév:</Form.Label>
-                    <Form.Control isInvalid={this.state.usernameError.length !== 0} isValid={this.state.usernameError.length === 0} id={"username"} type={"text"} placeholder={"Felhasznalonev"} onChange={this.handleTextChange} required/>
-                    <Form.Control.Feedback type={"invalid"}>{this.state.usernameError}</Form.Control.Feedback>
-                </Form.Group>
-                <FormGroup className={"mb-3"}>
-                    <Form.Label>Jelszó:</Form.Label>
-                    <Form.Control isInvalid={this.state.passwordError.length !== 0} isValid={this.state.passwordError.length ===0} id={"password"} type={"password"} onChange={this.handleTextChange} required/>
-                    <Form.Control.Feedback type={"invalid"}><ul>{this.state.passwordError.map(error => (
-                        <li>
-                        {error}
-                        </li>
-                    ))}</ul></Form.Control.Feedback>
+            <Container>
+                <Row className="justify-content-md-center">
+                    <Col xs lg={3}>
+                        <Form onSubmit={this.handleClick}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Felhasználónév</Form.Label>
+                                <Form.Control isInvalid={this.state.usernameError.length !== 0} isValid={this.state.usernameError.length === 0} id={"username"} type={"text"} placeholder={"Felhasznalonev"} onChange={this.handleTextChange} required/>
+                                <Form.Control.Feedback type={"invalid"}>{this.state.usernameError}</Form.Control.Feedback>
+                            </Form.Group>
+                            <FormGroup className={"mb-3"}>
+                                <Form.Label>Jelszó</Form.Label>
+                                <Form.Control isInvalid={this.state.passwordError.length !== 0} isValid={this.state.passwordError.length ===0} id={"password"} type={"password"} onChange={this.handleTextChange} required/>
+                                <Form.Control.Feedback type={"invalid"}><ul>{this.state.passwordError.map(error => (
+                                    <li>
+                                        {error}
+                                    </li>
+                                ))}</ul></Form.Control.Feedback>
 
-                    <Form.Label>Jelszó újra:</Form.Label>
-                    <Form.Control isInvalid={this.state.rePasswordError.length > 0} isValid={this.state.rePasswordError.length === 0} id={"rePassword"} type={"password"} onChange={this.handleTextChange} required/>
-                    <Form.Control.Feedback type={"invalid"}>{this.state.rePasswordError}</Form.Control.Feedback>
-                </FormGroup>
+                                <Form.Label>Jelszó újra</Form.Label>
+                                <Form.Control isInvalid={this.state.rePasswordError.length > 0} isValid={this.state.rePasswordError.length === 0} id={"rePassword"} type={"password"} onChange={this.handleTextChange} required/>
+                                <Form.Control.Feedback type={"invalid"}>{this.state.rePasswordError}</Form.Control.Feedback>
+                            </FormGroup>
 
-                <FormGroup>
-                    <Form.Label>E-mail</Form.Label>
-                    <Form.Control isInvalid={this.state.emailError.length > 0} isValid={this.state.emailError.length === 0} id={"email"} type={"email"} onChange={this.handleTextChange} required/>
-                    <Form.Control.Feedback type={"invalid"}>{this.state.emailError}</Form.Control.Feedback>
-                </FormGroup>
+                            <FormGroup>
+                                <Form.Label>E-mail</Form.Label>
+                                <Form.Control isInvalid={this.state.emailError.length > 0} isValid={this.state.emailError.length === 0} id={"email"} type={"email"} onChange={this.handleTextChange} required/>
+                                <Form.Control.Feedback type={"invalid"}>{this.state.emailError}</Form.Control.Feedback>
+                            </FormGroup>
 
-                <FormGroup>
-                    <Form.Label>Vezetéknév: </Form.Label>
-                    <Form.Control id={"lastName"} type={"text"} onChange={this.handleTextChange} />
+                            <FormGroup>
+                                <Form.Label>Vezetéknév</Form.Label>
+                                <Form.Control id={"lastName"} type={"text"} onChange={this.handleTextChange} />
 
-                    <Form.Label>Keresztnév: </Form.Label>
-                    <Form.Control id={"firstName"} type={"text"} onChange={this.handleTextChange} />
-                </FormGroup>
+                                <Form.Label>Keresztnév</Form.Label>
+                                <Form.Control id={"firstName"} type={"text"} onChange={this.handleTextChange} />
+                            </FormGroup>
 
-                <Button type={"submit"} variant={"primary"}>Regisztáció</Button>
-                {this.state.loading ? <span>Regisztráció folyamatban...</span> : ""}
-            </Form>
+                            <Button type={"submit"} style={{marginTop: 10}} variant={"primary"}>Regisztáció</Button>
+                            {this.state.loading ? <span>Regisztráció folyamatban...</span> : ""}
+                        </Form>
+                    </Col>
+                </Row>
+            </Container>
+
+
         </BaseSite>
         )
     }

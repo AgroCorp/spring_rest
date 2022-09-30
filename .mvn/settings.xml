@@ -1,20 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+<settings xmlns="http://maven.apache.org/SETTINGS/1.1.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
-
-  <pluginGroups>
-  </pluginGroups>
-  <proxies>
-  </proxies>
-
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
+  <localRepository>/usr/share/maven/ref/repository</localRepository>
   <servers>
+    <server>
+      <id>maven-snapshots</id>
+      <username>horvath12.gabor@ext.t-systems.hu</username>
+      <password>glpat-zZ_pECWrmrSNzdKKQSZz</password>
+    </server>
+    <server>
+      <id>maven-releases</id>
+      <username>horvath12.gabor@ext.t-systems.hu</username>
+      <password>glpat-zZ_pECWrmrSNzdKKQSZz</password>
+    </server>
+
+    <server>
+      <id>maven-public</id>
+      <username>horvath12.gabor@ext.t-systems.hu</username>
+      <password>glpat-zZ_pECWrmrSNzdKKQSZz</password>
+    </server>
+
+    <server>
+      <id>maven-central</id>
+      <username>horvath12.gabor@ext.t-systems.hu</username>
+      <password>glpat-zZ_pECWrmrSNzdKKQSZz</password>
+    </server>
+    <server>
+      <id>central</id>
+      <username>horvath12.gabor@ext.t-systems.hu</username>
+      <password>glpat-zZ_pECWrmrSNzdKKQSZz</password>
+    </server>
+    <server>
+      <id>nexus-snapshots</id>
+      <username>gaborka98</username>
+      <password>R2Fib3JrYTEx</password>
+    </server>
+    <server>
+      <id>nexus-releases</id>
+      <username>gaborka98</username>
+      <password>R2Fib3JrYTEx</password>
+    </server>
+
   </servers>
 
   <mirrors>
+    <mirror>
+      <id>google-maven-central</id>
+      <name>Google Maven Central</name>
+      <url>https://maven-central.storage.googleapis.com/maven2/</url>
+      <mirrorOf>central</mirrorOf>
+    </mirror>
+
+    <mirror>
+      <id>central</id>
+      <name>central</name>
+      <url>https://sunshine.tsmdev.tsmcloud.hu/nexus/repository/maven-public/</url>
+      <mirrorOf>sunshine</mirrorOf>
+    </mirror>
   </mirrors>
 
-  <profiles>
-  </profiles>
-
 </settings>
+

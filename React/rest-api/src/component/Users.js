@@ -1,8 +1,8 @@
 import React from "react";
 import axios from "axios";
 import ResultTable from "./ResultTable";
-import {Button, Container, Row} from "react-bootstrap";
-import BaseSite from "./baseSite";
+import {Button, Container, Row, Col} from "react-bootstrap";
+import BaseSite, {showNotification} from "./baseSite";
 
 class Users extends React.Component {
     constructor(props) {
@@ -12,7 +12,7 @@ class Users extends React.Component {
         this.initForm();
 
         this.state = {
-            data: props.data,
+            data: [],
             loading: false,
             error: ""
         }
@@ -41,7 +41,7 @@ class Users extends React.Component {
                 this.setState({data:r.data});
             })
             .catch(e => {
-                this.setState({error:e});
+                showNotification('error', e.response?.message);
             })
     }
 
@@ -54,40 +54,55 @@ class Users extends React.Component {
     }
 
     render() {
-        return <>
+        return (
             <BaseSite>
                 <Container>
                     <Row>
-                        <table>
-                            <tbody>
-                            <tr>
-                                <td>First name: </td>
-                                <td><input type={"text"} name={"firstName"} onChange={e => this.searchForm[e.target.name] = e.target.value} /></td>
-                                <td>Username: </td>
-                                <td><input type={"text"} name={"username"} onChange={e => this.searchForm[e.target.name] = e.target.value} /></td>
-                            </tr>
-                            <tr>
-                                <td>Last name: </td>
-                                <td><input type={"text"} name={"lastName"} onChange={e => this.searchForm[e.target.name] = e.target.value} /></td>
-                                <td>Email: </td>
-                                <td><input type={"text"} name={"email"} onChange={e => this.searchForm[e.target.name] = e.target.value} /></td>
-                            </tr>
-                            <tr>
-                                <td>Active: </td>
-                                <td><input type={"checkbox"} name={"active"} defaultChecked={true} onChange={e => {this.searchForm[e.target.name] = e.target.checked; console.log(e.target.checked);}} /></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                        <Button variant={"primary"} onClick={this.search} style={{width: 100}}>Kereses</Button>
+                        <Col xs={4} lg={3}>
+                            <label>First name:</label>
+                        </Col>
+                        <Col xs={8} lg={3}>
+                            <input type={"text"} name={"firstName"}  onChange={e => this.searchForm[e.target.name] = e.target.value} />
+                        </Col>
+                        <Col xs={4} lg={3}>
+                            <label>Username:</label>
+                        </Col>
+                        <Col xs={8} lg={3}>
+                            <input type={"text"} name={"username"} onChange={e => this.searchForm[e.target.name] = e.target.value} />
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={4} lg={3}>
+                            <label>Last name:</label>
+                        </Col>
+                        <Col xs={8} lg={3}>
+                            <input type={"text"} name={"lastName"}  onChange={e => this.searchForm[e.target.name] = e.target.value} />
+                        </Col>
+                        <Col xs={4} lg={3}>
+                            <label>Email:</label>
+                        </Col>
+                        <Col xs={8} lg={3}>
+                            <input type={"text"} name={"email"} onChange={e => this.searchForm[e.target.name] = e.target.value} />
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={4} lg={3}>
+                            <label>Active:</label>
+                        </Col>
+                        <Col xs={8} lg={3}>
+                            <input type={"checkbox"} name={"active"} defaultChecked={true} onChange={e => {this.searchForm[e.target.name] = e.target.checked; console.log(e.target.checked);}} />
+                        </Col>
+
+                    </Row>
+                    <Row xs={2} lg={6}>
+                        <Button variant={"primary"} onClick={this.search}>Kereses</Button>
                     </Row>
                     <Row style={{paddingTop: 10}}>
                         {this.state.data ? <ResultTable data = {this.state.data}/> : "Nincs adat"}
                     </Row>
                 </Container>
             </BaseSite>
-
-        </>
-
+        )
     }
 }
 

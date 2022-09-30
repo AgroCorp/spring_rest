@@ -6,6 +6,8 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -34,7 +36,10 @@ public class Password {
     @Column(name = "CRU") @CreatedBy
     private String cru;
 
+    @Column(name = "LMD") @LastModifiedDate
+    private LocalDateTime lmd;
+
     @ManyToOne(targetEntity = User.class)
-    @JoinColumn(name = "USER_ID")
+    @JoinColumn(name = "USER_ID", nullable = false)
     private User user;
 }

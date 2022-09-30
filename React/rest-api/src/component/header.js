@@ -15,7 +15,7 @@ class Header extends React.Component {
 
     render() {
         if (this.user == null) {
-            return <div style={{paddingBottom: 10}}>
+            return <div style={{paddingBottom: 100}}>
                 <Navbar collapseOnSelect fixed={"top"} expand={'sm'} variant={'dark'} bg={'dark'}>
                     <Container>
                         <Navbar.Brand href={'/'}>Password Manager</Navbar.Brand>
@@ -34,7 +34,7 @@ class Header extends React.Component {
                 </Navbar>
             </div>
         } else {
-            return <div style={{paddingBottom: 10}}>
+            return <div style={{paddingBottom: 100}}>
                 <Navbar collapseOnSelect fixed={"top"} expand={'sm'} variant={'dark'} bg={'dark'}>
                     <Container>
                         <Navbar.Brand href={'/'}>Password Manager</Navbar.Brand>
