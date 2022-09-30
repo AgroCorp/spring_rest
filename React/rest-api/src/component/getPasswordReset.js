@@ -1,6 +1,6 @@
 import React from "react";
 import {apiUrl, BaseSite} from "./baseSite";
-import {Form, FormGroup, Button} from "react-bootstrap";
+import {Form, FormGroup, Button, Row} from "react-bootstrap";
 import axios from 'axios';
 
 export class GetPasswordReset extends React.Component{
@@ -41,24 +41,27 @@ export class GetPasswordReset extends React.Component{
     render() {
         return (
             <BaseSite>
-                <Form onSubmit={this.handleSubmit}>
-                    <FormGroup>
-                        <Form.Label>E-mail:</Form.Label>
-                        <Form.Control required type={'email'} onChange={this.handleTextChange}
-                                      id={"email"} placeholder={"e-mail address"} isInvalid={this.state.error.includes("Check")} isValid={!this.state.error.includes("Check")} />
-                        {
-                            this.state.error !== "Check your e-mail box" &&
-                            <Form.Control.Feedback type={'invalid'}>{this.state.error}</Form.Control.Feedback>
-                        }
-                        {
-                            this.state.error === "Check your e-mail box" &&
-                            <Form.Control.Feedback>Check your e-mail box</Form.Control.Feedback>
-                        }
+                <Row xs lg={4} className={'justify-content-md-center'}>
+                    <Form onSubmit={this.handleSubmit}>
+                        <FormGroup>
+                            <Form.Label>E-mail:</Form.Label>
+                            <Form.Control required type={'email'} onChange={this.handleTextChange}
+                                          id={"email"} placeholder={"e-mail address"} isInvalid={this.state.error.includes("Check")} isValid={!this.state.error.includes("Check")} />
+                            {
+                                this.state.error !== "Check your e-mail box" &&
+                                <Form.Control.Feedback type={'invalid'}>{this.state.error}</Form.Control.Feedback>
+                            }
+                            {
+                                this.state.error === "Check your e-mail box" &&
+                                <Form.Control.Feedback>Check your e-mail box</Form.Control.Feedback>
+                            }
 
-                    </FormGroup>
+                        </FormGroup>
 
-                    <Button style={{marginTop:10}} type={'submit'} variant={'primary'}>Get reset e-mail</Button>
-                </Form>
+                        <Button style={{marginTop:10}} type={'submit'} variant={'primary'}>Get reset e-mail</Button>
+                    </Form>
+                </Row>
+
             </BaseSite>
         )
     }

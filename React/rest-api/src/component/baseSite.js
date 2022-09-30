@@ -1,5 +1,6 @@
 import Header from "./header";
 import { ToastContainer, toast } from 'react-toastify';
+import {Container, Row} from 'react-bootstrap'
 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -54,23 +55,25 @@ export function showNotification(type, msg) {
 }
 
 export function BaseSite(props) {
-    return ( <div>
-        <Header />
-        <div style={{justifyContent: "center", alignItems: "center", display: "flex", paddingTop: 55}}>
+    return ( <Container>
+            <Row>
+                <Header />
+            </Row>
+        <Container>
             {props.children}
-        </div>
-            <ToastContainer
-                position="bottom-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-            />
-        </div>
+        </Container>
+        <ToastContainer
+            position="bottom-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+        />
+        </Container>
     )
 }
 

@@ -79,12 +79,12 @@ class LoginForm extends React.Component {
                     <Col xs lg="3">
                         <Form onSubmit={this.handleClick}>
                             <FormGroup className="mb-3">
-                                <Form.Label>Felhasznalonev:</Form.Label>
+                                <Form.Label>Felhasznalonev</Form.Label>
                                 <Form.Control isInvalid={this.state.usernameError.length > 0} isValid={this.state.usernameError.length === 0} id={"username"} type={"text"} placeholder={"Felhasznalonev"} onChange={this.handleTextChange} required/>
                                 <Form.Control.Feedback type={"invalid"}>{this.state.usernameError}</Form.Control.Feedback>
                             </FormGroup>
                             <FormGroup className={"mb-3"}>
-                                <Form.Label>Jelszo:</Form.Label>
+                                <Form.Label>Jelszo</Form.Label>
                                 <Form.Control isInvalid={this.state.passwordError.length > 0} isValid={this.state.passwordError.length === 0} id={"password"} type={"password"} onChange={this.handleTextChange} required/>
                                 <Form.Control.Feedback type={"invalid"}>{this.state.passwordError}</Form.Control.Feedback>
                             </FormGroup>
@@ -94,7 +94,7 @@ class LoginForm extends React.Component {
                 </Row>
                 <Row className="justify-content-md-center">
                     <Col xs lg="3">
-                        <Link to={'/passwordReset'}>Reset your password</Link>
+                        <Link to={'/passwordReset'}>Jelszo helyreallitasa</Link>
                     </Col>
                 </Row>
             </Container>

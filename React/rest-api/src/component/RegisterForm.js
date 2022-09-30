@@ -116,12 +116,12 @@ class RegisterForm extends React.Component {
                     <Col xs lg={3}>
                         <Form onSubmit={this.handleClick}>
                             <Form.Group className="mb-3">
-                                <Form.Label>Felhasználónév:</Form.Label>
+                                <Form.Label>Felhasználónév</Form.Label>
                                 <Form.Control isInvalid={this.state.usernameError.length !== 0} isValid={this.state.usernameError.length === 0} id={"username"} type={"text"} placeholder={"Felhasznalonev"} onChange={this.handleTextChange} required/>
                                 <Form.Control.Feedback type={"invalid"}>{this.state.usernameError}</Form.Control.Feedback>
                             </Form.Group>
                             <FormGroup className={"mb-3"}>
-                                <Form.Label>Jelszó:</Form.Label>
+                                <Form.Label>Jelszó</Form.Label>
                                 <Form.Control isInvalid={this.state.passwordError.length !== 0} isValid={this.state.passwordError.length ===0} id={"password"} type={"password"} onChange={this.handleTextChange} required/>
                                 <Form.Control.Feedback type={"invalid"}><ul>{this.state.passwordError.map(error => (
                                     <li>
@@ -129,7 +129,7 @@ class RegisterForm extends React.Component {
                                     </li>
                                 ))}</ul></Form.Control.Feedback>
 
-                                <Form.Label>Jelszó újra:</Form.Label>
+                                <Form.Label>Jelszó újra</Form.Label>
                                 <Form.Control isInvalid={this.state.rePasswordError.length > 0} isValid={this.state.rePasswordError.length === 0} id={"rePassword"} type={"password"} onChange={this.handleTextChange} required/>
                                 <Form.Control.Feedback type={"invalid"}>{this.state.rePasswordError}</Form.Control.Feedback>
                             </FormGroup>
@@ -141,10 +141,10 @@ class RegisterForm extends React.Component {
                             </FormGroup>
 
                             <FormGroup>
-                                <Form.Label>Vezetéknév: </Form.Label>
+                                <Form.Label>Vezetéknév</Form.Label>
                                 <Form.Control id={"lastName"} type={"text"} onChange={this.handleTextChange} />
 
-                                <Form.Label>Keresztnév: </Form.Label>
+                                <Form.Label>Keresztnév</Form.Label>
                                 <Form.Control id={"firstName"} type={"text"} onChange={this.handleTextChange} />
                             </FormGroup>
 
