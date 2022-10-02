@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom';
 
 import axios from "axios";
 import {setAuthToken} from "./axiosDefault";
-import BaseSite, {apiUrl, showNotification} from "./baseSite";
+import BaseSite, {showNotification} from "./baseSite";
 
 class LoginForm extends React.Component {
     queryParams = new URLSearchParams(window.location.search);
@@ -35,7 +35,7 @@ class LoginForm extends React.Component {
 
         this.setState({validated : true, loading : true});
 
-        axios.post(`${apiUrl}/auth/login`, {"username": this.username, "password": this.password}).then(r => {
+        axios.post('/auth/login', {"username": this.username, "password": this.password}).then(r => {
             this.setState({loading: false});
             localStorage.setItem('user', JSON.stringify(r.data));
 

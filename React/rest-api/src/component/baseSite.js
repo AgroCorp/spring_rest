@@ -1,10 +1,7 @@
 import Header from "./header";
 import { ToastContainer, toast } from 'react-toastify';
 import {Container, Row} from 'react-bootstrap'
-
 import 'react-toastify/dist/ReactToastify.css';
-
-export const apiUrl = "http://localhost:8081";
 
 export function showNotification(type, msg) {
     switch (type) {

@@ -1,5 +1,5 @@
 import React from "react";
-import {apiUrl, BaseSite} from "./baseSite";
+import {BaseSite} from "./baseSite";
 import {Form, FormGroup, Button, Row} from "react-bootstrap";
 import axios from 'axios';
 
@@ -24,7 +24,7 @@ export class GetPasswordReset extends React.Component{
             event.stopPropagation();
         }
 
-        axios.post(`${apiUrl}/auth/forgot_password`, this.email, {headers: {"Content-Type": "plain/text"}}).then(r=>{
+        axios.post('/auth/forgot_password', this.email, {headers: {"Content-Type": "plain/text"}}).then(r=>{
             console.log(r);
             this.setState({error: "Check your e-mail box"});
         }).catch(error => {

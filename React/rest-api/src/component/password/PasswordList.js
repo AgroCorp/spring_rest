@@ -1,13 +1,15 @@
 import React from "react";
-import {apiUrl, BaseSite} from "../baseSite";
-import axios from "axios";
+import {Container, Row, Col, Button} from 'react-bootstrap';
+import {BaseSite} from "../baseSite";
 import ResultTable from "./ResultTable";
+import PasswordService from "./PasswordService";
 
 export class PasswordList extends React.Component {
     constructor(props) {
         super(props);
 
         this.user = JSON.parse(localStorage.getItem("user"));
+        this.passwordService = PasswordService;
 
         this.state = {
             loading: false,
@@ -17,23 +19,24 @@ export class PasswordList extends React.Component {
     }
 
     componentDidMount() {
-        this.getAllByUser();
+        this.setState({data: this.passwordService.getAllByUser()});
     }
 
-    getAllByUser() {
-        this.setState({loading: true});
-        axios.get(`${apiUrl}/password/getAllByUser`).then(r => {
-            this.setState({loading: false, data: r.data});
-        }).catch(e => {
-            console.log(e);
-            this.setState({loading: false, error: e.response.message});
-        })
+    handleAdd() {
+        this.passwordService.add({})
     }
 
     render() {
         return (
         <BaseSite>
-            <ResultTable data={this.state.data} />
+            <Container>
+                <Row>
+                    <Button variant={'success'} onClick={this.handleAdd} />
+                </Row>
+                <Row>
+                    <ResultTable data={this.state.data} />
+                </Row>
+            </Container>
         </BaseSite>
         )
     }

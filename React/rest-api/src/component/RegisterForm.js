@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 import {Form, Button, FormGroup, Container, Row, Col} from "react-bootstrap";
-import BaseSite, {apiUrl, showNotification} from "./baseSite";
+import BaseSite, {showNotification} from "./baseSite";
 
 class RegisterForm extends React.Component {
     username;
@@ -37,7 +37,7 @@ class RegisterForm extends React.Component {
 
         this.setState({validated : true, loading : true});
 
-        axios.post(`${apiUrl}/auth/register`, {"username": this.username,
+        axios.post('/auth/register', {"username": this.username,
         "password": this.password,
         "email": this.email,
         "firstName": this.firstName,

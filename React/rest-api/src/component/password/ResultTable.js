@@ -2,17 +2,13 @@ import React from "react";
 import {Table, Container} from "react-bootstrap"
 
 class ResultTable extends React.Component {
-    showModal() {
-        console.log("hello")
-    }
-
     render(){
         if (this.props.data === null) {
             return (<Container>
                 <h2>Nincs találat</h2>
             </Container>)
         }
-        return <Container >
+        return (
             <Table variant={"light"}>
                 <thead>
                 <tr>
@@ -26,7 +22,7 @@ class ResultTable extends React.Component {
                 {
                     this.props.data.map(row => {
                         return (
-                            <tr key={row.id} onDoubleClick={this.showModal()}>
+                            <tr key={row.id}>
                                 <td>{row.id}</td>
                                 <td>{row.name}</td>
                                 <td>{row.password}</td>
@@ -36,7 +32,7 @@ class ResultTable extends React.Component {
                 }
                 </tbody>
             </Table>
-        </Container>
+        )
     }
 }
 
