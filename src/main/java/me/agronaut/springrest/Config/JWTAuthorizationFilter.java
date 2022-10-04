@@ -1,10 +1,11 @@
 package me.agronaut.springrest.Config;
 
-import me.agronaut.springrest.Exception.ApiError;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -25,8 +26,15 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
     private final String HEADER = "Authorization";
     private final String PREFIX = "Bearer ";
-    @Value("${jwt.secret}")
-    String SECRET;
+
+    public JWTAuthorizationFilter setSECRET(String SECRET) {
+        this.SECRET = SECRET;
+        return this;
+    }
+
+
+    private String SECRET;
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {

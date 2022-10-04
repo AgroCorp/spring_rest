@@ -22,7 +22,7 @@ class Users extends React.Component {
 
     componentDidMount() {
         this.setState({loading:true});
-        axios.post("http://localhost:8081/auth/list_all_user",  this.searchForm).then(r=>{
+        axios.post("/auth/list_all_user",  this.searchForm).then(r=>{
             this.setState({loading:false});
             this.setState({data:r.data});
         }).catch(e => {
@@ -34,7 +34,7 @@ class Users extends React.Component {
 
     search() {
         this.setState({loading: true});
-        axios.post("http://localhost:8081/auth/list_all_user", this.searchForm)
+        axios.post("/auth/list_all_user", this.searchForm)
             .then(r=>{
                 console.log(r.data);
                 this.setState({loading:false});

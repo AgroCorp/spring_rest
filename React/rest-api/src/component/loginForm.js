@@ -3,7 +3,6 @@ import {Button, Form, FormGroup, Container, Row, Col} from "react-bootstrap";
 import {Link} from 'react-router-dom';
 
 import axios from "axios";
-import {setAuthToken} from "./axiosDefault";
 import BaseSite, {showNotification} from "./baseSite";
 
 class LoginForm extends React.Component {
@@ -39,13 +38,11 @@ class LoginForm extends React.Component {
             this.setState({loading: false});
             localStorage.setItem('user', JSON.stringify(r.data));
 
-
-            setAuthToken(r.data.token);
-
             window.location.pathname = this.next;
 
         }).catch(e => {
-            const errorMessage = e.response ? e.response.data.debugMessage : e;
+            console.log(e);
+            const errorMessage = e.response ? e.response?.data?.message : "uncaught error";
             errorMessage.toLowerCase().includes("user") ?
                 this.setState({usernameError: errorMessage}) :
                 this.setState({passwordError : errorMessage});

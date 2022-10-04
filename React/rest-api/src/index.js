@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
+
 import LoginForm from "./component/loginForm";
 import RegisterForm from "./component/RegisterForm";
 import Users from "./component/Users";
@@ -14,7 +15,22 @@ import {PasswordList} from "./component/password/PasswordList";
 import ActivateRegistration from "./component/ActivateRegistration";
 import PasswordReset from "./component/PasswordReset";
 import {GetPasswordReset} from "./component/getPasswordReset";
+import axios from "axios";
 
+import config from './config.json'
+
+axios.defaults.baseURL = config.API_URL;
+
+axios.interceptors.request.use(function (config) {
+    const user = localStorage.getItem("user");
+    if (user) {
+        config.headers.Authorization =  `Bearer ${JSON.parse(user).token}`;
+    } else {
+        delete config.headers.Authorization;
+    }
+
+    return config;
+});
 
 render(
     <BrowserRouter>

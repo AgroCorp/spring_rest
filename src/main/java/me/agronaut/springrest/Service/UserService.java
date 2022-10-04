@@ -83,15 +83,16 @@ public class UserService {
             throw new EntityNotFoundException("login user is null");
         }
 
-        User login = userRepo.getUserByUsername(loginUser.getUsername());
-        if (login != null) {
-            if (!login.getActive()) {
+        Optional<User> login = userRepo.getUserByUsername(loginUser.getUsername());
+        if (login.isPresent()) {
+            User casted = login.get();
+            if (!casted.getActive()) {
                 throw new NotActiveUserException("user is not activated");
             }
-            if (encoder.matches(loginUser.getPassword(), login.getPassword())) {
+            if (encoder.matches(loginUser.getPassword(), casted.getPassword())) {
                 log.debug("username and password match!");
-                login.setToken(getJWTToken(login.getUsername(), login.getRoles()));
-                return login;
+                casted.setToken(getJWTToken(casted.getUsername(), casted.getRoles()));
+                return casted;
             } else {
                 throw new EntityNotFoundException("Password is incorrect");
             }
@@ -175,7 +176,7 @@ public class UserService {
     }
 
     public User getByUsername(String name) {
-        return userRepo.getUserByUsername(name);
+        return userRepo.getUserByUsername(name).orElse(null);
     }
 
     public static class NotActiveUserException extends Exception {

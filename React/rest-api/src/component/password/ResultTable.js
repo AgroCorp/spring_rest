@@ -1,7 +1,19 @@
 import React from "react";
 import {Table, Container} from "react-bootstrap"
 
+
+
 class ResultTable extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.handleView = this.handleView.bind(this);
+    }
+
+    handleView(event) {
+        console.log(event.parentNode.key);
+    }
+
     render(){
         if (this.props.data === null) {
             return (<Container>
@@ -16,6 +28,7 @@ class ResultTable extends React.Component {
                     <th>Name</th>
                     <th>Password</th>
                     <th>Image</th>
+                    <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -26,6 +39,7 @@ class ResultTable extends React.Component {
                                 <td>{row.id}</td>
                                 <td>{row.name}</td>
                                 <td>{row.password}</td>
+                                <td onClick={this.handleView}>view</td>
                             </tr>
                         )
                     })
