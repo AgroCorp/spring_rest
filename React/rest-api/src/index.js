@@ -32,6 +32,21 @@ axios.interceptors.request.use(function (config) {
     return config;
 });
 
+axios.interceptors.response.use(response => response, error => {
+    if (error.response.status === 403 ){
+        // redirect to 403 page
+        localStorage.removeItem("user");
+        window.location = '/login?';
+    }
+});
+axios.interceptors.response.use(response => response, error => {
+    if (error.response.status === 401 ){
+        // redirect to 403 page
+        localStorage.removeItem("user");
+        window.location = '/login?';
+    }
+});
+
 render(
     <BrowserRouter>
         <Routes>

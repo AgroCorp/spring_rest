@@ -30,7 +30,9 @@ public class PasswordController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Password> addPassword(@RequestBody Password password) {
+    public ResponseEntity<Password> addPassword(@RequestBody Password password, HttpServletRequest request) {
+        User currentUser = userService.getByUsername(request.getUserPrincipal().getName());
+        password.setUser(currentUser);
         return new ResponseEntity<>(passwordService.addPassword(password), HttpStatus.CREATED);
     }
 

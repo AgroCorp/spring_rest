@@ -2,10 +2,8 @@ import axios from "axios";
 import configData from '../../config.json'
 var CryptoJS = require("crypto-js");
 
-
-
-type Password ={
-    password_id: number;
+export type Password ={
+    id: number;
     name: string;
     password: string;
     crd: string;
@@ -16,27 +14,25 @@ type Password ={
 
 
 export default class PasswordService {
-    getAllByUser():Password[] {
-        axios.get("/password/getAllByUser")
-            .then(res => {
-                return res.data;
-        })
-            .catch(err => {
-                console.log(err.response.message);
-                return null;
-            });
+    async getAllByUser():Password[] {
+        return await axios.get("/password/getAllByUser");
     }
 
-    add(password: Password):Password {
-        password.password = CryptoJS.AES.encrypt(password.password, configData.SECRET).toString();
+    async add(password: Password):Password {
+        password.password = this.encode(password.password);
 
-        axios.post("/password/add", password)
-            .then(res => {
-                return res.data;
-            })
-            .catch(err => {
-                console.log(err);
-                return null;
-            })
+        return axios.post("/password/add", password);
+    }
+
+    async delete(pw: Password): void {
+        return axios.delete(`/password/delete/${pw.id}`);
+    }
+
+    encode(text: string): string {
+        return CryptoJS.AES.encrypt(text, configData.SECRET).toString();
+    }
+
+    decode(text: string): string {
+        return CryptoJS.AES.decrypt(text, configData.SECRET).toString(CryptoJS.enc.Utf8);
     }
 }
