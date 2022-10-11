@@ -57,15 +57,10 @@ export class PasswordList extends React.Component {
     }
 
     async handleDelete(event) {
-        this.selectedPassword = this.state.data[event.target.parentNode.rowIndex - 1];
-        console.log(event.target.parentNode.rowIndex - 1);
-        console.log(this.selectedPassword);
-
         await this.passwordService.delete(this.selectedPassword);
 
         this.passwordService.getAllByUser().then(r=>{
             this.setState({data: r.data});
-            console.log(this.state.data);
         });
 
         await this.deleteClose();
@@ -89,19 +84,13 @@ export class PasswordList extends React.Component {
 
     }
 
-    deleteOpen() {
-
+    deleteOpen(event) {
+        this.selectedPassword = this.state.data[event.target.parentNode.rowIndex - 1];
+        this.setState({deleteShow: true});
     }
 
     deleteClose() {
-
-    }
-
-    isEmpty(obj) {
-        for (const property in obj) {
-            return false;
-        }
-        return true;
+        this.setState({deleteShow: false});
     }
 
     async addNewPassword(event) {
@@ -152,7 +141,7 @@ export class PasswordList extends React.Component {
                                         <td>{row.name}</td>
                                         <td onClick={this.handleView}>{row.password}</td>
                                         <td hidden={this.state.isMobile}>{row.image}</td>
-                                        <td onClick={this.handleDelete}>delete</td>
+                                        <td onClick={this.deleteOpen}>delete</td>
                                         <td onClick={this.handleEdit}>edit</td>
                                     </tr>
                                 )
@@ -162,16 +151,6 @@ export class PasswordList extends React.Component {
                     </Table>
                 </Row>
             </Container>
-            {/*<div className="container">*/}
-            {/*    <div className="row row-cols-1 row-cols-md-2 row-cols-xl-4">*/}
-            {/*        {!this.isEmpty(this.state.data) &&*/}
-            {/*            this.state.data.map(row => {*/}
-            {/*                return <PasswordCard key={row.id} data={row} />*/}
-            {/*            })*/}
-            {/*        }*/}
-            {/*    </div>*/}
-            {/*</div>*/}
-
 
             <Modal show={this.state.addShow} id={"add"} onHide={this.addClose}>
                 <Modal.Header >
@@ -210,11 +189,11 @@ export class PasswordList extends React.Component {
                     </h1>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={this.editClose}>
-                        Close
+                    <Button variant="secondary" onClick={this.deleteClose}>
+                        No
                     </Button>
-                    <Button type={'submit'} variant="primary">
-                        Save Changes
+                    <Button type={'button'} variant="primary" onClick={this.handleDelete}>
+                        Yes
                     </Button>
                 </Modal.Footer>
             </Modal>

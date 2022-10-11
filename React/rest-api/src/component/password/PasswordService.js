@@ -28,6 +28,11 @@ export default class PasswordService {
         return axios.delete(`/password/delete/${pw.id}`);
     }
 
+    async update(newPassword: Password): Password {
+        newPassword.password = this.encode(newPassword.password, configData.SECRET).toString();
+        return axios.put("/password/update", newPassword);
+    }
+
     encode(text: string): string {
         return CryptoJS.AES.encrypt(text, configData.SECRET).toString();
     }
