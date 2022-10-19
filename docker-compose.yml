@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  app-server:
+    build:
+      context: .
+      dockerfile: Dockerfile-spring
+    expose:
+      - 8080
+    ports:
+      - "8081:8080"
+    restart: always
+    depends_on:
+      - db
+    networks:
+      - backend
+      - frontend
+
+  app-client:
+    build:
+      context: .
+      dockerfile: Dockerfile-react
+    expose:
+      - 80
+    ports:
+      - "3000:80"
+    restart: always
+    depends_on:
+      - app-server
+    networks:
+      - frontend
+
+  db:
+    image: mariadb:10.5
+    expose:
+      - 3306
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      MARIADB_USER: admin
+      MARIADB_PASSWORD: admin
+      MARIADB_DATABASE: java
+      MARIADB_ROOT_PASSWORD: Gaborka11
+    volumes:
+      - db-data:/var/lib/
+    networks:
+      - backend
+
+volumes:
+  db-data:
+
+networks:
+  backend:
+  frontend:

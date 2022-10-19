@@ -158,7 +158,7 @@ public class UserService {
                     "Hello " + user.getUsername() + "<br /><br />"
                             + "This is a password resetting e-mail.<br />"
                             + "Please click to link below to reset your password!<br />"
-                            + "<a href=" + apiUrl + "/set_new_password/" + token + ">Click hear!</a>");
+                            + "<a href=" + apiUrl + "/set_new_password/" + token + ">Click here!</a>");
         } else {
             throw new EntityNotFoundException("This email not associated for any user");
         }
