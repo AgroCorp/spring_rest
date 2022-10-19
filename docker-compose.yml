@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  app-server:
+    build:
+      context: .
+      dockerfile: Dockerfile-spring
+    ports:
+      - "8081:8080"
+    restart: always
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://db:3306/java?useSSL=false&serverTimezone=UTC&useLegacy
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+    networks:
+      - backend
+      - frontend
+
+  app-client:
+    build:
+      context: .
+      dockerfile: Dockerfile-react
+    ports:
+      - "3000:80"
+    restart: always
+    depends_on:
+      - app-server
+    networks:
+      - frontend
+
+  db:
+    image: mariadb:10.5
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      MARIADB_USER: admin
+      MARIADB_PASSWORD: admin
+      MARIADB_DATABASE: java
+      MARIADB_ROOT_PASSWORD: Gaborka11
+    volumes:
+      - db-data:/var/lib/
+    networks:
+      - backend
+
+volumes:
+  db-data:
+
+networks:
+  backend:
+  frontend:
