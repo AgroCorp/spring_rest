@@ -16,7 +16,7 @@ class Header extends React.Component {
     render() {
         if (this.user == null) {
             return <div style={{paddingBottom: 100}}>
-                <Navbar collapseOnSelect fixed={"top"} expand={'sm'} variant={'dark'} bg={'dark'}>
+                <Navbar collapseOnSelect fixed={"top"} expand={'sm'} variant={'dark'} bg={'primary'}>
                     <Container>
                         <Navbar.Brand href={'/'}>Password Manager</Navbar.Brand>
                         <Navbar.Toggle aria-controls={'responsive-navbar-nav'}/>
@@ -35,7 +35,7 @@ class Header extends React.Component {
             </div>
         } else {
             return <div style={{paddingBottom: 100}}>
-                <Navbar collapseOnSelect fixed={"top"} expand={'sm'} variant={'dark'} bg={'dark'}>
+                <Navbar collapseOnSelect fixed={"top"} expand={'sm'} variant={'dark'} bg={'primary'}>
                     <Container>
                         <Navbar.Brand href={'/'}>Password Manager</Navbar.Brand>
                         <Navbar.Toggle aria-controls={'responsive-navbar-nav'}/>
