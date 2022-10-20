@@ -6,7 +6,6 @@ import lombok.extern.log4j.Log4j2;
 import me.agronaut.springrest.Model.Role;
 import me.agronaut.springrest.Model.User;
 import me.agronaut.springrest.Repository.UserRepository;
-import org.hibernate.internal.ExceptionConverterImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,20 +13,14 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Base64Utils;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -56,7 +49,7 @@ public class UserService {
         newUser.setPassword(encoder.encode(newUser.getPassword()));
         newUser.setRegistrationDate(new Date());
         newUser.setActive(false);
-        log.info("new user save to the database: \n\t{}", newUser);
+        log.debug("new user save to the database: \n\t{}", newUser);
 
         if (userRepo.existsUserByEmail(newUser.getEmail())) {
             log.warn("Email cim mar foglalat!!");
@@ -65,19 +58,20 @@ public class UserService {
 
         User registeredUser = userRepo.save(newUser);
 
-        String token = URLEncoder.encode(registeredUser.getId().toString(), StandardCharsets.UTF_8);
-        log.info("token: \n\t{}", token);
-        emailService.sendEmail(EmailService.NO_REPLY_ADDRESS, registeredUser.getEmail(), "Confirm Registration",
-                "Hello" + registeredUser.getUsername() + "!\n\n" +
-                "Please click the link below to activate your account" +
-                apiUrl + "/auth/activate/" + token);
+        String token = Base64Utils.encodeToUrlSafeString(newUser.getId().toString().getBytes());
+        log.debug("\n\ttoken: {}", token);
+        emailService.sendEmail(null, registeredUser.getEmail(), "Confirm Registration",
+                "Hello " + registeredUser.getUsername() + "!<br /><br />" +
+                "Please click the link below to <a href=" +
+                apiUrl + "/activate/" + token + ">activate your account</a>.");
 
         return registeredUser;
     }
 
     public void activate(Long userId) {
         log.info("activate methos - START");
-        User user = userRepo.getById(userId);
+        log.debug("{}\n\t[{}]\t{}", "user id in activate method:", "userId" ,userId);
+        User user = userRepo.getUserById(userId);
 
         user.setActive(true);
 
@@ -95,7 +89,7 @@ public class UserService {
                 throw new NotActiveUserException("user is not activated");
             }
             if (encoder.matches(loginUser.getPassword(), login.getPassword())) {
-                log.info("username and password match!");
+                log.debug("username and password match!");
                 login.setToken(getJWTToken(login.getUsername(), login.getRoles()));
                 return login;
             } else {
@@ -158,19 +152,20 @@ public class UserService {
         User user = userRepo.getUserByEmail(email);
 
         if (user != null) {
-            String token = URLEncoder.encode(user.getId().toString(), StandardCharsets.UTF_8);
-            emailService.sendEmail(EmailService.NO_REPLY_ADDRESS, user.getEmail(), "Password Reset",
-                    "Hello " + user.getUsername() + "\n\n"
-                            + "This is a password resetting e-mail.\n"
-                            + "Please click to link below to reset your password!\n"
-                            + apiUrl + "/set_new_password/" + token);
+            String token = Base64Utils.encodeToUrlSafeString(user.getId().toString().getBytes());
+            log.debug("{}\n\t[{}]\t{}","token after encode:", "token", token);
+            emailService.sendEmail(null, user.getEmail(), "Password Reset",
+                    "Hello " + user.getUsername() + "<br /><br />"
+                            + "This is a password resetting e-mail.<br />"
+                            + "Please click to link below to reset your password!<br />"
+                            + "<a href=" + apiUrl + "/set_new_password/" + token + ">Click here!</a>");
         } else {
             throw new EntityNotFoundException("This email not associated for any user");
         }
     }
 
     public User set_new_password(String newPassword, Long userId) {
-        User user = userRepo.getById(userId);
+        User user = userRepo.getUserById(userId);
 
         user.setPassword(encoder.encode(newPassword));
 

@@ -11,6 +11,10 @@ import RegisterForm from "./component/RegisterForm";
 import Users from "./component/Users";
 import PrivateRoute from "./component/PrivateRoute";
 import {PasswordList} from "./component/password/PasswordList";
+import ActivateRegistration from "./component/ActivateRegistration";
+import PasswordReset from "./component/PasswordReset";
+import {GetPasswordReset} from "./component/getPasswordReset";
+
 
 render(
     <BrowserRouter>
@@ -18,12 +22,19 @@ render(
             <Route path={'/'} element={<App/>} />
             <Route path={'login'} element={<LoginForm/>} />
             <Route path={'register'} element={<RegisterForm/>} />
+            <Route path={'activate'} element={<ActivateRegistration />} >
+                <Route path={":token"} element={<ActivateRegistration />} />
+            </Route>
+            <Route path={'set_new_password/:token'} element={<PasswordReset />}>
+            </Route>
+            <Route path={'passwordReset'} element={<GetPasswordReset />} />
             <Route path={'users'} element={<PrivateRoute>
                 <Users/>
             </PrivateRoute>}></Route>
             <Route path={'passwords'} element={<PrivateRoute>
                 <PasswordList/>
-            </PrivateRoute>}></Route>
+            </PrivateRoute>}>
+            </Route>
         </Routes>
     </BrowserRouter>,
   document.getElementById('root')

@@ -24,17 +24,6 @@
         <jdbc.password>DB_PASSWORD</jdbc.password>
     </properties>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>nexus-snapshots</id>
-            <url>https://nexus.sativus.space/repository/maven-snapshots/</url>
-        </snapshotRepository>
-        <repository>
-            <id>nexus-releases</id>
-            <url>https://nexus.sativus.space/repository/maven-releases/</url>
-        </repository>
-    </distributionManagement>
-
     <scm>
         <connection>scm:git:git@github.com:AgroCorp/spring_rest.git</connection>
         <url>scm:git:git@github.com:AgroCorp/spring_rest.git</url>
