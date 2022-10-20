@@ -3,6 +3,8 @@ import axios from "axios";
 import ResultTable from "./ResultTable";
 import {Button, Container, Row, Col} from "react-bootstrap";
 import BaseSite, {showNotification} from "./baseSite";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 
 class Users extends React.Component {
     constructor(props) {
@@ -95,7 +97,7 @@ class Users extends React.Component {
 
                     </Row>
                     <Row xs={2} lg={6}>
-                        <Button variant={"primary"} onClick={this.search}>Kereses</Button>
+                        <Button variant={"primary"} onClick={this.search}><FontAwesomeIcon icon={solid('magnifying-glass')}/></Button>
                     </Row>
                     <Row style={{paddingTop: 10}}>
                         {this.state.data ? <ResultTable data = {this.state.data}/> : "Nincs adat"}

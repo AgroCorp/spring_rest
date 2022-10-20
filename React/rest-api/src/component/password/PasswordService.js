@@ -2,14 +2,16 @@ import axios from "axios";
 import configData from '../../config.json'
 var CryptoJS = require("crypto-js");
 
-export type Password ={
+export interface Password {
     id: number;
     name: string;
     password: string;
+    image: string;
     crd: string;
     cru: string;
     user_id: number;
     lmd:string;
+    show?:boolean;
 }
 
 
@@ -25,7 +27,13 @@ export default class PasswordService {
     }
 
     async delete(pw: Password): void {
-        return axios.delete(`/password/delete/${pw.id}`);
+        return await axios.delete(`/password/delete/${pw.id}`);
+    }
+
+    async edit(pw: Password): Password {
+        pw.password = this.encode(pw.password);
+
+        return axios.put("/password/update", pw);
     }
 
     async update(newPassword: Password): Password {
