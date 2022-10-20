@@ -62,7 +62,7 @@ class RegisterForm extends React.Component {
             this.email = event.target.value;
             if (event.target.value.length === 0) {
                 this.setState({emailError: "Kotelezo megadni az e-mail cimet"});
-            } else if(!/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+            } else if(!/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
             .test(event.target.value)) {
                 this.setState({emailError:"E-mail cím nem megfelelő formátumú"});
             } else {
@@ -124,7 +124,7 @@ class RegisterForm extends React.Component {
                                 <Form.Label>Jelszó</Form.Label>
                                 <Form.Control isInvalid={this.state.passwordError.length !== 0} isValid={this.state.passwordError.length ===0} id={"password"} type={"password"} onChange={this.handleTextChange} required/>
                                 <Form.Control.Feedback type={"invalid"}><ul>{this.state.passwordError.map(error => (
-                                    <li>
+                                    <li key={crypto.randomUUID()}>
                                         {error}
                                     </li>
                                 ))}</ul></Form.Control.Feedback>

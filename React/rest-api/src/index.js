@@ -33,18 +33,13 @@ axios.interceptors.request.use(function (config) {
 });
 
 axios.interceptors.response.use(response => response, error => {
-    if (error.response.status === 403 ){
+    if (error.response.status === 403 || error.response.status === 401){
         // redirect to 403 page
         localStorage.removeItem("user");
         window.location = '/login?';
     }
-});
-axios.interceptors.response.use(response => response, error => {
-    if (error.response.status === 401 ){
-        // redirect to 403 page
-        localStorage.removeItem("user");
-        window.location = '/login?';
-    }
+
+    return Promise.reject(error);
 });
 
 render(

@@ -42,7 +42,7 @@ class LoginForm extends React.Component {
 
         }).catch(e => {
             console.log(e);
-            const errorMessage = e.response ? e.response.data.debugMessage : "";
+            const errorMessage = e.response ? e.response.data.message : "";
             if (errorMessage.length === 0) {
                 console.log(e);
             } else {
