@@ -17,9 +17,7 @@ import PasswordReset from "./component/PasswordReset";
 import {GetPasswordReset} from "./component/getPasswordReset";
 import axios from "axios";
 
-import config from './config.json'
-
-axios.defaults.baseURL = config.API_URL;
+axios.defaults.baseURL = process.env.API_URL;
 
 axios.interceptors.request.use(function (config) {
     const user = localStorage.getItem("user");

@@ -1,5 +1,4 @@
 import axios from "axios";
-import configData from '../../config.json'
 var CryptoJS = require("crypto-js");
 
 export interface Password {
@@ -13,7 +12,7 @@ export interface Password {
     lmd:string;
     show?:boolean;
 }
-
+const SECRET = process.env.SECRET;
 
 export default class PasswordService {
     async getAllByUser():Password[] {
@@ -37,15 +36,15 @@ export default class PasswordService {
     }
 
     async update(newPassword: Password): Password {
-        newPassword.password = this.encode(newPassword.password, configData.SECRET).toString();
+        newPassword.password = this.encode(newPassword.password, SECRET).toString();
         return axios.put("/password/update", newPassword);
     }
 
     encode(text: string): string {
-        return CryptoJS.AES.encrypt(text, configData.SECRET).toString();
+        return CryptoJS.AES.encrypt(text, SECRET).toString();
     }
 
     decode(text: string): string {
-        return CryptoJS.AES.decrypt(text, configData.SECRET).toString(CryptoJS.enc.Utf8);
+        return CryptoJS.AES.decrypt(text, SECRET).toString(CryptoJS.enc.Utf8);
     }
 }
