@@ -42,10 +42,14 @@ class LoginForm extends React.Component {
 
         }).catch(e => {
             console.log(e);
-            const errorMessage = e.response ? e.response?.data?.message : "uncaught error";
-            errorMessage.toLowerCase().includes("user") ?
-                this.setState({usernameError: errorMessage}) :
-                this.setState({passwordError : errorMessage});
+            const errorMessage = e.response ? e.response.data.debugMessage : "";
+            if (errorMessage.length === 0) {
+                console.log(e);
+            } else {
+                errorMessage?.toLowerCase().includes("user") ?
+                    this.setState({usernameError: errorMessage}) :
+                    this.setState({passwordError: errorMessage});
+            }
 
             this.setState({loading: false});
             showNotification("error", "Login failed!");
