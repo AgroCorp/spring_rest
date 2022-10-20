@@ -84,7 +84,7 @@ public class UserService {
         userRepo.save(user);
     }
 
-    public User login(User loginUser) throws NotActiveUserException {
+    public User login(User loginUser) throws NotActiveUserException, EntityNotFoundException {
         if (loginUser == null) {
             throw new EntityNotFoundException("login user is null");
         }
