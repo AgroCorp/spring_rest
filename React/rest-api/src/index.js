@@ -17,7 +17,7 @@ import PasswordReset from "./component/PasswordReset";
 import {GetPasswordReset} from "./component/getPasswordReset";
 import axios from "axios";
 
-axios.defaults.baseURL = process.env.API_URL;
+axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
 axios.interceptors.request.use(function (config) {
     const user = localStorage.getItem("user");
@@ -31,10 +31,13 @@ axios.interceptors.request.use(function (config) {
 });
 
 axios.interceptors.response.use(response => response, error => {
-    if (error.response.status === 403 || error.response.status === 401){
-        // redirect to 403 page
-        localStorage.removeItem("user");
-        window.location = '/login?';
+    console.log(error);
+    if (error.response) {
+        if (error.response.status === 403 || error.response.status === 401){
+            // redirect to 403 page
+            localStorage.removeItem("user");
+            window.location = '/login?';
+        }
     }
 
     return Promise.reject(error);

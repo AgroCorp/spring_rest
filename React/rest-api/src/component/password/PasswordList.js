@@ -3,6 +3,7 @@ import {Container, Row, Button, Modal, Form, FormGroup, Table, ButtonGroup} from
 import {BaseSite} from "../baseSite";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
+import PasswordService from "./PasswordService";
 
 export class PasswordList extends React.Component {
     constructor(props) {
@@ -96,7 +97,11 @@ export class PasswordList extends React.Component {
 
     editOpen(event) {
         this.setState({selectedPassword: Object.assign({},this.state.data[event.target.closest('tr').rowIndex - 1])});
-        this.state.selectedPassword.password = this.passwordService.decode(this.selectedPassword.password);
+        this.setState(prevState => {
+            let selectedPassword = prevState.selectedPassword;
+            selectedPassword.password = this.passwordService.decode(selectedPassword.password);
+            return selectedPassword;
+        })
         this.setState({editShow: true});
     }
 
@@ -186,15 +191,30 @@ export class PasswordList extends React.Component {
                         <Modal.Body>
                         <FormGroup>
                             <Form.Label>Name</Form.Label>
-                            <Form.Control type={'text'} id={'name'} onChange={e=>{this.state.selectedPassword.name = e.target.value;}} required />
+                            <Form.Control type={'text'} id={'name'} onChange={e=>{
+                                this.setState(prevState => {
+                                    prevState.selectedPassword.name = e.target.value;
+                                    return prevState
+                                })
+                            }} required />
                         </FormGroup>
                         <FormGroup>
                             <Form.Label>Password</Form.Label>
-                            <Form.Control type={'password'} id={'password'} onChange={e=>{this.state. selectedPassword.password = e.target.value}} required />
+                            <Form.Control type={'password'} id={'password'} onChange={e=>{
+                                this.setState(prevState => {
+                                    prevState.selectedPassword.password = e.target.value;
+                                    return prevState.selectedPassword;
+                                })
+                            }} required />
                         </FormGroup>
                         <FormGroup>
                             <Form.Label>Image URL</Form.Label>
-                            <Form.Control type={'text'} id={'image'} onChange={e=>{this.state.selectedPassword.image = e.target.value}} required />
+                            <Form.Control type={'text'} id={'image'} onChange={e=>{
+                                this.setState(prevState => {
+                                    prevState.selectedPassword.image = e.target.value;
+                                    return prevState
+                                })
+                            }} required />
                         </FormGroup>
                     </Modal.Body>
                     <Modal.Footer>
@@ -236,15 +256,30 @@ export class PasswordList extends React.Component {
 
                         <FormGroup>
                             <Form.Label>Name</Form.Label>
-                            <Form.Control type={'text'} id={'name'} value={this.state.selectedPassword.name} onChange={e=>{this.state.updatedPassword.name = e.target.value}} required />
+                            <Form.Control type={'text'} id={'name'} value={this.state.selectedPassword.name} onChange={e=>{
+                                this.setState(prevState => {
+                                    prevState.selectedPassword.name = e.target.value;
+                                    return prevState
+                                })
+                            }} required />
                         </FormGroup>
                         <FormGroup>
                             <Form.Label>Password</Form.Label>
-                            <Form.Control type={'password'} id={'password'} value={this.state.selectedPassword.password} onChange={e=>{this.state.updatedPassword.password = e.target.value}} required />
+                            <Form.Control type={'password'} id={'password'} value={this.state.selectedPassword.password} onChange={e=>{
+                                this.setState(prevState => {
+                                    prevState.selectedPassword.password = e.target.value;
+                                    return prevState
+                                })
+                            }} required />
                         </FormGroup>
                         <FormGroup>
                             <Form.Label>Image url</Form.Label>
-                            <Form.Control type={'text'} id={'name'} value={this.state.selectedPassword.image} onChange={e=>{this.state.updatedPassword.image = e.target.value}} />
+                            <Form.Control type={'text'} id={'image'} value={this.state.selectedPassword.image} onChange={e=>{
+                                this.setState(prevState => {
+                                    prevState.selectedPassword.image = e.target.value;
+                                    return prevState
+                                })
+                            }} />
                         </FormGroup>
                 </Modal.Body>
                 <Modal.Footer>
