@@ -20,7 +20,7 @@ import axios from "axios";
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
 axios.interceptors.request.use(function (config) {
-    const user = localStorage.getItem("user");
+    const user = sessionStorage.getItem("user");
     if (user) {
         config.headers.Authorization =  `Bearer ${JSON.parse(user).token}`;
     } else {
@@ -35,7 +35,8 @@ axios.interceptors.response.use(response => response, error => {
     if (error.response) {
         if (error.response.status === 403 || error.response.status === 401){
             // redirect to 403 page
-            localStorage.removeItem("user");
+            sessionStorage.removeItem("user");
+            //TODO implement dont have permission page for redirect
             window.location = '/login?';
         }
     }

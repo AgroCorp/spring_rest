@@ -12,7 +12,7 @@ export interface Password {
     lmd:string;
     show?:boolean;
 }
-const SECRET = process.env.SECRET;
+const SECRET = process.env.REACT_APP_SECRET;
 
 export default class PasswordService {
     async getAllByUser():Password[] {

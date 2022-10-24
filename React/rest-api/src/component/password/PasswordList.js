@@ -161,11 +161,11 @@ export class PasswordList extends React.Component {
                         {this.state.data.length !== 0 &&
                             this.state.data.map(row => {
                                 return (
-                                    <tr key={row.id} onDoubleClick={this.editOpen}>
-                                        <td hidden={this.state.isMobile}>{row.id}</td>
-                                        <td>{row.name}</td>
-                                        <td onClick={this.handleView} style={{whiteSpace: "pre"}}>{row.password}</td>
-                                        <td hidden={this.state.isMobile}>{row.image}</td>
+                                    <tr key={row.id}>
+                                        <td hidden={this.state.isMobile} onDoubleClick={this.editOpen}>{row.id}</td>
+                                        <td onDoubleClick={this.editOpen}>{row.name}</td>
+                                        <td onClick={this.handleView} style={{whiteSpace: "pre"}} onDoubleClick={this.editOpen}>{row.password}</td>
+                                        <td hidden={this.state.isMobile} onDoubleClick={this.editOpen}>{row.image}</td>
                                         <td>
                                             <ButtonGroup>
                                                 <Button variant={"primary"} onClick={this.handleView}><FontAwesomeIcon icon={solid("eye")}/></Button>
@@ -190,7 +190,7 @@ export class PasswordList extends React.Component {
                     <Form onSubmit={this.addNewPassword}>
                         <Modal.Body>
                         <FormGroup>
-                            <Form.Label>Name</Form.Label>
+                            <Form.Label>Name *</Form.Label>
                             <Form.Control type={'text'} id={'name'} onChange={e=>{
                                 this.setState(prevState => {
                                     prevState.selectedPassword.name = e.target.value;
@@ -199,7 +199,7 @@ export class PasswordList extends React.Component {
                             }} required />
                         </FormGroup>
                         <FormGroup>
-                            <Form.Label>Password</Form.Label>
+                            <Form.Label>Password *</Form.Label>
                             <Form.Control type={'password'} id={'password'} onChange={e=>{
                                 this.setState(prevState => {
                                     prevState.selectedPassword.password = e.target.value;
@@ -214,7 +214,7 @@ export class PasswordList extends React.Component {
                                     prevState.selectedPassword.image = e.target.value;
                                     return prevState
                                 })
-                            }} required />
+                            }} />
                         </FormGroup>
                     </Modal.Body>
                     <Modal.Footer>

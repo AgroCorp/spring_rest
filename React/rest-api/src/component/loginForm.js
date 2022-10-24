@@ -36,7 +36,7 @@ class LoginForm extends React.Component {
 
         axios.post('/auth/login', {"username": this.username, "password": this.password}).then(r => {
             this.setState({loading: false});
-            localStorage.setItem('user', JSON.stringify(r.data));
+            sessionStorage.setItem('user', JSON.stringify(r.data));
 
             window.location.pathname = this.next;
 

@@ -6,6 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import me.agronaut.springrest.Model.Role;
 import me.agronaut.springrest.Model.User;
 import me.agronaut.springrest.Repository.UserRepository;
+import me.agronaut.springrest.Util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,7 +22,10 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -137,6 +141,7 @@ public class UserService {
                 AuthorityUtils.commaSeparatedStringToAuthorityList(roles.stream().map(Role::getName).collect(Collectors.joining(", "))) :
                 AuthorityUtils.commaSeparatedStringToAuthorityList("");
 
+        log.debug(Utils.SIMPLE_LOG_PATTERN, "belepett user jogai:", "ROLES", roles.toString());
 
         return Jwts
                 .builder()

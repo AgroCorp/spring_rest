@@ -3,17 +3,14 @@ package me.agronaut.springrest.Controller;
 import lombok.extern.log4j.Log4j2;
 import me.agronaut.springrest.Model.User;
 import me.agronaut.springrest.Service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -22,12 +19,11 @@ import java.util.Map;
 @CrossOrigin
 @Log4j2
 public class LoginController {
+    @Qualifier("UserService")
     private final UserService service;
-    @Autowired
     public LoginController(UserService service) {
         this.service = service;
     }
-
 
     @PostMapping("/register")
     public User register(@RequestBody User newUser) throws UserService.UserExistByEmailException
@@ -66,7 +62,7 @@ public class LoginController {
         return service.set_new_password(jsonData.get("password"), userId);
     }
 
-    @Secured("ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/list_all_user", consumes = "application/json", produces = "application/json")
     public List<User> getAll(@RequestBody User user) {
         log.info("user to search: " + user);

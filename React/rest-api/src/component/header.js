@@ -5,11 +5,11 @@ class Header extends React.Component {
     constructor(props) {
         super(props);
 
-        this.user = JSON.parse(localStorage.getItem("user"));
+        this.user = JSON.parse(sessionStorage.getItem("user"));
     }
 
     handleLogout() {
-        localStorage.removeItem("user");
+        sessionStorage.removeItem("user");
         window.location.pathname = "/";
     }
 
