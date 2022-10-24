@@ -1,9 +1,17 @@
 import React from "react";
 import {Table, Container} from "react-bootstrap"
 
+
+
 class ResultTable extends React.Component {
-    showModal() {
-        console.log("hello")
+    constructor(props) {
+        super(props);
+
+        this.handleView = this.handleView.bind(this);
+    }
+
+    handleView(event) {
+        console.log(event.parentNode.key);
     }
 
     render(){
@@ -12,7 +20,7 @@ class ResultTable extends React.Component {
                 <h2>Nincs találat</h2>
             </Container>)
         }
-        return <Container >
+        return (
             <Table variant={"light"}>
                 <thead>
                 <tr>
@@ -20,23 +28,25 @@ class ResultTable extends React.Component {
                     <th>Name</th>
                     <th>Password</th>
                     <th>Image</th>
+                    <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 {
                     this.props.data.map(row => {
                         return (
-                            <tr key={row.id} onDoubleClick={this.showModal()}>
+                            <tr key={row.id}>
                                 <td>{row.id}</td>
                                 <td>{row.name}</td>
                                 <td>{row.password}</td>
+                                <td onClick={this.handleView}>view</td>
                             </tr>
                         )
                     })
                 }
                 </tbody>
             </Table>
-        </Container>
+        )
     }
 }
 

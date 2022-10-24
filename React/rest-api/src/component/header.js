@@ -5,11 +5,11 @@ class Header extends React.Component {
     constructor(props) {
         super(props);
 
-        this.user = JSON.parse(localStorage.getItem("user"));
+        this.user = JSON.parse(sessionStorage.getItem("user"));
     }
 
     handleLogout() {
-        localStorage.removeItem("user");
+        sessionStorage.removeItem("user");
         window.location.pathname = "/";
     }
 
@@ -25,9 +25,6 @@ class Header extends React.Component {
                                 <Nav.Link href={"/"}>Home</Nav.Link>
                                 <Nav.Link href={'/login'}>Login</Nav.Link>
                                 <Nav.Link href={'/register'}>Register</Nav.Link>
-                                {this.user &&
-                                    <Nav.Link href={'/users'}>Users</Nav.Link>
-                                }
                             </Nav>
                         </Navbar.Collapse>
                     </Container>
@@ -43,7 +40,12 @@ class Header extends React.Component {
                             <Nav activeKey={window.location.pathname}>
                                 <Nav.Link href={"/"}>Home</Nav.Link>
                                 <Nav.Link onClick={this.handleLogout}>Logout</Nav.Link>
-                                <Nav.Link href={'/users'}>Users</Nav.Link>
+                                {this.user &&
+                                    <Nav.Link href={'/users'}>Users</Nav.Link>
+                                }
+                                {this.user &&
+                                    <Nav.Link href={'/passwords'}>Passwords</Nav.Link>
+                                }
                             </Nav>
                         </Navbar.Collapse>
                         <Navbar.Text>{this.user.username}</Navbar.Text>

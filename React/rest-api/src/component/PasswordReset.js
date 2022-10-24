@@ -1,5 +1,5 @@
 import React from "react";
-import BaseSite, {apiUrl} from "./baseSite";
+import {BaseSite} from './baseSite'
 import {Button, Form, FormGroup} from "react-bootstrap";
 import axios from "axios";
 import { useParams } from 'react-router-dom';
@@ -73,7 +73,7 @@ class PasswordReset extends React.Component {
 
         this.setState({validated : true, loading : true});
 
-        axios.post(`${apiUrl}/auth/set_new_password`, {'password': this.newPassword, 'token': this.props.match?.params.token})
+        axios.post('/auth/set_new_password', {'password': this.newPassword, 'token': this.props.match?.params.token})
             .then(r=>{
                 console.log(r);
                 setTimeout(() => {

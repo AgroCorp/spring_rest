@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
+
 import LoginForm from "./component/loginForm";
 import RegisterForm from "./component/RegisterForm";
 import Users from "./component/Users";
@@ -14,7 +15,34 @@ import {PasswordList} from "./component/password/PasswordList";
 import ActivateRegistration from "./component/ActivateRegistration";
 import PasswordReset from "./component/PasswordReset";
 import {GetPasswordReset} from "./component/getPasswordReset";
+import axios from "axios";
 
+axios.defaults.baseURL = process.env.REACT_APP_API_URL;
+
+axios.interceptors.request.use(function (config) {
+    const user = sessionStorage.getItem("user");
+    if (user) {
+        config.headers.Authorization =  `Bearer ${JSON.parse(user).token}`;
+    } else {
+        delete config.headers.Authorization;
+    }
+
+    return config;
+});
+
+axios.interceptors.response.use(response => response, error => {
+    console.log(error);
+    if (error.response) {
+        if (error.response.status === 403 || error.response.status === 401){
+            // redirect to 403 page
+            sessionStorage.removeItem("user");
+            //TODO implement dont have permission page for redirect
+            window.location = '/login?';
+        }
+    }
+
+    return Promise.reject(error);
+});
 
 render(
     <BrowserRouter>

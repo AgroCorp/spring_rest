@@ -8,10 +8,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    User getUserByUsername(String username);
+    Optional<User> getUserByUsername(String username);
+
     User getUserByEmail(String email);
 
     User getUserById(Long id);

@@ -8,6 +8,7 @@ import me.agronaut.springrest.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +31,9 @@ public class PasswordController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Password> addPassword(@RequestBody Password password) {
+    public ResponseEntity<Password> addPassword(@RequestBody Password password, HttpServletRequest request) {
+        User currentUser = userService.getByUsername(request.getUserPrincipal().getName());
+        password.setUser(currentUser);
         return new ResponseEntity<>(passwordService.addPassword(password), HttpStatus.CREATED);
     }
 

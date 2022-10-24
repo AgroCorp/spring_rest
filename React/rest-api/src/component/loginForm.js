@@ -3,8 +3,7 @@ import {Button, Form, FormGroup, Container, Row, Col} from "react-bootstrap";
 import {Link} from 'react-router-dom';
 
 import axios from "axios";
-import {setAuthToken} from "./axiosDefault";
-import BaseSite, {apiUrl, showNotification} from "./baseSite";
+import BaseSite, {showNotification} from "./baseSite";
 
 class LoginForm extends React.Component {
     queryParams = new URLSearchParams(window.location.search);
@@ -35,18 +34,15 @@ class LoginForm extends React.Component {
 
         this.setState({validated : true, loading : true});
 
-        axios.post(`${apiUrl}/auth/login`, {"username": this.username, "password": this.password}).then(r => {
+        axios.post('/auth/login', {"username": this.username, "password": this.password}).then(r => {
             this.setState({loading: false});
-            localStorage.setItem('user', JSON.stringify(r.data));
-
-
-            setAuthToken(r.data.token);
+            sessionStorage.setItem('user', JSON.stringify(r.data));
 
             window.location.pathname = this.next;
 
         }).catch(e => {
             console.log(e);
-            const errorMessage = e.response ? e.response.data.debugMessage : "";
+            const errorMessage = e.response ? e.response.data.message : "";
             if (errorMessage.length === 0) {
                 console.log(e);
             } else {

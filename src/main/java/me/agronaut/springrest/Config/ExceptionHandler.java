@@ -19,6 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
@@ -30,6 +31,13 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
         ApiError error = new ApiError(HttpStatus.NOT_FOUND, LocalDateTime.now(), ex.getMessage(), "Cannot find requested entity");
 
         return handleExceptionInternal(ex,error,new HttpHeaders(), error.getStatus(), request);
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(NoSuchElementException.class)
+    protected ResponseEntity<Object> handleNoSuchException(NoSuchElementException ex, WebRequest request) {
+        ApiError error = new ApiError(HttpStatus.NOT_FOUND, LocalDateTime.now(), ex.getMessage(), "cannot find requested entity with given id");
+
+        return handleExceptionInternal(ex, error, new HttpHeaders(),  error.getStatus(), request);
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler(ExpiredJwtException.class)
