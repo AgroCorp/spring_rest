@@ -16,7 +16,7 @@ import ActivateRegistration from "./component/ActivateRegistration.js";
 import PasswordReset from "./component/PasswordReset.js";
 import {GetPasswordReset} from "./component/getPasswordReset.js";
 import axios from "axios";
-import PermissionPage from "./Pages/PermissionPage.tsx";
+import PermissionPage from "./Pages/PermissionPage.jsx";
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
