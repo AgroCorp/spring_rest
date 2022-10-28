@@ -3,15 +3,16 @@ package me.agronaut.springrest.Controller;
 import lombok.extern.log4j.Log4j2;
 import me.agronaut.springrest.Model.User;
 import me.agronaut.springrest.Service.UserService;
+import me.agronaut.springrest.Util.Utils;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -64,9 +65,9 @@ public class LoginController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/list_all_user", consumes = "application/json", produces = "application/json")
-    public List<User> getAll(@RequestBody User user) {
-        log.info("user to search: " + user);
+    public Page<User> getAll(@RequestBody User user, Pageable pageable) {
+        log.debug(Utils.SIMPLE_LOG_PATTERN, "getAllByUser endpoint called:", "DATA", user + "\t" + pageable + "\t");
 
-        return service.getAll(user);
+        return service.getAll(user, pageable);
     }
 }

@@ -9,6 +9,7 @@ import me.agronaut.springrest.Repository.UserRepository;
 import me.agronaut.springrest.Util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,10 +19,7 @@ import org.springframework.util.Base64Utils;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -105,7 +103,7 @@ public class UserService {
         }
     }
 
-    public List<User> getAll(User user) {
+    public Page<User> getAll(User user, Pageable pageable) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
         CriteriaQuery<User> query = builder.createQuery(User.class);
@@ -133,7 +131,10 @@ public class UserService {
 
         query.select(root).where(builder.and(whereCauses.toArray(new Predicate[0])));
 
-        return entityManager.createQuery(query).getResultList();
+        int allCount =  entityManager.createQuery(query).getResultList().size();
+        List<User> res =  entityManager.createQuery(query).setFirstResult((int) pageable.getOffset()).setMaxResults(pageable.getPageSize()).getResultList();
+
+        return new PageImpl<>(res, pageable, allCount);
     }
 
     private String getJWTToken(String username, List<Role> roles) {

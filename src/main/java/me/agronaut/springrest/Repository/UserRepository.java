@@ -1,17 +1,14 @@
 package me.agronaut.springrest.Repository;
 
-import me.agronaut.springrest.Model.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.stereotype.Repository;
+
+import me.agronaut.springrest.Model.User;
+
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends PagingAndSortingRepository<User, Long> {
     Optional<User> getUserByUsername(String username);
 
     User getUserByEmail(String email);
