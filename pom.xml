@@ -20,8 +20,8 @@
         <changelog-file>/db/changelog/db.changelog-master.xml</changelog-file>
         <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
         <jdbc.url>jdbc:mariadb://192.168.2.55:3306/java</jdbc.url>
-        <jdbc.username>DB_USER</jdbc.username>
-        <jdbc.password>DB_PASSWORD</jdbc.password>
+        <jdbc.username>admin</jdbc.username>
+        <jdbc.password>Gaborka11</jdbc.password>
     </properties>
 
     <scm>

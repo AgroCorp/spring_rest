@@ -1,6 +1,7 @@
 import axios from "axios";
 import ResultTable from "./ResultTable.js";
 import {Button, Container, Row, Col, Pagination} from "react-bootstrap";
+import Form from "react-bootstrap/Form";
 import BaseSite, {showNotification} from "./baseSite";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
@@ -23,18 +24,11 @@ class Users extends React.Component {
         }
 
         this.search = this.search.bind(this);
+        this.setPage = this.setPage.binding(this);
     }
 
     componentDidMount() {
-        this.setState({loading:true});
-        axios.post(`/auth/list_all_user?page=${this.state.page}&size=${this.state.size}`,  {user: this.searchForm}).then(r=>{
-            this.setState({loading:false});
-            this.setState({data:r.data, pageNumbers:[...Array(r.data.totalPages + 1).keys()].slice(1)});
-        }).catch(e => {
-            console.log(e.error);
-            this.setState({error:e.error});
-            this.setState({loading: false})
-        })
+        this.search();
     }
 
     search() {
@@ -42,7 +36,12 @@ class Users extends React.Component {
         axios.post(`/auth/list_all_user?page=${this.state.page}&size=${this.state.size}`, {user: this.searchForm})
             .then(r=>{
                 this.setState({loading:false});
-                this.setState({data:r.data, pageNumbers:[...Array(r.data.totalPages + 1).keys()].slice(1)});
+                let lowerPage = r.data.page -5, upperPage = r.data.page + 5;
+
+                lowerPage = lowerPage < 0 ? 0 : lowerPage;
+                upperPage = upperPage > r.data.totalPages ? r.data.totalPages : upperPage;
+
+                this.setState({data:r.data, pageNumbers:[...Array(upperPage - lowerPage).keys()].map(i => i+lowerPage)});
             })
             .catch(e => {
                 showNotification('error', e.response?.message);
@@ -55,6 +54,12 @@ class Users extends React.Component {
         this.searchForm['email'] = null;
         this.searchForm['username'] = null;
         this.searchForm['active'] = true;
+    }
+
+    setPage(page:number):boolean {
+        this.setState({page: page});
+        this.search();
+        return true;
     }
 
     render() {
@@ -99,22 +104,34 @@ class Users extends React.Component {
 
                     </Row>
                     <Row xs={2} lg={6}>
-                        <Button variant={"primary"} onClick={this.search}><FontAwesomeIcon icon={solid('magnifying-glass')}/></Button>
+                        <Col>
+                            <Button variant={"primary"} onClick={this.search}><FontAwesomeIcon icon={solid('magnifying-glass')}/></Button>
+                        </Col>
+                        <Col>
+                            <Form.Select onChange={event => {this.setState({size:event.target.value});this.search();}}>
+                                <option value={10}>10</option>
+                                <option value={20}>20</option>
+                                <option value={50}>50</option>
+                                <option value={100}>100</option>
+                            </Form.Select>
+                        </Col>
                     </Row>
 
                     <Row>
                         <Pagination>
                             <Pagination.First disabled={this.state.data.first} />
-                            <Pagination.Prev disabled={this.state.data.first}/>
+                            <Pagination.Prev disabled={this.state.data.page !== 0}/>
                             
                             {
                                 this.state.pageNumbers.map(number => {
-                                    return (<Pagination.Item key={number} active={this.state.data.number-1 === number}>{number}</Pagination.Item>)
+                                    return (<Pagination.Item key={number} active={this.state.data.number-1 === number}>
+                                        <a onClick={this.setPage(number)}>{number}</a>
+                                    </Pagination.Item>)
                                 })
 
                             }
 
-                            <Pagination.Next disabled={this.state.data.last}/>
+                            <Pagination.Next disabled={this.state.data.page !== this.state.data.totalPages}/>
                             <Pagination.Last disabled={this.state.data.last} />
                         </Pagination>
                     </Row>
