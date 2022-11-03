@@ -1,6 +1,5 @@
 import axios from "axios";
-import ResultTable from "./ResultTable.js";
-import {Button, Container, Row, Col, Pagination} from "react-bootstrap";
+import {Button, Container, Row, Col, Pagination, Table} from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import BaseSite, {showNotification} from "./baseSite";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -137,7 +136,40 @@ class Users extends React.Component {
                     </Row>
 
                     <Row style={{paddingTop: 10}}>
-                        {this.state.data.content ? <ResultTable data = {this.state.data.content}/> : "Nincs adat"}
+                        <Container>
+                            <Table variant={"light"}>
+                                <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th onClick={}>First name</th>
+                                    <th>Last name</th>
+                                    <th>username</th>
+                                    <th>email</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    { this.state.data.content.length === 0 ?
+                                        <td colSpan={5}>
+                                            Nincs talalat
+                                        </td> :
+                                        this.props.data.map(row => {
+                                            return (
+                                                <tr key={row.id} onDoubleClick={node => {this.handleDoubleClick(row)}}>
+                                                    <td>{row.id}</td>
+                                                    <td>{row.firstName}</td>
+                                                    <td>{row.lastName}</td>
+                                                    <td>{row.username}</td>
+                                                    <td>{row.email}</td>
+                                                </tr>
+                                            )
+                                        })
+                                    }
+
+                                </tr>
+                                </tbody>
+                            </Table>
+                        </Container>
                     </Row>
                 </Container>
             </BaseSite>
