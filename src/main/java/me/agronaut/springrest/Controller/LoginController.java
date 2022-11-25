@@ -18,7 +18,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin
-@Log4j2
 public class LoginController {
     @Qualifier("UserService")
     private final UserService service;
@@ -34,7 +33,7 @@ public class LoginController {
 
     @GetMapping("/activate/{token}")
     public ResponseEntity<?> activate(@PathVariable String token) {
-        log.debug("{}:\n\t[{}]\t{}","raw token", "token", token);
+//        log.debug("{}:\n\t[{}]\t{}","raw token", "token", token);
         Long userId = Long.valueOf(new String(Base64Utils.decodeFromUrlSafeString(token)));
 
         service.activate(userId);
@@ -45,20 +44,20 @@ public class LoginController {
     @PostMapping("/login")
     public User login(@RequestBody User loginUser) throws UserService.NotActiveUserException
     {
-        log.debug("requestben kapott user: \n\t{}", loginUser);
+//        log.debug("requestben kapott user: \n\t{}", loginUser);
         return service.login(loginUser);
     }
 
     @PostMapping("/forgot_password")
     public ResponseEntity<?> forgotPassword(@RequestBody String email) {
-        log.debug("{}\n\t[{}]\t{}", "requestben kapott email", "email",email);
+//        log.debug("{}\n\t[{}]\t{}", "requestben kapott email", "email",email);
         service.reset_password(email);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping ("/set_new_password")
     public User setNewPassword(@RequestBody Map<String,String> jsonData) {
-        log.debug("{}\n\t[{}]\t{}\n\t[{}]\t{}", "requestben kapott adatok", "token",jsonData.get("token"), "password", jsonData.get("password"));
+//        log.debug("{}\n\t[{}]\t{}\n\t[{}]\t{}", "requestben kapott adatok", "token",jsonData.get("token"), "password", jsonData.get("password"));
         Long userId = Long.valueOf(new String(Base64Utils.decodeFromUrlSafeString(jsonData.get("token"))));
         return service.set_new_password(jsonData.get("password"), userId);
     }
@@ -66,7 +65,7 @@ public class LoginController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/list_all_user", consumes = "application/json", produces = "application/json")
     public Page<User> getAll(@RequestBody User user, Pageable pageable) {
-        log.debug(Utils.SIMPLE_LOG_PATTERN, "getAllByUser endpoint called:", "DATA", user + "\t" + pageable + "\t");
+//        log.debug(Utils.SIMPLE_LOG_PATTERN, "getAllByUser endpoint called:", "DATA", user + "\t" + pageable + "\t");
 
         return service.getAll(user, pageable);
     }

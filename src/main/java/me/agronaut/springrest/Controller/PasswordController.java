@@ -19,7 +19,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/password")
 @CrossOrigin
-@Log4j2
 public class PasswordController {
     private final PasswordService passwordService;
     private final UserService userService;

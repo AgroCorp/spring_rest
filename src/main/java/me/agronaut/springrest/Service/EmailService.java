@@ -17,7 +17,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 @Service
-@Log4j2
 public class EmailService{
 
     @Autowired private JavaMailSender sender;
@@ -26,7 +25,7 @@ public class EmailService{
     public String NO_REPLY_ADDRESS;
 
     public void sendEmail(String from, String to, String subject, String msg) {
-        log.debug("email details:\n\t[Details]\t" + from + ", " + to + ", " + subject + ", " + msg);
+        //log.debug("email details:\n\t[Details]\t" + from + ", " + to + ", " + subject + ", " + msg);
 
 
         try {
@@ -39,7 +38,7 @@ public class EmailService{
             helper.setText(msg ,true);
 
             sender.send(message);
-            log.debug("Email sent to address: " + to);
+//            log.debug("Email sent to address: " + to);
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
