@@ -76,7 +76,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '17'
-          distributiQon: 'temurin'
+          distribution: 'temurin'
           cache: maven
       - name: Cache SonarQube packages
         uses: actions/cache@v1
