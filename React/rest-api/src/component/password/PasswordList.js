@@ -4,6 +4,7 @@ import {BaseSite} from "../baseSite";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import PasswordService from "./PasswordService";
+import type {Password} from "./PasswordService";
 
 export class PasswordList extends React.Component {
     constructor(props) {
@@ -54,7 +55,7 @@ export class PasswordList extends React.Component {
         const selectedItem = this.state.data[event.target.closest('tr').rowIndex-1];
 
         if (selectedItem.show === true) {
-            selectedText[2].innerText = selectedItem.password;
+            selectedText[2].innerText = selectedItem.value;
             selectedItem.show = false;
         } else {
             selectedText[2].innerText = this.passwordService.decode(selectedText[2].innerText);
@@ -98,8 +99,8 @@ export class PasswordList extends React.Component {
     editOpen(event) {
         this.setState({selectedPassword: Object.assign({},this.state.data[event.target.closest('tr').rowIndex - 1])});
         this.setState(prevState => {
-            let selectedPassword = prevState.selectedPassword;
-            selectedPassword.password = this.passwordService.decode(selectedPassword.password);
+            let selectedPassword: Password = prevState.selectedPassword;
+            selectedPassword.value = this.passwordService.decode(selectedPassword.value);
             return selectedPassword;
         })
         this.setState({editShow: true});
@@ -164,7 +165,7 @@ export class PasswordList extends React.Component {
                                     <tr key={row.id}>
                                         <td hidden={this.state.isMobile} onDoubleClick={this.editOpen}>{row.id}</td>
                                         <td onDoubleClick={this.editOpen}>{row.name}</td>
-                                        <td onClick={this.handleView} style={{whiteSpace: "pre"}} onDoubleClick={this.editOpen}>{row.password}</td>
+                                        <td onClick={this.handleView} style={{whiteSpace: "pre"}} onDoubleClick={this.editOpen}>{row.value}</td>
                                         <td hidden={this.state.isMobile} onDoubleClick={this.editOpen}>{row.image}</td>
                                         <td>
                                             <ButtonGroup>
@@ -202,7 +203,7 @@ export class PasswordList extends React.Component {
                             <Form.Label>Password *</Form.Label>
                             <Form.Control type={'password'} id={'password'} onChange={e=>{
                                 this.setState(prevState => {
-                                    prevState.selectedPassword.password = e.target.value;
+                                    prevState.selectedPassword.value = e.target.value;
                                     return prevState.selectedPassword;
                                 })
                             }} required />
@@ -267,7 +268,7 @@ export class PasswordList extends React.Component {
                             <Form.Label>Password</Form.Label>
                             <Form.Control type={'password'} id={'password'} value={this.state.selectedPassword.password} onChange={e=>{
                                 this.setState(prevState => {
-                                    prevState.selectedPassword.password = e.target.value;
+                                    prevState.selectedPassword.value = e.target.value;
                                     return prevState
                                 })
                             }} required />

@@ -4,7 +4,7 @@ var CryptoJS = require("crypto-js");
 export interface Password {
     id: number;
     name: string;
-    password: string;
+    value: string;
     image: string;
     crd: string;
     cru: string;
