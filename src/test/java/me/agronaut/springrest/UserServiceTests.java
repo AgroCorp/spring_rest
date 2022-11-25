@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = SpringRestApplication.class)
-public class UserServiceTests {
+class UserServiceTests {
    @MockBean
     private UserRepository userRepository;
    @MockBean
@@ -39,7 +39,7 @@ public class UserServiceTests {
    private UserService userSD;
 
     @Test
-    public void testRegister() throws UserService.UserExistByEmailException {
+    void testRegister() throws UserService.UserExistByEmailException {
 
         // new user does not exist
         testUser.setPassword("testPassword");
@@ -60,7 +60,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void testLogin() {
+    void testLogin() {
 //        when(testUser.getActive()).thenReturn(true);
 //        when(testUser.getUsername()).thenReturn("testUser");
 //        when(testUser.getPassword()).thenReturn("testPassword");

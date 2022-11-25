@@ -149,7 +149,7 @@ public class UserService {
                 .setId("RestAgroTest")
                 .setSubject(username)
                 .claim("authorities", grantedAuthorities.stream()
-                        .map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
+                        .map(GrantedAuthority::getAuthority).toList())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 604800000))
                 .signWith(SignatureAlgorithm.HS512, secretKey.getBytes()).compact();
