@@ -23,7 +23,7 @@ public class PasswordController {
     private final PasswordService passwordService;
     private final UserService userService;
 
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
     @Autowired
     public PasswordController(PasswordService passwordService, UserService userService, ModelMapper mapper) {
