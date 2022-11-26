@@ -10,7 +10,6 @@ export class PasswordList extends React.Component {
     constructor(props) {
         super(props);
 
-        this.user = JSON.parse(localStorage.getItem("user"));
         this.passwordService = new PasswordService();
 
         this.state = {

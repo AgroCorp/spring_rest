@@ -1,10 +1,10 @@
 package me.agronaut.springrest;
 
 
-import me.agronaut.springrest.Model.User;
-import me.agronaut.springrest.Repository.UserRepository;
-import me.agronaut.springrest.Service.EmailService;
-import me.agronaut.springrest.Service.UserService;
+import me.agronaut.springrest.model.User;
+import me.agronaut.springrest.repository.UserRepository;
+import me.agronaut.springrest.service.EmailService;
+import me.agronaut.springrest.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

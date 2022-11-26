@@ -1,5 +1,5 @@
 import axios from "axios";
-var CryptoJS = require("crypto-js");
+const CryptoJS = require("crypto-js");
 
 export interface Password {
     id: number;
@@ -20,7 +20,7 @@ export default class PasswordService {
     }
 
     async add(password: Password):Password {
-        password.password = this.encode(password.password);
+        password.value = this.encode(password.value);
 
         return axios.post("/password/add", password);
     }
@@ -36,7 +36,7 @@ export default class PasswordService {
     }
 
     async update(newPassword: Password): Password {
-        newPassword.password = this.encode(newPassword.password, SECRET).toString();
+        newPassword.value = this.encode(newPassword.value, SECRET).toString();
         return axios.put("/password/update", newPassword);
     }
 

@@ -1,0 +1,86 @@
+name: master
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  sonarqube:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+      - name: Cache SonarQube packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache Maven packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Build and analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=AgroCorp_spring_rest_AYSwpPtT6xO6_35rpeNz -Dmaven.test.skip=true
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: replace db credentials in pom.xml
+          run: |
+            sed -i 's/DB_USER/${{secrets.DB_USER}}/g' pom.xml && sed -i 's/DB_PASSWORD/${{secrets.databasePassword}}/g' pom.xml && sed -i 's/192.168.2.55/127.17.0.1/g' pom.xml && \
+            sed -i 's/192.168.2.55/127.17.0.1/g' ./src/main/resources/application-local.properties && \
+            sed -i 's/admin/${{secrets.DB_USER}}/g' src/main/resources/application-local.properties && sed -i 's/Gaborka11/${{secrets.databasePassword}}/g' src/main/resources/application-local.properties
+
+            - name: Build with Maven
+              run: mvn -B package -Dmaven.test.skip=true --file pom.xml
+
+            - run: mkdir staging && cp target/*.jar staging
+            - uses: actions/upload-artifact@v3
+              with:
+                name: Package
+                path: staging
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Shutdown Ubuntu MySQL (SUDO)
+        run: sudo service mysql stop
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Set up MariaDB
+        uses: getong/mariadb-action@v1.1
+        with:
+          mysql database: 'java'
+          mysql user: ${{secrets.DB_USER}}
+          mysql password: ${{secrets.databasePassword}}
+
+      - name: replace credentials
+        run: |
+          sed -i 's/DB_USER/${{secrets.DB_USER}}/g' pom.xml && sed -i 's/DB_PASSWORD/${{secrets.databasePassword}}/g' pom.xml && sed -i 's/192.168.2.55/127.17.0.1/g' pom.xml && \
+          sed -i 's/192.168.2.55/127.17.0.1/g' ./src/main/resources/application-local.properties && \
+          sed -i 's/admin/${{secrets.DB_USER}}/g' src/main/resources/application-local.properties && sed -i 's/Gaborka11/${{secrets.databasePassword}}/g' src/main/resources/application-local.properties
+
+      - name: Test application
+        run: mvn -B verify --file pom.xml
