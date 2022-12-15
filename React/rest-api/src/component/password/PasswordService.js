@@ -3,6 +3,7 @@ const CryptoJS = require("crypto-js");
 
 export interface Password {
     id: number;
+    web_page: string;
     name: string;
     value: string;
     image: string;
@@ -15,8 +16,8 @@ export interface Password {
 const SECRET = process.env.REACT_APP_SECRET;
 
 export default class PasswordService {
-    async getAllByUser():Password[] {
-        return await axios.get("/password/getAllByUser");
+    async getAllByUser(page: number, size:number):Password[] {
+        return await axios.get(`/password/getAllByUser?page=${page}&size=${size}`);
     }
 
     async add(password: Password):Password {

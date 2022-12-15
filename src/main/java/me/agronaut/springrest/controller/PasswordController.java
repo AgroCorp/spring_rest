@@ -7,6 +7,8 @@ import me.agronaut.springrest.service.PasswordService;
 import me.agronaut.springrest.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,9 +52,9 @@ public class PasswordController {
     }
 
     @GetMapping("/getAllByUser")
-    public ResponseEntity<List<Password>> getAllByUser(HttpServletRequest request) {
+    public Page<Password> getAllByUser(HttpServletRequest request, Pageable pageable) {
         User currentUser = userService.getByUsername(request.getUserPrincipal().getName());
-        return new ResponseEntity<>(passwordService.getAllByUser(currentUser), HttpStatus.OK);
+        return passwordService.getAllByUser(currentUser, pageable);
     }
 
     @PutMapping("/update")

@@ -9,6 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
@@ -28,6 +29,10 @@ public class Password {
 
     @Column(name = "VALUE", nullable = false)
     private String value;
+
+    @Column(name = "WEB_PAGE", nullable = false)
+    @NotNull(message = "Web page need to be filled")
+    private String webPage;
 
     @Column(name = "CRD") @CreatedDate
     private LocalDateTime crd;

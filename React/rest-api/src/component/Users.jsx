@@ -23,27 +23,36 @@ class Users extends React.Component {
         }
 
         this.search = this.search.bind(this);
-        this.setPage = this.setPage.binding(this);
+        this.setPage = this.setPage.bind(this);
+        this.setSize = this.setSize.bind(this);
     }
 
     componentDidMount() {
-        this.search();
+        this.search(this.state.page, this.state.size);
     }
 
-    search() {
+    search(page:number, size:number) {
         this.setState({loading: true});
-        axios.post(`/auth/list_all_user?page=${this.state.page}&size=${this.state.size}`, {user: this.searchForm})
+        console.log(this.state.page);
+        axios.post(`/auth/list_all_user?page=${page}&size=${size}`, {user: this.searchForm})
             .then(r=>{
                 this.setState({loading:false});
-                let lowerPage = r.data.page -5, upperPage = r.data.page + 5;
+                let lowerPage = r.data.totalPages -5
+                let upperPage = r.data.totalPages + 5;
 
-                lowerPage = lowerPage < 0 ? 0 : lowerPage;
+
+                lowerPage = lowerPage < 0 ? 1 : lowerPage;
                 upperPage = upperPage > r.data.totalPages ? r.data.totalPages : upperPage;
 
-                this.setState({data:r.data, pageNumbers:[...Array(upperPage - lowerPage).keys()].map(i => i+lowerPage)});
+                let list = [];
+                for (let i = lowerPage; i <= upperPage; i++) {
+                    list.push(i);
+                }
+                console.log(r.data);
+                this.setState({data:r.data, pageNumbers: list , page: r.data.pageable.pageNumber});
             })
             .catch(e => {
-                showNotification('error', e.response?.message);
+                showNotification('error', e?.message);
             })
     }
 
@@ -55,10 +64,14 @@ class Users extends React.Component {
         this.searchForm['active'] = true;
     }
 
-    setPage(page:number):boolean {
+    setPage(page:number): void {
         this.setState({page: page});
-        this.search();
-        return true;
+        this.search(page, this.state.size);
+    }
+
+    setSize(size: number): void {
+        this.setState({size: size});
+        this.search(this.state.page, size);
     }
 
     render() {
@@ -107,32 +120,32 @@ class Users extends React.Component {
                             <Button variant={"primary"} onClick={this.search}><FontAwesomeIcon icon={solid('magnifying-glass')}/></Button>
                         </Col>
                         <Col>
-                            <Form.Select onChange={event => {this.setState({size:event.target.value});this.search();}}>
+                            <Form.Select onChange={event => this.setSize(event.target.value)}>
                                 <option value={10}>10</option>
                                 <option value={20}>20</option>
                                 <option value={50}>50</option>
                                 <option value={100}>100</option>
                             </Form.Select>
                         </Col>
-                    </Row>
+                        <Col>
+                            <Pagination>
+                                <Pagination.First disabled={this.state.data.first} onClick={()=> this.setPage(0)} />
+                                <Pagination.Prev disabled={this.state.data.first} onClick={()=>this.setPage(this.state.page - 1)}/>
 
-                    <Row>
-                        <Pagination>
-                            <Pagination.First disabled={this.state.data.first} />
-                            <Pagination.Prev disabled={this.state.data.page !== 0}/>
-                            
-                            {
-                                this.state.pageNumbers.map(number => {
-                                    return (<Pagination.Item key={number} active={this.state.data.number-1 === number}>
-                                        <a onClick={this.setPage(number)}>{number}</a>
-                                    </Pagination.Item>)
-                                })
+                                {
+                                    this.state.pageNumbers.map(number => {
+                                        return (<Pagination.Item key={number} onClick={()=>this.setPage(number-1)} active={this.state.data.pageable.pageNumber+1 === number}>
+                                            {number}
+                                        </Pagination.Item>)
+                                    })
 
-                            }
+                                }
 
-                            <Pagination.Next disabled={this.state.data.page !== this.state.data.totalPages}/>
-                            <Pagination.Last disabled={this.state.data.last} />
-                        </Pagination>
+                                <Pagination.Next disabled={this.state.data.last} onClick={()=>this.setPage(this.state.page + 1)} />
+                                <Pagination.Last disabled={this.state.data.last} onClick={()=>this.setPage(this.state.data.totalPages -1)} />
+                            </Pagination>
+                        </Col>
+
                     </Row>
 
                     <Row style={{paddingTop: 10}}>
@@ -141,19 +154,21 @@ class Users extends React.Component {
                                 <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th onClick={}>First name</th>
+                                    <th>First name</th>
                                     <th>Last name</th>
                                     <th>username</th>
                                     <th>email</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    { this.state.data.content.length === 0 ?
-                                        <td colSpan={5}>
-                                            Nincs talalat
-                                        </td> :
-                                        this.props.data.map(row => {
+                                    { this.state.data.content?.length === 0 ?
+                                        <tr>
+                                            <td colSpan={5}>
+                                                Nincs talalat
+                                            </td>
+                                        </tr>
+                                        :
+                                        this.state.data.content?.map(row => {
                                             return (
                                                 <tr key={row.id} onDoubleClick={node => {this.handleDoubleClick(row)}}>
                                                     <td>{row.id}</td>
@@ -165,8 +180,6 @@ class Users extends React.Component {
                                             )
                                         })
                                     }
-
-                                </tr>
                                 </tbody>
                             </Table>
                         </Container>

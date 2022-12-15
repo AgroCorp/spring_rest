@@ -15,8 +15,11 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.persistence.EntityNotFoundException;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
@@ -65,6 +68,12 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
     @org.springframework.web.bind.annotation.ExceptionHandler(UserService.UserExistByEmailException.class)
     protected ResponseEntity<Object> handleNotActivated(UserService.UserExistByEmailException ex, WebRequest request) {
         ApiError error = new ApiError(HttpStatus.BAD_REQUEST,LocalDateTime.now(),ex.getMessage(), "This e-mail address is taken. Please select other!");
+        return handleExceptionInternal(ex, error, new HttpHeaders(), error.getStatus(), request);
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(ConstraintViolationException.class)
+    protected ResponseEntity<Object> handleValidationException(ConstraintViolationException ex, WebRequest request) {
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST, LocalDateTime.now(), ex.getConstraintViolations().stream().map(ConstraintViolation::getMessage).collect(Collectors.joining(";")), "");
         return handleExceptionInternal(ex, error, new HttpHeaders(), error.getStatus(), request);
     }
 }

@@ -4,6 +4,9 @@ import me.agronaut.springrest.model.Password;
 import me.agronaut.springrest.model.User;
 import me.agronaut.springrest.repository.PasswordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,8 +20,10 @@ public class PasswordService {
         this.passwordRepository = passwordRepository;
     }
 
-    public List<Password> getAllByUser(User user) {
-        return passwordRepository.findAllByUser(user);
+    public Page<Password> getAllByUser(User user, Pageable pageable) {
+        List<Password> res = passwordRepository.findAllByUser(user);
+        return new PageImpl<>(res , pageable, res.size());
+
     }
 
     public Password getById(Long id) {

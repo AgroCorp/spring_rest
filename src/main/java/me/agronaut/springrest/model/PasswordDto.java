@@ -17,6 +17,7 @@ public class PasswordDto implements Serializable {
     private final Long id;
     private final String name;
     private final String value;
+    private final String webPage;
     private final LocalDateTime crd;
     private final String cru;
     private final LocalDateTime lmd;
