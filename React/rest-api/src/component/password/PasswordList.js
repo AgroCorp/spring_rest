@@ -38,27 +38,15 @@ export class PasswordList extends React.Component {
         this.handleEdit = this.handleEdit.bind(this);
         this.addNewPassword = this.addNewPassword.bind(this);
         this.handleResize = this.handleResize.bind(this);
+        this.setData = this.setData.bind(this);
     }
 
     componentDidMount() {
         this.setState({loading:true});
         this.setState({isMobile: window.innerWidth < 500});
-        this.passwordService.getAllByUser(this.state.page, this.state.size).then(r =>{
-            this.setState({loading:false});
-            let lowerPage = r.data.totalPages -5
-            let upperPage = r.data.totalPages + 5;
 
+        this.setData(this.passwordService.getAllByUser(this.state.page, this.state.size));
 
-            lowerPage = lowerPage < 0 ? 1 : lowerPage;
-            upperPage = upperPage > r.data.totalPages ? r.data.totalPages : upperPage;
-
-            let list = [];
-            for (let i = lowerPage; i <= upperPage; i++) {
-                list.push(i);
-            }
-            console.log(r.data);
-            this.setState({data:r.data, pageNumbers: list , page: r.data.pageable.pageNumber});
-        });
         window.addEventListener('resize', this.handleResize);
     }
 
@@ -82,9 +70,7 @@ export class PasswordList extends React.Component {
     async handleDelete() {
         await this.passwordService.delete(this.state.selectedPassword);
 
-        this.passwordService.getAllByUser().then(r=>{
-            this.setState({data: r.data});
-        });
+        await this.setData({data:  this.passwordService.getAllByUser(this.state.page, this.state.size)});
 
         await this.deleteClose();
     }
@@ -98,10 +84,27 @@ export class PasswordList extends React.Component {
         }
 
         await this.passwordService.edit(this.state.selectedPassword);
-        this.passwordService.getAllByUser().then(r=>{
-            this.setState({data: r.data});
-        });
+
+        await this.setData({data: this.passwordService.getAllByUser(this.state.page, this.state.size)});
+
         await this.editClose();
+    }
+
+    setData(r) {
+        this.setState({loading:false});
+        let lowerPage = r.data.totalPages -5
+        let upperPage = r.data.totalPages + 5;
+
+
+        lowerPage = lowerPage < 0 ? 1 : lowerPage;
+        upperPage = upperPage > r.data.totalPages ? r.data.totalPages : upperPage;
+
+        let list = [];
+        for (let i = lowerPage; i <= upperPage; i++) {
+            list.push(i);
+        }
+        console.log(r.data);
+        this.setState({data:r.data, pageNumbers: list , page: r.data.pageable.pageNumber});
     }
 
     addOpen () {
@@ -144,9 +147,7 @@ export class PasswordList extends React.Component {
         }
 
         await this.passwordService.add(this.state.selectedPassword)
-        this.passwordService.getAllByUser().then(r=>{
-            this.setState({data: r.data});
-        })
+        await this.setData(this.passwordService.getAllByUser(this.state.page, this.state.size));
         await this.addClose();
 
     }

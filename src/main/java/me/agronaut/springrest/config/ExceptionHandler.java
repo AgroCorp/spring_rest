@@ -76,4 +76,11 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
         ApiError error = new ApiError(HttpStatus.BAD_REQUEST, LocalDateTime.now(), ex.getConstraintViolations().stream().map(ConstraintViolation::getMessage).collect(Collectors.joining(";")), "");
         return handleExceptionInternal(ex, error, new HttpHeaders(), error.getStatus(), request);
     }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(Exception.class)
+    protected ResponseEntity<Object> handleBaseExecption(Exception ex, WebRequest request) {
+        ApiError error = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, LocalDateTime.now(), ex.getMessage(), "Unknown exception");
+
+        return handleExceptionInternal(ex, error, new HttpHeaders(), error.getStatus(), request);
+    }
 }
