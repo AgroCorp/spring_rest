@@ -20,8 +20,8 @@
         <changelog-file>/db/changelog/db.changelog-master.xml</changelog-file>
         <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
         <jdbc.url>jdbc:mariadb://192.168.2.55:3306/java</jdbc.url>
-        <jdbc.username>DB_USER</jdbc.username>
-        <jdbc.password>DB_PASSWORD</jdbc.password>
+        <jdbc.username>admin</jdbc.username>
+        <jdbc.password>Gaborka11</jdbc.password>
         <sonar.host.url>http://192.168.2.55:9002</sonar.host.url>
         <sonar.login>sqa_6a74116866376a11e1a91e49069ab7f8f46cfa95</sonar.login>
     </properties>
@@ -110,7 +110,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>3.1.0</version>
+        </dependency>
     </dependencies>
 
     <build>

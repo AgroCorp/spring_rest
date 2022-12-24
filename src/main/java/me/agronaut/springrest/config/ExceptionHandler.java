@@ -5,11 +5,13 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import me.agronaut.springrest.exception.ApiError;
 import me.agronaut.springrest.service.UserService;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -83,4 +85,13 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
 
         return handleExceptionInternal(ex, error, new HttpHeaders(), error.getStatus(), request);
     }
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST,LocalDateTime.now(), ex.getBindingResult().getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(";")),
+                "You have invalid data. Please read error messages for more details");
+
+        return handleExceptionInternal(ex, error, new HttpHeaders(), error.getStatus(), request);
+    }
+
 }
