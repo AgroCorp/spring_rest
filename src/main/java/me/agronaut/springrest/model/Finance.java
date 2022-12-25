@@ -33,6 +33,6 @@ public class Finance {
     @Column(name = "IS_INCOME", nullable = false)
     private Boolean income;
 
-//    @CreatedDate
-//    private LocalDateTime crd;
+    @CreatedDate
+    private LocalDateTime crd;
 }

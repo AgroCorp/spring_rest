@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * A DTO for the {@link Finance} entity
@@ -26,4 +27,6 @@ public class FinanceDto implements Serializable {
     private UserDto user;
     @NotNull(message = "Income field is required!")
     private Boolean income;
+
+    private LocalDateTime crd;
 }
