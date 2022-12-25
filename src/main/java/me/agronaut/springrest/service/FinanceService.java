@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class FinanceService {
@@ -38,5 +39,20 @@ public class FinanceService {
         Finance casted = modelMapper.map(financeDto, Finance.class);
         casted.setUser(user);
         return modelMapper.map(financeRepository.save(casted), FinanceDto.class);
+    }
+
+    public FinanceDto update(FinanceDto financeToUpdate) {
+        Finance casted = modelMapper.map(financeToUpdate, Finance.class);
+        financeRepository.save(casted);
+
+        return modelMapper.map(casted, FinanceDto.class);
+    }
+
+    public void delete(Long id) {
+        financeRepository.deleteById(id);
+    }
+
+    public FinanceDto getById(Long id) {
+        return modelMapper.map(financeRepository.getById(id).orElseThrow(NoSuchElementException::new), FinanceDto.class);
     }
 }

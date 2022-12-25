@@ -34,6 +34,16 @@ public class FinanceController {
         return financeSD.save(financeDto, current);
     }
 
+    @PutMapping("/update")
+    public FinanceDto updateFinance(@Valid @RequestBody FinanceDto financeToUpdate) {
+        return financeSD.update(financeToUpdate);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public void deleteSelected(@PathVariable("id") Long id) {
+        financeSD.delete(id);
+    }
+
     @GetMapping("/get-all-by-user")
     public Page<FinanceDto> getAllByUSer(HttpServletRequest request, Pageable pageable) {
         User current = userSD.getByUsername(request.getUserPrincipal().getName());
