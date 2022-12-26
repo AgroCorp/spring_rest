@@ -33,7 +33,7 @@ pipeline {
         }
         stage('SonarQube scan') {
             steps {
-                sh "mvn -B --file pom.xml clean verify sonar:sonar"
+                sh "mvn -B --file pom.xml -Dmaven.test.skip=true clean verify sonar:sonar"
             }
         }
     }
