@@ -1,6 +1,6 @@
 import React from "react";
 import {Container, Row, Col, Button, Modal, Form, FormGroup, Table, ButtonGroup, Pagination} from 'react-bootstrap';
-import {BaseSite} from "../baseSite";
+import {BaseSite, showNotification} from "../baseSite";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import PasswordService from "./PasswordService";
@@ -38,14 +38,14 @@ export class PasswordList extends React.Component {
         this.handleEdit = this.handleEdit.bind(this);
         this.addNewPassword = this.addNewPassword.bind(this);
         this.handleResize = this.handleResize.bind(this);
-        this.setData = this.setData.bind(this);
+        this.search = this.search.bind(this);
     }
 
     componentDidMount() {
-        this.setState({loading:true});
+        this.setState({loading: true});
         this.setState({isMobile: window.innerWidth < 500});
 
-        this.setData(this.passwordService.getAllByUser(this.state.page, this.state.size));
+        this.search(this.state.page, this.state.size);
 
         window.addEventListener('resize', this.handleResize);
     }
@@ -56,7 +56,7 @@ export class PasswordList extends React.Component {
 
     handleView(event) {
         const selectedText = event.target.closest('tr').childNodes;
-        const selectedItem = this.state.data[event.target.closest('tr').rowIndex-1];
+        const selectedItem = this.state.data.content[event.target.closest('tr').rowIndex-1];
 
         if (selectedItem.show === true) {
             selectedText[3].innerText = selectedItem.value;
@@ -70,7 +70,7 @@ export class PasswordList extends React.Component {
     async handleDelete() {
         await this.passwordService.delete(this.state.selectedPassword);
 
-        await this.setData({data:  this.passwordService.getAllByUser(this.state.page, this.state.size)});
+        await this.search(this.state.page, this.state.size)
 
         await this.deleteClose();
     }
@@ -85,26 +85,34 @@ export class PasswordList extends React.Component {
 
         await this.passwordService.edit(this.state.selectedPassword);
 
-        await this.setData({data: this.passwordService.getAllByUser(this.state.page, this.state.size)});
+        await this.search(this.state.page, this.state.size);
 
         await this.editClose();
     }
 
-    setData(r) {
-        this.setState({loading:false});
-        let lowerPage = r.data.totalPages -5
-        let upperPage = r.data.totalPages + 5;
+    search(page:number, size:number) {
+        this.setState({loading: true});
+        this.passwordService.getAllByUser(page, size)
+            .then(r=>{
+                this.setState({loading:false});
+                let lowerPage = r.data.totalPages -5
+                let upperPage = r.data.totalPages + 5;
 
 
-        lowerPage = lowerPage < 0 ? 1 : lowerPage;
-        upperPage = upperPage > r.data.totalPages ? r.data.totalPages : upperPage;
+                lowerPage = lowerPage < 0 ? 1 : lowerPage;
+                upperPage = upperPage > r.data.totalPages ? r.data.totalPages : upperPage;
 
-        let list = [];
-        for (let i = lowerPage; i <= upperPage; i++) {
-            list.push(i);
-        }
-        console.log(r.data);
-        this.setState({data:r.data, pageNumbers: list , page: r.data.pageable.pageNumber});
+                let list = [];
+                for (let i = lowerPage; i <= upperPage; i++) {
+                    list.push(i);
+                }
+                console.log(r.data);
+                this.setState({data:r.data, pageNumbers: list , page: r.data.pageable.pageNumber});
+            })
+            .catch(e => {
+                console.log(e)
+                showNotification('error', e?.message);
+            })
     }
 
     addOpen () {
@@ -116,7 +124,7 @@ export class PasswordList extends React.Component {
     }
 
     editOpen(event) {
-        this.setState({selectedPassword: Object.assign({},this.state.data[event.target.closest('tr').rowIndex - 1])});
+        this.setState({selectedPassword: Object.assign({},this.state.data.content[event.target.closest('tr').rowIndex - 1])});
         this.setState(prevState => {
             let selectedPassword: Password = prevState.selectedPassword;
             selectedPassword.value = this.passwordService.decode(selectedPassword.value);
@@ -130,7 +138,7 @@ export class PasswordList extends React.Component {
     }
 
     deleteOpen(event) {
-        this.setState({selectedPassword: Object.assign({},this.state.data[event.target.closest('tr').rowIndex - 1])});
+        this.setState({selectedPassword: Object.assign({},this.state.data.content[event.target.closest('tr').rowIndex - 1])});
         this.setState({deleteShow: true});
     }
 
@@ -147,9 +155,18 @@ export class PasswordList extends React.Component {
         }
 
         await this.passwordService.add(this.state.selectedPassword)
-        await this.setData(this.passwordService.getAllByUser(this.state.page, this.state.size));
+        await this.search(this.state.page, this.state.size);
         await this.addClose();
+    }
 
+    setPage(page:number): void {
+        this.setState({page: page});
+        this.search(page, this.state.size);
+    }
+
+    setSize(size: number): void {
+        this.setState({size: size});
+        this.search(this.state.page, size);
     }
 
     render() {
@@ -159,6 +176,14 @@ export class PasswordList extends React.Component {
                 <Row xs={4} lg={6} style={{marginBottom: 10}}>
                     <Col>
                         <Button variant={'success'} onClick={this.addOpen}><FontAwesomeIcon icon={solid('plus')} /></Button>
+                    </Col>
+                    <Col>
+                        <Form.Select onChange={event => this.setSize(event.target.value)}>
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                            <option value={50}>50</option>
+                            <option value={100}>100</option>
+                        </Form.Select>
                     </Col>
                     <Col>
                         <Pagination>
@@ -202,7 +227,7 @@ export class PasswordList extends React.Component {
                                 return (
                                     <tr key={row.id}>
                                         <td hidden={this.state.isMobile} onDoubleClick={this.editOpen}>{row.id}</td>
-                                        <td>{row.web_page}</td>
+                                        <td>{row.webPage}</td>
                                         <td onDoubleClick={this.editOpen}>{row.name}</td>
                                         <td onClick={this.handleView} style={{whiteSpace: "pre"}} onDoubleClick={this.editOpen}>{row.value}</td>
                                         <td hidden={this.state.isMobile} onDoubleClick={this.editOpen}>{row.image}</td>
@@ -323,9 +348,9 @@ export class PasswordList extends React.Component {
                         </FormGroup>
                         <FormGroup>
                             <Form.Label>Web Page *</Form.Label>
-                            <Form.Control type={'text'} id={'webPage'} value={this.state.selectedPassword.web_page} onChange={e=>{
+                            <Form.Control type={'text'} id={'webPage'} value={this.state.selectedPassword.webPage} onChange={e=>{
                                 this.setState(prevState => {
-                                    prevState.selectedPassword.web_page = e.target.value;
+                                    prevState.selectedPassword.webPage = e.target.value;
                                     return prevState
                                 })
                             }} required />
