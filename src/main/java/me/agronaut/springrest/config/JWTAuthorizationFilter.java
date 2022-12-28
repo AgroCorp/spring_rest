@@ -76,7 +76,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
     private boolean checkJWTToken(HttpServletRequest request) {
         String authenticationHeader = request.getHeader(HEADER);
-        if (authenticationHeader.contains(ADMIN_TOKEN)) {
+        if (authenticationHeader != null && authenticationHeader.contains(ADMIN_TOKEN)) {
             return true;
         }
         return authenticationHeader != null && authenticationHeader.startsWith(PREFIX);

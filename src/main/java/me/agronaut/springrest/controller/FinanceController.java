@@ -44,9 +44,28 @@ public class FinanceController {
         financeSD.delete(id);
     }
 
+    /**
+     * Get list of all {@link me.agronaut.springrest.model.Finance} by currently logged in user
+     * @param request request object from endpoint
+     * @param pageable pageable object from endpoint
+     * @return {@link Page} object with data
+     */
     @GetMapping("/get-all-by-user")
     public Page<FinanceDto> getAllByUSer(HttpServletRequest request, Pageable pageable) {
         User current = userSD.getByUsername(request.getUserPrincipal().getName());
+
+        return financeSD.getAllByUser(current, pageable);
+    }
+
+    /**
+     * Get all finances by User with given ID
+     * @param userId wanted User's id in database
+     * @param pageable pageable object from endpoint
+     * @return {@link Page} object with data
+     */
+    @GetMapping("/get-all-by-user/{userId}")
+    public Page<FinanceDto> getAllByUSerWithParameter(@PathVariable Long userId, Pageable pageable) {
+        User current = userSD.getById(userId);
 
         return financeSD.getAllByUser(current, pageable);
     }

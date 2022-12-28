@@ -11,6 +11,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -79,8 +80,16 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, error, new HttpHeaders(), error.getStatus(), request);
     }
 
+    @org.springframework.web.bind.annotation.ExceptionHandler(AccessDeniedException.class)
+    protected ResponseEntity<Object> handleAccessDenied(AccessDeniedException ex, WebRequest request) {
+        ApiError error = new ApiError(HttpStatus.FORBIDDEN, LocalDateTime.now(), ex.getMessage(), "You dont have permission to this site, or you need to log in.");
+
+        return handleExceptionInternal(ex, error, new HttpHeaders(), error.getStatus(), request);
+    }
+
     @org.springframework.web.bind.annotation.ExceptionHandler(Exception.class)
     protected ResponseEntity<Object> handleBaseExecption(Exception ex, WebRequest request) {
+        ex.printStackTrace();
         ApiError error = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, LocalDateTime.now(), ex.getMessage(), "Unknown exception");
 
         return handleExceptionInternal(ex, error, new HttpHeaders(), error.getStatus(), request);
