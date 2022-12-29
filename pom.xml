@@ -22,6 +22,8 @@
         <jdbc.url>jdbc:mariadb://192.168.2.55:3306/java</jdbc.url>
         <jdbc.username>admin</jdbc.username>
         <jdbc.password>Gaborka11</jdbc.password>
+        <sonar.host.url>http://192.168.2.55:9002</sonar.host.url>
+        <sonar.login>sqa_6a74116866376a11e1a91e49069ab7f8f46cfa95</sonar.login>
     </properties>
 
     <scm>
