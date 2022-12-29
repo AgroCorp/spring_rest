@@ -3,47 +3,6 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
   <localRepository>/usr/share/maven/ref/repository</localRepository>
-  <servers>
-    <server>
-      <id>maven-snapshots</id>
-      <username>horvath12.gabor@ext.t-systems.hu</username>
-      <password>glpat-zZ_pECWrmrSNzdKKQSZz</password>
-    </server>
-    <server>
-      <id>maven-releases</id>
-      <username>horvath12.gabor@ext.t-systems.hu</username>
-      <password>glpat-zZ_pECWrmrSNzdKKQSZz</password>
-    </server>
-
-    <server>
-      <id>maven-public</id>
-      <username>horvath12.gabor@ext.t-systems.hu</username>
-      <password>glpat-zZ_pECWrmrSNzdKKQSZz</password>
-    </server>
-
-    <server>
-      <id>maven-central</id>
-      <username>horvath12.gabor@ext.t-systems.hu</username>
-      <password>glpat-zZ_pECWrmrSNzdKKQSZz</password>
-    </server>
-    <server>
-      <id>central</id>
-      <username>horvath12.gabor@ext.t-systems.hu</username>
-      <password>glpat-zZ_pECWrmrSNzdKKQSZz</password>
-    </server>
-    <server>
-      <id>nexus-snapshots</id>
-      <username>gaborka98</username>
-      <password>R2Fib3JrYTEx</password>
-    </server>
-    <server>
-      <id>nexus-releases</id>
-      <username>gaborka98</username>
-      <password>R2Fib3JrYTEx</password>
-    </server>
-
-  </servers>
-
   <mirrors>
     <mirror>
       <id>google-maven-central</id>
@@ -51,14 +10,31 @@
       <url>https://maven-central.storage.googleapis.com/maven2/</url>
       <mirrorOf>central</mirrorOf>
     </mirror>
-
-    <mirror>
-      <id>central</id>
-      <name>central</name>
-      <url>https://sunshine.tsmdev.tsmcloud.hu/nexus/repository/maven-public/</url>
-      <mirrorOf>sunshine</mirrorOf>
-    </mirror>
   </mirrors>
+
+  <pluginGroups>
+    <pluginGroup>org.sonarsource.scanner.maven</pluginGroup>
+  </pluginGroups>
+  <profiles>
+    <profile>
+      <id>sonar</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <sonar.host.url>
+          http://192.168.2.55:9002
+        </sonar.host.url>
+        <sonar.organization>
+          Agro_corp
+        </sonar.organization>
+        <sonar.login>
+          sqp_53bd2acaa91dea9de2d6073b2ea26a8f2fd87c8c
+        </sonar.login>
+        <sonar.debug>true</sonar.debug>
+      </properties>
+    </profile>
+  </profiles>
 
 </settings>
 

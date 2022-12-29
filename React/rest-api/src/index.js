@@ -7,15 +7,16 @@ import {BrowserRouter, Route, Routes} from "react-router-dom";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import LoginForm from "./component/loginForm";
-import RegisterForm from "./component/RegisterForm";
-import Users from "./component/Users";
-import PrivateRoute from "./component/PrivateRoute";
-import {PasswordList} from "./component/password/PasswordList";
-import ActivateRegistration from "./component/ActivateRegistration";
-import PasswordReset from "./component/PasswordReset";
-import {GetPasswordReset} from "./component/getPasswordReset";
+import LoginForm from "./component/loginForm.js";
+import RegisterForm from "./component/RegisterForm.js";
+import Users from "./component/Users.jsx";
+import PrivateRoute from "./component/PrivateRoute.js";
+import {PasswordList} from "./component/password/PasswordList.js";
+import ActivateRegistration from "./component/ActivateRegistration.js";
+import PasswordReset from "./component/PasswordReset.js";
+import {GetPasswordReset} from "./component/getPasswordReset.js";
 import axios from "axios";
+import PermissionPage from "./Pages/PermissionPage.jsx";
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
@@ -36,8 +37,7 @@ axios.interceptors.response.use(response => response, error => {
         if (error.response.status === 403 || error.response.status === 401){
             // redirect to 403 page
             sessionStorage.removeItem("user");
-            //TODO implement dont have permission page for redirect
-            window.location = '/login?';
+            window.location = '/403';
         }
     }
 
@@ -63,6 +63,8 @@ render(
                 <PasswordList/>
             </PrivateRoute>}>
             </Route>
+
+            <Route path={'403'} element={<PermissionPage/>} />
         </Routes>
     </BrowserRouter>,
   document.getElementById('root')
