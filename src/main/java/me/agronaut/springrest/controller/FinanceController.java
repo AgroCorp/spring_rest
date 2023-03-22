@@ -5,6 +5,7 @@ import me.agronaut.springrest.model.User;
 import me.agronaut.springrest.service.FinanceService;
 import me.agronaut.springrest.service.UserService;
 import me.agronaut.springrest.util.LogUtil;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,9 @@ import javax.validation.Valid;
 @RequestMapping("/finance")
 @CrossOrigin
 public class FinanceController {
+    @Qualifier("FinanceService")
     private final FinanceService financeSD;
+    @Qualifier("userService")
     private final UserService userSD;
 
     private final LogUtil logger = new LogUtil(getClass());

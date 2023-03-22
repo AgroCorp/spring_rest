@@ -30,18 +30,22 @@ public class FinanceService {
 
 
     public Page<FinanceDto> getAllByUser(User user, Pageable pageable) {
+        logger.debug("FinanceService.getAllByUser - START");
+
         List<Finance> res = financeRepository.getAllByUser(user);
 
         return new PageImpl<>(res.stream().map(iter -> modelMapper.map(iter, FinanceDto.class)).toList(), pageable, res.size());
     }
 
     public FinanceDto save(FinanceDto financeDto, User user) {
+        logger.debug("FinanceService.save - START");
         Finance casted = modelMapper.map(financeDto, Finance.class);
         casted.setUser(user);
         return modelMapper.map(financeRepository.save(casted), FinanceDto.class);
     }
 
     public FinanceDto update(FinanceDto financeToUpdate) {
+        logger.debug("FinanceService.update - START");
         Finance casted = modelMapper.map(financeToUpdate, Finance.class);
         financeRepository.save(casted);
 
@@ -49,10 +53,13 @@ public class FinanceService {
     }
 
     public void delete(Long id) {
+        logger.debug("FinanceService.delete - START");
+
         financeRepository.deleteById(id);
     }
 
     public FinanceDto getById(Long id) {
+        logger.debug("FinanceService.getById - START");
         return modelMapper.map(financeRepository.getById(id).orElseThrow(NoSuchElementException::new), FinanceDto.class);
     }
 }
