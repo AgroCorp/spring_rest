@@ -53,7 +53,7 @@ public class FinanceController {
      * @param pageable pageable object from endpoint
      * @return {@link Page} object with data
      */
-    @GetMapping("/get-all-by-user")
+    @GetMapping("/get")
     public Page<FinanceDto> getAllByUSer(HttpServletRequest request, Pageable pageable) {
         User current = userSD.getByUsername(request.getUserPrincipal().getName());
 
@@ -66,7 +66,7 @@ public class FinanceController {
      * @param pageable pageable object from endpoint
      * @return {@link Page} object with data
      */
-    @GetMapping("/get-all-by-user/{userId}")
+    @GetMapping("/get/{userId}")
     public Page<FinanceDto> getAllByUSerWithParameter(@PathVariable Long userId, Pageable pageable) {
         User current = userSD.getById(userId);
 
