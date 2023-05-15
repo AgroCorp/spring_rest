@@ -1,7 +1,9 @@
 package me.agronaut.springrest.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
@@ -12,8 +14,10 @@ import java.io.Serializable;
 @Data
 @Getter
 @Setter
+@NoArgsConstructor
 public class RoleDto implements Serializable {
-    private final Long id;
-    private final String name;
-    private final UserDto user;
+    private  Long id;
+    private  String name;
+    @JsonBackReference
+    private  UserDto user;
 }

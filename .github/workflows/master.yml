@@ -1,12 +1,12 @@
-
-name: master
+name: Build
 on:
   push:
     branches:
-      - master
+      - master # or the name of your main branch
 
 jobs:
-  sonarqube:
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -36,7 +36,6 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=AgroCorp_spring_rest_AYSwpPtT6xO6_35rpeNz -Dmaven.test.skip=true
-
   build:
     runs-on: ubuntu-latest
     needs: test
@@ -93,4 +92,3 @@ jobs:
 
       - name: Test application
         run: mvn -B verify --file pom.xml
-

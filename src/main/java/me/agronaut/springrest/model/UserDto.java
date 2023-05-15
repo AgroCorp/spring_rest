@@ -1,7 +1,9 @@
 package me.agronaut.springrest.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.Email;
@@ -16,20 +18,22 @@ import java.util.List;
 @Data
 @Getter
 @Setter
+@NoArgsConstructor
 public class UserDto implements Serializable {
-    private final Long id;
-    private final String firstName;
-    private final String lastName;
+    private  Long id;
+    private  String firstName;
+    private  String lastName;
     @NotNull
-    private final String username;
+    private  String username;
     @NotNull
-    private final String password;
+    private  String password;
     @NotNull
     @Email
-    private final String email;
+    private  String email;
     @NotNull
-    private final Date registrationDate;
+    private  Date registrationDate;
     @NotNull
-    private final Boolean active;
-    private final List<RoleDto> roles;
+    private  Boolean active;
+    @JsonManagedReference
+    private  List<RoleDto> roles;
 }

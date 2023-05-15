@@ -4,8 +4,10 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import me.agronaut.springrest.model.Role;
 import me.agronaut.springrest.model.User;
+import me.agronaut.springrest.model.UserDto;
 import me.agronaut.springrest.repository.UserRepository;
 import me.agronaut.springrest.util.LogUtil;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
@@ -31,10 +33,13 @@ public class UserService {
     private final EmailService emailService;
     private final LogUtil logger = new LogUtil(UserService.class);
 
+    private final ModelMapper modelMapper;
+
     @Autowired
-    public UserService(UserRepository userRepo, EmailService emailService) {
+    public UserService(UserRepository userRepo, EmailService emailService, ModelMapper modelMapper) {
         this.userRepo = userRepo;
         this.emailService = emailService;
+        this.modelMapper = modelMapper;
     }
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -88,7 +93,7 @@ public class UserService {
         if (login.isPresent()) {
             logger.debug("getted user", "User", login.isPresent());
             User casted = login.get();
-            if (!casted.getActive()) {
+            if (casted.getActive() != null && !casted.getActive()) {
                 throw new NotActiveUserException("user is not activated");
             }
             if (encoder.matches(loginUser.getPassword(), casted.getPassword())) {
@@ -101,6 +106,10 @@ public class UserService {
         } else {
             throw new EntityNotFoundException("Cannot find user with given username");
         }
+    }
+
+    public User getById(Long id) {
+        return userRepo.getUserById(id);
     }
 
     public Page<User> getAll(User user, Pageable pageable) {
@@ -183,6 +192,17 @@ public class UserService {
 
     public User getByUsername(String name) {
         return userRepo.getUserByUsername(name).orElse(null);
+    }
+
+    /**
+     *
+     * @param roleName role's name example: ADMIN or USER
+     * @return pageable object with users which have role with given name
+     */
+    public List<UserDto> getAllByRole(String roleName) {
+        List<User> all = userRepo.findAllUserByRoleName(roleName);
+
+        return all.stream().map(iter-> modelMapper.map(iter, UserDto.class)).toList();
     }
 
     public static class NotActiveUserException extends Exception {

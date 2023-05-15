@@ -40,13 +40,10 @@ class UserServiceTests {
 
     @Test
     void testRegister() throws UserService.UserExistByEmailException {
-
         // new user does not exist
         testUser.setPassword("testPassword");
         testUser.setEmail("test@user.com");
         testUser.setId(1L);
-//        when(testUser.getPassword()).thenReturn("testPassword");
-//        when(testUser.getEmail()).thenReturn("test@user.com");
         when(userRepository.save(any(User.class))).thenReturn(testUser);
         when(userRepository.existsUserByEmail("test@user.com")).thenReturn(false);
         doNothing().when(emailSD).sendEmail(anyString(),anyString(),anyString(),anyString());
@@ -61,10 +58,6 @@ class UserServiceTests {
 
     @Test
     void testLogin() {
-//        when(testUser.getActive()).thenReturn(true);
-//        when(testUser.getUsername()).thenReturn("testUser");
-//        when(testUser.getPassword()).thenReturn("testPassword");
-
         testUser.setActive(true);
         testUser.setUsername("testUser");
         testUser.setPassword("testPassword");
@@ -75,6 +68,7 @@ class UserServiceTests {
         mockUser.setUsername("testUser");
         when(userRepository.getUserByUsername(anyString())).
                 thenReturn(Optional.of(mockUser));
+
         // everything ok
         assertDoesNotThrow(() -> userSD.login(testUser));
 

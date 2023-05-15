@@ -15,6 +15,7 @@ import {PasswordList} from "./component/password/PasswordList.js";
 import ActivateRegistration from "./component/ActivateRegistration.js";
 import PasswordReset from "./component/PasswordReset.js";
 import {GetPasswordReset} from "./component/getPasswordReset.js";
+import FinanceList from "./component/finances/FinanceList";
 import axios from "axios";
 import PermissionPage from "./Pages/PermissionPage.jsx";
 
@@ -61,6 +62,10 @@ render(
             </PrivateRoute>}></Route>
             <Route path={'passwords'} element={<PrivateRoute>
                 <PasswordList/>
+            </PrivateRoute>}>
+            </Route>
+            <Route path={'finance'} element={<PrivateRoute>
+                <FinanceList/>
             </PrivateRoute>}>
             </Route>
 

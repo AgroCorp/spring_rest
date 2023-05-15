@@ -15,7 +15,6 @@ export interface Password {
 }
 const SECRET = process.env.REACT_APP_SECRET;
 
-//! TODO: refactor all calls just return data
 export default class PasswordService {
     async getAllByUser(page: number, size:number):Password[] {
         return axios.get(`/password/getAllByUser?page=${page}&size=${size}`)

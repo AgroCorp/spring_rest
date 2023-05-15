@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -67,5 +68,10 @@ public class LoginController {
     @PostMapping(value = "/list_all_user", consumes = "application/json", produces = "application/json")
     public Page<User> getAll(@RequestBody UserDto user, Pageable pageable) {
         return service.getAll( modelMapper.map(user, User.class), pageable);
+    }
+
+    @GetMapping(value = "/get-all-by-role/{roleName}", produces = "application/json")
+    public List<UserDto> getAllByRole(@PathVariable String roleName) {
+        return service.getAllByRole(roleName);
     }
 }

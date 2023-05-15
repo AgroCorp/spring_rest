@@ -2,6 +2,7 @@ package me.agronaut.springrest.model;
 
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
@@ -13,13 +14,14 @@ import java.time.LocalDateTime;
 @Data
 @Getter
 @Setter
+@NoArgsConstructor
 public class PasswordDto implements Serializable {
-    private final Long id;
-    private final String name;
-    private final String value;
-    private final String webPage;
-    private final LocalDateTime crd;
-    private final String cru;
-    private final LocalDateTime lmd;
-    private final UserDto user;
+    private  Long id;
+    private  String name;
+    private  String value;
+    private  String webPage;
+    private  LocalDateTime crd;
+    private  String cru;
+    private  LocalDateTime lmd;
+    private  UserDto user;
 }
