@@ -20,8 +20,6 @@ public class FinanceService {
     private final FinanceRepository financeRepository;
     private final ModelMapper modelMapper;
 
-    private final LogUtil logger = new LogUtil(this.getClass());
-
     @Autowired
     public FinanceService(FinanceRepository financeRepository, ModelMapper modelMapper) {
         this.financeRepository = financeRepository;

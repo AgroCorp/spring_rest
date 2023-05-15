@@ -93,7 +93,7 @@ public class UserService {
         if (login.isPresent()) {
             logger.debug("getted user", "User", login.isPresent());
             User casted = login.get();
-            if (!casted.getActive()) {
+            if (casted.getActive() != null && !casted.getActive()) {
                 throw new NotActiveUserException("user is not activated");
             }
             if (encoder.matches(loginUser.getPassword(), casted.getPassword())) {
