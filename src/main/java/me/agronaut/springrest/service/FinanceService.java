@@ -18,6 +18,7 @@ import java.util.NoSuchElementException;
 @Service
 public class FinanceService {
     private final FinanceRepository financeRepository;
+    private final LogUtil logger = new LogUtil(UserService.class);
     private final ModelMapper modelMapper;
 
     @Autowired
