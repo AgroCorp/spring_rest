@@ -15,7 +15,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/finance")
-@CrossOrigin
+@CrossOrigin("localhost")
 public class FinanceController {
     @Qualifier("FinanceService")
     private final FinanceService financeSD;

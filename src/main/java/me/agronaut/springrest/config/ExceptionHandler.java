@@ -89,7 +89,6 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
 
     @org.springframework.web.bind.annotation.ExceptionHandler(Exception.class)
     protected ResponseEntity<Object> handleBaseExecption(Exception ex, WebRequest request) {
-        ex.printStackTrace();
         ApiError error = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, LocalDateTime.now(), ex.getMessage(), "Unknown exception");
 
         return handleExceptionInternal(ex, error, new HttpHeaders(), error.getStatus(), request);
