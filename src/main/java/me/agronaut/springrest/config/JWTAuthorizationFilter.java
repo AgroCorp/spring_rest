@@ -1,6 +1,7 @@
 package me.agronaut.springrest.config;
 
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,7 +25,8 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
     private static final String HEADER = "Authorization";
     private static final String PREFIX = "Bearer ";
-    private static final String ADMIN_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBZG1pbiIsIm5hbWUiOiJBZG1pbiIsImlhdCI6MTUxNjIzOTAyMiwiYXV0aG9yaXRpZXMiOlsiQURNSU4iXX0.qyQTOIuvzx0SAHkOUodg2t4ICdMvchxze_klGUK8vCI";
+    @Value("${ADMIN_TOKEN}")
+    private String ADMIN_TOKEN;
 
     public JWTAuthorizationFilter setSECRET(String secret) {
         this.SECRET = secret;
