@@ -20,7 +20,6 @@ import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/password")
-@CrossOrigin
 public class PasswordController {
     @Qualifier("PasswordServce")
     private final PasswordService passwordService;
