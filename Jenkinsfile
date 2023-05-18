@@ -26,7 +26,7 @@ pipeline {
 
     stage('Unit tests') {
         steps {
-            "mvn -B --file pom.xml -Dmaven.test.failure.ignore=true test"
+            sh "mvn -B --file pom.xml -Dmaven.test.failure.ignore=true test"
         }
     }
 
