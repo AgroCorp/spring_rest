@@ -11,9 +11,22 @@ pipeline {
         git 'https://github.com/AgroCorp/spring_rest.git'
       }
     }
+
+    stage('Build project') {
+        steps {
+            sh 'mvn -B -Dmaven.test.skip=true clean package'
+        }
+    }
+
     stage('SonarQube scan') {
         steps {
             sh "mvn -B --file pom.xml -Dmaven.test.skip=true clean verify sonar:sonar"
+        }
+    }
+
+    stage('Unit tests') {
+        steps {
+            "mvn -B --file pom.xml -Dmaven.test.failure.ignore=true test"
         }
     }
 
@@ -52,6 +65,10 @@ pipeline {
 //     }
 }
   post {
+    success {
+  //      junit '**/target/surefire-reports/TEST-*.xml'
+        archiveArtifacts 'target/*.jar'
+  }
     failure {
         emailext body: "<b>Error in build</b><br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br>Stage: ${FAILED_STAGE} <br> URL to build: ${env.BUILD_URL}",
         from: 'jenkins@sativus.space',
