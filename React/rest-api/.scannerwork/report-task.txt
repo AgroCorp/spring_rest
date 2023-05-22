@@ -1,0 +1,6 @@
+projectKey=springReact
+serverUrl=http://192.168.2.55:9002
+serverVersion=10.0.0.68432
+dashboardUrl=http://192.168.2.55:9002/dashboard?id=springReact
+ceTaskId=AYhCk59uXl6dXmOspQ7y
+ceTaskUrl=http://192.168.2.55:9002/api/ce/task?id=AYhCk59uXl6dXmOspQ7y

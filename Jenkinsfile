@@ -15,12 +15,14 @@ pipeline {
     stage('Build project') {
         steps {
             sh 'mvn -B -Dmaven.test.skip=true clean package'
+            sh 'npm --prefix ./React/rest-api run build'
         }
     }
 
     stage('SonarQube scan') {
         steps {
             sh "mvn -B --file pom.xml -Dmaven.test.skip=true clean verify sonar:sonar"
+            sh 'node React/rest-api/sonarqube-scanner.js'
         }
     }
 
