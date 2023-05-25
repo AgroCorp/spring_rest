@@ -26,8 +26,8 @@ pipeline {
           FAILED_STAGE = env.STAGE_NAME+" - npm"
           sh 'CI=false npm --prefix ./React/rest-api install'
           sh 'CI=false npm --prefix ./React/rest-api run build'
-
-          sh 'tar -czvf build.tar.gz ./React/rest-api/build'
+          sh 'cp ./React/rest-api/build ./'
+          sh 'tar -czvf build.tar.gz ./build'
         }
       }
     }
