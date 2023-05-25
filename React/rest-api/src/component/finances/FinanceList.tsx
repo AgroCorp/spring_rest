@@ -1,6 +1,6 @@
 import * as React from "react";
 import BaseSite from "../baseSite.js"
-import FinanceService from "./FinanceService";
+import FinanceService from "./FinanceService.ts";
 
 type State = {
     loading: boolean;

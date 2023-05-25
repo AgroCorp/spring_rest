@@ -15,7 +15,7 @@ import {PasswordList} from "./component/password/PasswordList.js";
 import ActivateRegistration from "./component/ActivateRegistration.js";
 import PasswordReset from "./component/PasswordReset.js";
 import {GetPasswordReset} from "./component/getPasswordReset.js";
-import FinanceList from "./component/finances/FinanceList";
+import FinanceList from "./component/finances/FinanceList.tsx";
 import axios from "axios";
 import PermissionPage from "./Pages/PermissionPage.jsx";
 

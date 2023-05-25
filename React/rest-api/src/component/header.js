@@ -1,5 +1,5 @@
 import React from "react";
-import {Navbar, Container, Nav} from "react-bootstrap";
+import {Container, Nav, Navbar} from "react-bootstrap";
 
 class Header extends React.Component {
     constructor(props) {

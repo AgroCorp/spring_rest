@@ -9,12 +9,14 @@ pipeline {
   stages {
     stage('Checkout Scm') {
       steps {
+        FAILED_STAGE = env.STAGE_NAME
         git 'https://github.com/AgroCorp/spring_rest.git'
       }
     }
 
     stage('Build project') {
         steps {
+            FAILED_STAGE = env.STAGE_NAME
             sh 'mvn -B -Dmaven.test.skip=true clean package'
             sh 'npm --prefix ./React/rest-api install'
             sh 'npm --prefix ./React/rest-api run build'
@@ -23,6 +25,7 @@ pipeline {
 
     stage('SonarQube scan') {
         steps {
+            FAILED_STAGE = env.STAGE_NAME
             sh "mvn -B --file pom.xml -Dmaven.test.skip=true clean verify sonar:sonar"
             sh 'node React/rest-api/sonarqube-scanner.js'
         }
@@ -30,6 +33,7 @@ pipeline {
 
     stage('Unit tests') {
         steps {
+            FAILED_STAGE = env.STAGE_NAME
             sh "mvn -B --file pom.xml -Dmaven.test.failure.ignore=true test"
         }
     }
