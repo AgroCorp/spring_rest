@@ -1,5 +1,6 @@
 package me.agronaut.springrest.controller;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
 import me.agronaut.springrest.model.FinanceDto;
 import me.agronaut.springrest.model.User;
 import me.agronaut.springrest.service.FinanceService;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.Base64;
 
 @RestController
 @RequestMapping("/finance")
@@ -70,5 +72,22 @@ public class FinanceController {
         User current = userSD.getById(userId);
 
         return financeSD.getAllByUser(current, pageable);
+    }
+
+    /**
+     * Get finance by given ID
+     * @param financeId searched finance's id
+     * @return {@link FinanceDto} object with data
+     */
+    @GetMapping("/get/{financeId}")
+    public FinanceDto getById(@PathVariable String financeId) {
+        String decodedId = new String(Base64.getDecoder().decode(financeId));
+        Long parsedId = null;
+        try {
+            parsedId = Long.valueOf(decodedId);
+        } catch (NumberFormatException e) {
+            logger.error("error in parsing financeId");
+        }
+        return financeSD.getById(parsedId);
     }
 }
