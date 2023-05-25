@@ -9,8 +9,10 @@ pipeline {
   stages {
     stage('Checkout Scm') {
       steps {
-        FAILED_STAGE = env.STAGE_NAME
-        git 'https://github.com/AgroCorp/spring_rest.git'
+        script {
+          FAILED_STAGE = env.STAGE_NAME
+          git 'https://github.com/AgroCorp/spring_rest.git'
+        }
       }
     }
 
