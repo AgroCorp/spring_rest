@@ -23,9 +23,9 @@ pipeline {
           sh 'mvn -B -Dmaven.test.skip=true clean package'
         }
         script {
-          FAILED_STAGE = env.STAGE_NAME+" - maven"
-          sh 'npm --prefix ./React/rest-api install'
-          sh 'npm --prefix ./React/rest-api run build'
+          FAILED_STAGE = env.STAGE_NAME+" - npm"
+          sh 'CI=false npm --prefix ./React/rest-api install'
+          sh 'CI=false npm --prefix ./React/rest-api run build'
         }
       }
     }
