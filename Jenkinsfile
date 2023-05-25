@@ -27,7 +27,7 @@ pipeline {
           sh 'CI=false npm --prefix ./React/rest-api install'
           sh 'CI=false npm --prefix ./React/rest-api run build'
           sh 'cp -r ./React/rest-api/build ./'
-          sh 'tar -czvf build.tar.gz ./build'
+          sh 'tar -czvf build.tar.gz -C ./build .'
         }
       }
     }
