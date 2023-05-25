@@ -16,6 +16,7 @@ pipeline {
     stage('Build project') {
         steps {
             sh 'mvn -B -Dmaven.test.skip=true clean package'
+            sh 'npm --prefix ./React/rest-api install'
             sh 'npm --prefix ./React/rest-api run build'
         }
     }
