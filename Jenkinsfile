@@ -27,7 +27,7 @@ pipeline {
           sh 'CI=false npm --prefix ./React/rest-api install'
           sh 'CI=false npm --prefix ./React/rest-api run build'
           sh 'cp -r ./React/rest-api/build ./'
-          sh 'find /my/dir/ -printf "%P\n" -type f -o -type l -o -type d | tar -czf build.tar.gz --no-recursion -C build -T -'
+          sh 'find ./build/ -printf "%P\n" -type f -o -type l -o -type d | tar -czf build.tar.gz --no-recursion -C ./build/ -T -'
         }
       }
     }
