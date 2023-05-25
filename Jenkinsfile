@@ -15,27 +15,36 @@ pipeline {
     }
 
     stage('Build project') {
-        steps {
-            FAILED_STAGE = env.STAGE_NAME
-            sh 'mvn -B -Dmaven.test.skip=true clean package'
-            sh 'npm --prefix ./React/rest-api install'
-            sh 'npm --prefix ./React/rest-api run build'
+      steps {
+        script {
+          FAILED_STAGE = env.STAGE_NAME+" - maven"
+          sh 'mvn -B -Dmaven.test.skip=true clean package'
         }
+        script {
+          FAILED_STAGE = env.STAGE_NAME+" - maven"
+          sh 'npm --prefix ./React/rest-api install'
+          sh 'npm --prefix ./React/rest-api run build'
+        }
+      }
     }
 
     stage('SonarQube scan') {
-        steps {
-            FAILED_STAGE = env.STAGE_NAME
-            sh "mvn -B --file pom.xml -Dmaven.test.skip=true clean verify sonar:sonar"
-            sh 'node React/rest-api/sonarqube-scanner.js'
+      steps {
+        script {
+          FAILED_STAGE = env.STAGE_NAME
+          sh "mvn -B --file pom.xml -Dmaven.test.skip=true clean verify sonar:sonar"
+          sh 'node React/rest-api/sonarqube-scanner.js'
         }
+      }
     }
 
     stage('Unit tests') {
-        steps {
-            FAILED_STAGE = env.STAGE_NAME
-            sh "mvn -B --file pom.xml -Dmaven.test.failure.ignore=true test"
+      steps {
+        script {
+          FAILED_STAGE = env.STAGE_NAME
+          sh "mvn -B --file pom.xml -Dmaven.test.failure.ignore=true test"
         }
+      }
     }
 
 //     stage('Build image') {
