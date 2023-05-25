@@ -26,6 +26,8 @@ pipeline {
           FAILED_STAGE = env.STAGE_NAME+" - npm"
           sh 'CI=false npm --prefix ./React/rest-api install'
           sh 'CI=false npm --prefix ./React/rest-api run build'
+
+          sh 'zip -r build.zip ./React/rest-api/build '
         }
       }
     }
@@ -87,7 +89,7 @@ pipeline {
     success {
         junit '**/target/surefire-reports/TEST-*.xml'
         archiveArtifacts 'target/*.jar'
-        archiveArtifacts 'React/rest-api/build/**/*.*'
+        archiveArtifacts 'build.zip'
   }
     failure {
         emailext body: "<b>Error in build</b><br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br>Stage: ${FAILED_STAGE} <br> URL to build: ${env.BUILD_URL}",
