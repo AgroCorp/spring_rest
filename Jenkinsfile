@@ -89,7 +89,7 @@ pipeline {
     success {
         junit '**/target/surefire-reports/TEST-*.xml'
         archiveArtifacts 'target/*.jar'
-        archiveArtifacts 'build.zip'
+        archiveArtifacts 'build.tar.gz'
   }
     failure {
         emailext body: "<b>Error in build</b><br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br>Stage: ${FAILED_STAGE} <br> URL to build: ${env.BUILD_URL}",
