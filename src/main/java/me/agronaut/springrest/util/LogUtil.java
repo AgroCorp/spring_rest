@@ -1,6 +1,5 @@
 package me.agronaut.springrest.util;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,12 +12,17 @@ public class LogUtil {
         log = LogManager.getLogger(outerClass);
     }
 
-
     public void debug(String message) {
         log.debug(message);
     }
-    public void warn(String message) {log.warn(message);}
-    public void error(String message) {log.error(message);}
+
+    public void warn(String message) {
+        log.warn(message);
+    }
+
+    public void error(String message) {
+        log.error(message);
+    }
 
     public void debug(String message, String parameter, Object value) {
         String[] parameters = new String[1];
@@ -28,6 +32,7 @@ public class LogUtil {
 
         this.debug(message, parameters, values);
     }
+
     public void warn(String message, String parameter, Object value) {
         String[] parameters = new String[1];
         parameters[0] = parameter;
@@ -36,6 +41,7 @@ public class LogUtil {
 
         this.warn(message, parameters, values);
     }
+
     public void error(String message, String parameter, Object value) {
         String[] parameters = new String[1];
         parameters[0] = parameter;
@@ -45,35 +51,30 @@ public class LogUtil {
         this.error(message, parameters, values);
     }
 
-    public void debug(String message,  String[] parameters, Object[] values) {
-        if (log.isEnabled(Level.DEBUG)) {
-            StringBuilder sb = getLogBuilder(message, parameters, values);
-            if (!sb.isEmpty()) {
-                log.debug(sb.toString());
-            }
+    public void debug(String message, String[] parameters, Object[] values) {
+        StringBuilder sb = getLogBuilder(message, parameters, values);
+        if (!sb.isEmpty() && log.isDebugEnabled()) {
+            log.debug(sb.toString());
         }
     }
 
     public void warn(String message, String[] parameters, Object[] values) {
-        if (log.isEnabled(Level.WARN)) {
-            StringBuilder sb = getLogBuilder(message, parameters, values);
-            if (!sb.isEmpty()) {
-                log.warn(sb.toString());
-            }
+        StringBuilder sb = getLogBuilder(message, parameters, values);
+        if (!sb.isEmpty() && log.isWarnEnabled()) {
+            log.warn(sb.toString());
         }
     }
+
     public void error(String message, String[] parameters, Object[] values) {
-        if (log.isEnabled(Level.ERROR)) {
-            StringBuilder sb = getLogBuilder(message, parameters, values);
-            if (!sb.isEmpty()) {
-                log.error(sb.toString());
-            }
+        StringBuilder sb = getLogBuilder(message, parameters, values);
+        if (!sb.isEmpty() && log.isErrorEnabled()) {
+            log.error(sb.toString());
         }
     }
 
     private StringBuilder getLogBuilder(String message, String[] parameters, Object[] values) throws InvalidParameterException {
         StringBuilder sb = new StringBuilder();
-        if (message != null) {
+        if (message != null && !message.isEmpty()) {
             sb.append(message);
 
             if (parameters != null && values != null && parameters.length != values.length) {

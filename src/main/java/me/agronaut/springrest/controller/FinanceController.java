@@ -50,7 +50,8 @@ public class FinanceController {
 
     /**
      * Get list of all {@link me.agronaut.springrest.model.Finance} by currently logged in user
-     * @param request request object from endpoint
+     *
+     * @param request  request object from endpoint
      * @param pageable pageable object from endpoint
      * @return {@link Page} object with data
      */
@@ -63,11 +64,12 @@ public class FinanceController {
 
     /**
      * Get all finances by User with given ID
-     * @param userId wanted User's id in database
+     *
+     * @param userId   wanted User's id in database
      * @param pageable pageable object from endpoint
      * @return {@link Page} object with data
      */
-    @GetMapping("/get/{userId}")
+    @GetMapping("/user/{userId}")
     public Page<FinanceDto> getAllByUSerWithParameter(@PathVariable Long userId, Pageable pageable) {
         User current = userSD.getById(userId);
 
@@ -76,9 +78,11 @@ public class FinanceController {
 
     /**
      * Get finance by given ID
+     *
      * @param financeId searched finance's id
      * @return {@link FinanceDto} object with data
      */
+
     @GetMapping("/get/{financeId}")
     public FinanceDto getById(@PathVariable String financeId) {
         String decodedId = new String(Base64.getDecoder().decode(financeId));

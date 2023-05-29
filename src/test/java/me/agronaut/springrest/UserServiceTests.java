@@ -19,24 +19,23 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = SpringRestApplication.class)
 class UserServiceTests {
-   @MockBean
+    @MockBean
     private UserRepository userRepository;
-   @MockBean
-   private EmailService emailSD;
+    @MockBean
+    private EmailService emailSD;
 
-   private final User testUser = new User();
+    private final User testUser = new User();
 
-   @Autowired
-   private BCryptPasswordEncoder encoder;
+    @Autowired
+    private BCryptPasswordEncoder encoder;
 
-   @Autowired
-   private UserService userSD;
+    @Autowired
+    private UserService userSD;
 
     @Test
     void testRegister() throws UserService.UserExistByEmailException {
@@ -46,7 +45,7 @@ class UserServiceTests {
         testUser.setId(1L);
         when(userRepository.save(any(User.class))).thenReturn(testUser);
         when(userRepository.existsUserByEmail("test@user.com")).thenReturn(false);
-        doNothing().when(emailSD).sendEmail(anyString(),anyString(),anyString(),anyString());
+        doNothing().when(emailSD).sendEmail(anyString(), anyString(), anyString(), anyString());
 
         Long insertedId = userSD.register(testUser).getId();
         assertNotNull(insertedId);
@@ -54,6 +53,22 @@ class UserServiceTests {
         // new user exist
         when(userRepository.existsUserByEmail("test@user.com")).thenReturn(true);
         assertThrows(UserService.UserExistByEmailException.class, () -> userSD.register(testUser));
+    }
+
+    @Test
+    void testActivate() {
+        testUser.setId(1L);
+        doReturn(testUser).when(userRepository).save(any(User.class));
+        doReturn(testUser).when(userRepository).getUserById(anyLong());
+
+        userSD.activate(testUser.getId());
+        assertThrows(EntityNotFoundException.class, () -> {
+            userSD.activate(null);
+        });
+
+
+        verify(userRepository, times(1)).save(nullable(User.class));
+        verify(userRepository, times(2)).getUserById(nullable(Long.class));
     }
 
     @Test
@@ -78,10 +93,10 @@ class UserServiceTests {
         mockUser.setActive(true);
 
         // null user
-        assertThrows(EntityNotFoundException.class,()-> userSD.login(null));
+        assertThrows(EntityNotFoundException.class, () -> userSD.login(null));
 
         // pad password
         mockUser.setPassword(encoder.encode("testPasswordBad"));
-        assertThrows(EntityNotFoundException.class,()-> userSD.login(testUser));
+        assertThrows(EntityNotFoundException.class, () -> userSD.login(testUser));
     }
 }

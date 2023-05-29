@@ -1,0 +1,20 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run All Unit Tests" type="JUnit" factoryName="JUnit">
+    <module name="springRest" />
+    <option name="MAIN_CLASS_NAME" value="" />
+    <option name="METHOD_NAME" value="" />
+    <option name="TEST_OBJECT" value="directory" />
+    <envs>
+      <env name="spring.profiles.active" value="junit" />
+    </envs>
+    <dir value="$PROJECT_DIR$/src/test/java/me/agronaut/springrest" />
+    <patterns>
+      <pattern testClass="me.agronaut.springrest.CategoryServiceTests" />
+      <pattern testClass="me.agronaut.springrest.LogUtilTests" />
+      <pattern testClass="me.agronaut.springrest.UserServiceTests" />
+    </patterns>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

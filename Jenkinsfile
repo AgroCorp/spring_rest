@@ -32,21 +32,29 @@ pipeline {
       }
     }
 
-    stage('SonarQube scan') {
-      steps {
-        script {
-          FAILED_STAGE = env.STAGE_NAME
-          sh "mvn -B --file pom.xml -Dmaven.test.skip=true clean verify sonar:sonar"
-          sh 'node React/rest-api/sonarqube-scanner.js'
-        }
-      }
-    }
-
     stage('Unit tests') {
       steps {
         script {
           FAILED_STAGE = env.STAGE_NAME
           sh "mvn -B --file pom.xml -Dmaven.test.failure.ignore=true test"
+        }
+      }
+    }
+
+    stage('Jacoco report') {
+      steps {
+        script{
+          FAILED_STAGE = env.STAGE_NAME
+          sh 'mvn clean org.jacoco:jacoco-maven-plugin:0.8.10:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.10:report'
+        }
+      }
+    }
+
+    stage('SonarQube scan') {
+      steps {
+        script {
+          sh "mvn -B --file pom.xml -Dmaven.test.skip=true sonar:sonar"
+          sh 'node React/rest-api/sonarqube-scanner.js'
         }
       }
     }
