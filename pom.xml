@@ -9,18 +9,18 @@
         <relativePath/>
     </parent>
 
-    <!--    <distributionManagement>
-            <repository>
-                <id>nexus</id>
-                <name>Releases</name>
-                <url>http://192.168.2.55:8101/repository/maven-releases</url>
-            </repository>
-            <snapshotRepository>
-                <id>nexus</id>
-                <name>Snapshot</name>
-                <url>http://192.168.2.55:8101/repository/maven-snapshots</url>
-            </snapshotRepository>
-        </distributionManagement>-->
+    <distributionManagement>
+        <repository>
+            <id>nexus</id>
+            <name>Releases</name>
+            <url>http://192.168.2.55:8101/repository/maven-releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus</id>
+            <name>Snapshot</name>
+            <url>http://192.168.2.55:8101/repository/maven-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <groupId>hu.AgroCorp</groupId>
     <artifactId>springRest</artifactId>
@@ -38,6 +38,7 @@
         <sonar.host.url>http://192.168.2.55:9002</sonar.host.url>
         <sonar.token>sqa_6a74116866376a11e1a91e49069ab7f8f46cfa95</sonar.token>
         <sonar.java.binaries>target</sonar.java.binaries>
+        <sonar.tests>src/test</sonar.tests>
     </properties>
 
     <scm>
@@ -171,28 +172,17 @@
                             <goal>parse-version</goal>
                         </goals>
                     </execution>
-                    <execution>
-                        <id>attach-artifacts</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attach-artifact</goal>
-                        </goals>
-                        <configuration>
-                            <artifacts>
-                                <artifact>
-                                    <file>src/main/resources/lorem-ipsum.pdf</file>
-                                    <type>pdf</type>
-                                    <classifier>pdf</classifier>
-                                </artifact>
-                            </artifacts>
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
                 <version>2.8.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.7.0.1746</version>
             </plugin>
         </plugins>
     </build>
