@@ -36,7 +36,7 @@ pipeline {
       steps {
         script {
           FAILED_STAGE = env.STAGE_NAME
-          sh "mvn -B --file pom.xml -Dmaven.test.skip=true clean verify sonar:sonar"
+          sh "mvn -B --file pom.xml -Dmaven.test.skip=true sonar:sonar"
           sh 'node React/rest-api/sonarqube-scanner.js'
         }
       }
