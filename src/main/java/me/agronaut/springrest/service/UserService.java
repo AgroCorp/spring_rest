@@ -10,7 +10,9 @@ import me.agronaut.springrest.util.LogUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,7 +22,10 @@ import org.springframework.util.Base64Utils;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,20 +73,24 @@ public class UserService {
         logger.debug("token:", "token", token);
         emailService.sendEmail(null, registeredUser.getEmail(), "Confirm Registration",
                 "Hello " + registeredUser.getUsername() + "!<br /><br />" +
-                "Please click the link below to <a href=" +
-                apiUrl + "/activate/" + token + ">activate your account</a>.");
+                        "Please click the link below to <a href=" +
+                        apiUrl + "/activate/" + token + ">activate your account</a>.");
 
         return registeredUser;
     }
 
     public void activate(Long userId) {
         logger.debug("activate methos - START");
-        logger.debug("user id in activate method:", "userId" ,userId);
+        logger.debug("user id in activate method:", "userId", userId);
         User user = userRepo.getUserById(userId);
 
-        user.setActive(true);
+        if (user != null) {
+            user.setActive(true);
 
-        userRepo.save(user);
+            userRepo.save(user);
+        } else {
+            throw new EntityNotFoundException("User with given ID does not exist");
+        }
     }
 
     public User login(User loginUser) throws NotActiveUserException, EntityNotFoundException {
@@ -140,8 +149,8 @@ public class UserService {
 
         query.select(root).where(builder.and(whereCauses.toArray(new Predicate[0])));
 
-        int allCount =  entityManager.createQuery(query).getResultList().size();
-        List<User> res =  entityManager.createQuery(query).setFirstResult((int) pageable.getOffset()).setMaxResults(pageable.getPageSize()).getResultList();
+        int allCount = entityManager.createQuery(query).getResultList().size();
+        List<User> res = entityManager.createQuery(query).setFirstResult((int) pageable.getOffset()).setMaxResults(pageable.getPageSize()).getResultList();
 
         return new PageImpl<>(res, pageable, allCount);
     }
@@ -195,14 +204,13 @@ public class UserService {
     }
 
     /**
-     *
      * @param roleName role's name example: ADMIN or USER
      * @return pageable object with users which have role with given name
      */
     public List<UserDto> getAllByRole(String roleName) {
         List<User> all = userRepo.findAllUserByRoleName(roleName);
 
-        return all.stream().map(iter-> modelMapper.map(iter, UserDto.class)).toList();
+        return all.stream().map(iter -> modelMapper.map(iter, UserDto.class)).toList();
     }
 
     public static class NotActiveUserException extends Exception {
