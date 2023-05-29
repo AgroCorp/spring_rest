@@ -14,8 +14,9 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.security.InvalidParameterException;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = SpringRestApplication.class)
@@ -25,10 +26,12 @@ class LogUtilTests {
     @Mock
     private LogUtil logger;
 
-    private Logger log = LogManager.getLogger(getClass());
+    @Mock
+    private final Logger log = LogManager.getLogger(getClass());
 
     @BeforeEach
     void SetUp() {
+        doNothing().when(log).debug(anyString());
         ReflectionTestUtils.setField(logger, "log", log);
 
         doCallRealMethod().when(logger).debug(anyString());
@@ -51,6 +54,7 @@ class LogUtilTests {
         testUser.setFirstName("test");
         testUser.setLastName("user");
     }
+
     @Test
     void testConstruct() {
         assertDoesNotThrow(() -> new LogUtil(this.getClass()));
@@ -90,35 +94,46 @@ class LogUtilTests {
 
     @Test
     void testArrayParameterLogging() {
-        logger.debug("test", new String[]{"hello"}, new Object[]{testUser});
-        assertThrows(InvalidParameterException.class, () -> {logger.debug("test", new String[]{"hello", "test"}, new Object[]{testUser});});
-        assertThrows(InvalidParameterException.class, () -> {logger.debug("test", new String[]{"hello"}, new Object[]{testUser, "test"});});
-        logger.debug("test", new String[]{"hello"}, new Object[]{null});
-        logger.debug("test", new String[]{null}, new Object[]{"test"});
-        logger.debug(null, new String[]{"hello"}, new Object[]{"test"});
-        logger.debug(null, new String[]{}, new Object[]{});
+        doReturn(true).when(log).isDebugEnabled();
+        doReturn(true).when(log).isErrorEnabled();
+        doReturn(true).when(log).isWarnEnabled();
+        logger.debug("test", new String[]{"test"}, new Object[]{testUser});
+        logger.warn("test", new String[]{"test"}, new Object[]{testUser});
+        logger.error("test", new String[]{"test"}, new Object[]{testUser});
+
+        logger.debug(null, new String[]{"test"}, new Object[]{testUser});
+        logger.debug("", new String[]{"test"}, new Object[]{testUser});
+        logger.error(null, new String[]{"test"}, new Object[]{testUser});
+        logger.error("", new String[]{"test"}, new Object[]{testUser});
+        logger.warn(null, new String[]{"test"}, new Object[]{testUser});
+        logger.warn("", new String[]{"test"}, new Object[]{testUser});
+
+        logger.debug("test", (String[]) null, new Object[]{testUser});
+        logger.debug("test", new String[]{null}, new Object[]{testUser});
+
+        logger.debug("test", new String[]{"test"}, new Object[]{null});
+        logger.debug("test", new String[]{"test"}, null);
+
+        assertThrows(InvalidParameterException.class, () -> logger.debug("test", new String[]{"test"}, new Object[]{testUser, "test"}));
+        assertThrows(InvalidParameterException.class, () -> logger.debug("test", new String[]{"test", "hello"}, new Object[]{testUser}));
         logger.debug("test", new String[]{}, new Object[]{});
 
-        logger.warn("test", new String[]{"hello"}, new Object[]{testUser});
-        assertThrows(InvalidParameterException.class, () -> {logger.warn("test", new String[]{"hello", "test"}, new Object[]{testUser});});
-        assertThrows(InvalidParameterException.class, () -> {logger.warn("test", new String[]{"hello"}, new Object[]{testUser, "test"});});
-        logger.warn("test", new String[]{"hello"}, new Object[]{null});
-        logger.warn("test", new String[]{null}, new Object[]{"test"});
-        logger.warn(null, new String[]{"hello"}, new Object[]{"test"});
-        logger.warn(null, new String[]{}, new Object[]{});
-        logger.warn("test", new String[]{}, new Object[]{});
+        doReturn(false).when(log).isDebugEnabled();
+        doReturn(false).when(log).isErrorEnabled();
+        doReturn(false).when(log).isWarnEnabled();
+        logger.debug("test", new String[]{"test"}, new Object[]{testUser});
+        logger.error("test", new String[]{"test"}, new Object[]{testUser});
+        logger.warn("test", new String[]{"test"}, new Object[]{testUser});
+        logger.debug(null, new String[]{"test"}, new Object[]{testUser});
+        logger.error(null, new String[]{"test"}, new Object[]{testUser});
+        logger.warn(null, new String[]{"test"}, new Object[]{testUser});
+        logger.debug("", new String[]{"test"}, new Object[]{testUser});
+        logger.warn("", new String[]{"test"}, new Object[]{testUser});
+        logger.error("", new String[]{"test"}, new Object[]{testUser});
 
-        logger.error("test", new String[]{"hello"}, new Object[]{testUser});
-        assertThrows(InvalidParameterException.class, () -> {logger.error("test", new String[]{"hello", "test"}, new Object[]{testUser});});
-        assertThrows(InvalidParameterException.class, () -> {logger.error("test", new String[]{"hello"}, new Object[]{testUser, "test"});});
-        logger.error("test", new String[]{"hello"}, new Object[]{null});
-        logger.error("test", new String[]{null}, new Object[]{"test"});
-        logger.error(null, new String[]{"hello"}, new Object[]{"test"});
-        logger.error(null, new String[]{}, new Object[]{});
-        logger.error("test", new String[]{}, new Object[]{});
 
-        verify(logger, times(8)).debug(nullable(String.class), nullable(String[].class), nullable(Object[].class));
-        verify(logger, times(8)).warn(nullable(String.class), nullable(String[].class), nullable(Object[].class));
-        verify(logger, times(8)).error(nullable(String.class), nullable(String[].class), nullable(Object[].class));
+        verify(log, times(6)).debug(anyString());
+        verify(log, times(1)).warn(anyString());
+        verify(log, times(1)).error(anyString());
     }
 }
