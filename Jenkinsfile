@@ -18,35 +18,42 @@ pipeline {
 
     stage('Build project') {
       steps {
-        script {
-          FAILED_STAGE = env.STAGE_NAME+" - maven"
-          sh 'mvn -B -Dmaven.test.skip=true clean package'
-        }
-        script {
-          FAILED_STAGE = env.STAGE_NAME+" - npm"
-          sh 'CI=false npm --prefix ./React/rest-api install'
-          sh 'CI=false npm --prefix ./React/rest-api run build'
-          sh 'cp -r ./React/rest-api/build ./'
-          sh 'find ./build/ -printf "%P\n" -type f -o -type l -o -type d | tar -czf build.tar.gz --no-recursion -C ./build/ -T -'
-        }
+        parallel (
+          "Spring": {
+            script {
+              FAILED_STAGE = env.STAGE_NAME+" - maven"
+              sh 'mvn -B -Dmaven.test.skip=true clean package'
+            }
+          },
+          "React": {
+            script {
+              FAILED_STAGE = env.STAGE_NAME+" - npm"
+              sh 'CI=false npm --prefix ./React/rest-api install'
+              sh 'CI=false npm --prefix ./React/rest-api run build'
+              sh 'cp -r ./React/rest-api/build ./'
+              sh 'find ./build/ -printf "%P\n" -type f -o -type l -o -type d | tar -czf build.tar.gz --no-recursion -C ./build/ -T -'
+            }
+          }
+        )
       }
     }
 
-    stage('Unit tests') {
+    stage('Tests') {
       steps {
-        script {
-          FAILED_STAGE = env.STAGE_NAME
-          sh "mvn -B --file pom.xml -Dmaven.test.failure.ignore=true test"
-        }
-      }
-    }
-
-    stage('Jacoco report') {
-      steps {
-        script{
-          FAILED_STAGE = env.STAGE_NAME
-          sh 'mvn clean org.jacoco:jacoco-maven-plugin:0.8.10:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.10:report'
-        }
+        parallel (
+          "Unit tests": {
+            script {
+              FAILED_STAGE = env.STAGE_NAME
+              sh "mvn -B --file pom.xml -Dmaven.test.failure.ignore=true test"
+            }
+          },
+          "Jacoco test": {
+            script{
+              FAILED_STAGE = env.STAGE_NAME
+              sh 'mvn clean org.jacoco:jacoco-maven-plugin:0.8.10:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.10:report'
+            }
+          }
+        )
       }
     }
 
@@ -59,39 +66,47 @@ pipeline {
       }
     }
 
-//     stage('Build image') {
-//         steps{
-//           parallel (
-//             frontend: {
-//               script {
-//                 FAILED_STAGE = env.STAGE_NAME+"-frontend"
-//                 dockerImage = docker.build("gaborka98/rest-fe:latest", "-f Dockerfile-react")
-//               }
-//             },
-//             backend: {
-//               script {
-//                 FAILED_STAGE = env.STAGE_NAME+"-backend"
-//                 dockerImage = docker.build("gaborka98/rest-be:latest", "-f Dockerfile-spring .")
-//               }
-//             }
-//           )
-//         }
-//     }
-//
-//     stage('Deploy') {
-//         steps {
-//             script {
-//                 FAILED_STAGE = env.STAGE_NAME
-//                 sh "docker container stop wedding-page"
-//                 sh "docker container rm wedding-page"
-//                 sh "docker run -d --restart unless-stopped -p 8102:80 -m 72m --name wedding-page gaborka98/rest-fe:latest"
-//
-//                 sh "docker container stop wedding-be"
-//                 sh "docker container rm wedding-be"
-//                 sh "docker run -d --restart unless-stopped -p 8103:3001 --name wedding-be gaborka98/rest-be:latest"
-//             }
-//         }
-//     }
+    stage('Build Dockerfile') {
+      when {
+        expression {
+          env.GIT_BRANCH == "origin/master"
+        }
+        triggeredBy cause: "UserIdCause"
+      }
+      steps{
+        parallel (
+          frontend: {
+            script {
+              FAILED_STAGE = "build-frontend"
+              echo env.GIT_BRANCH
+              sh 'printenv'
+              dockerImage = docker.build("gaborka98/rest-fe:latest", "-f Dockerfile-react .")
+            }
+          },
+          backend: {
+            script {
+              FAILED_STAGE = "build-backend"
+              dockerImage = docker.build("gaborka98/rest-be:latest", "-f Dockerfile-spring .")
+            }
+          }
+        )
+      }
+    }
+    stage('Deploy') {
+      when {
+        expression {
+          env.GIT_BRANCH == "origin/master"
+        }
+        triggeredBy cause: "UserIdCause"
+      }
+      steps {
+        script {
+            FAILED_STAGE = env.STAGE_NAME
+            sh "docker run -d -rm --restart unless-stopped -p 8102:80 -m 72m --name wedding-page gaborka98/rest-fe:latest"
+            sh "docker run -d -rm --restart unless-stopped -p 8103:3001 --name wedding-be gaborka98/rest-be:latest"
+        }
+      }
+    }
 }
   post {
     success {
