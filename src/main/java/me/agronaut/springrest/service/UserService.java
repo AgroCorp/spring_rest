@@ -200,7 +200,11 @@ public class UserService {
     }
 
     public User getByUsername(String name) {
-        return userRepo.getUserByUsername(name).orElse(null);
+        if (name != null && !name.isEmpty()) {
+            return userRepo.getUserByUsername(name).orElseThrow(() -> new EntityNotFoundException("User not found with given username"));
+        } else {
+            throw new EntityNotFoundException("Name is mandatory");
+        }
     }
 
     /**

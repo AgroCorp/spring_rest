@@ -1,6 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run All Unit Tests" type="JUnit" factoryName="JUnit">
     <module name="springRest" />
+    <extension name="coverage" runner="jacoco" />
     <option name="MAIN_CLASS_NAME" value="" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="directory" />

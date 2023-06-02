@@ -2,6 +2,7 @@ package me.agronaut.springrest;
 
 
 import me.agronaut.springrest.model.User;
+import me.agronaut.springrest.model.UserDto;
 import me.agronaut.springrest.repository.UserRepository;
 import me.agronaut.springrest.service.EmailService;
 import me.agronaut.springrest.service.UserService;
@@ -14,7 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -95,8 +96,75 @@ class UserServiceTests {
         // null user
         assertThrows(EntityNotFoundException.class, () -> userSD.login(null));
 
-        // pad password
+        // bad password
         mockUser.setPassword(encoder.encode("testPasswordBad"));
         assertThrows(EntityNotFoundException.class, () -> userSD.login(testUser));
+
+        // user not presented
+        doReturn(Optional.empty()).when(userRepository).getUserByUsername(anyString());
+        assertThrows(EntityNotFoundException.class, () -> {
+            userSD.login(new User());
+        });
+    }
+
+    @Test
+    void testGetById() {
+        // null parameter
+        assertNull(userSD.getById(null));
+        // presented user
+        doReturn(testUser).when(userRepository).getUserById(anyLong());
+        assertNotNull(userSD.getById(2L));
+
+        // not presented user
+        doReturn(null).when(userRepository).getUserById(anyLong());
+        assertNull(userSD.getById(1L));
+    }
+
+    @Test
+    void testGetByUsername() {
+        // null parameter
+        assertThrows(EntityNotFoundException.class, () -> userSD.getByUsername(null));
+        assertThrows(EntityNotFoundException.class, () -> userSD.getByUsername(""));
+
+        // presented user
+        doReturn(Optional.of(testUser)).when(userRepository).getUserByUsername(anyString());
+        assertNotNull(userSD.getByUsername("laci"));
+
+        // not presented user
+        doReturn(Optional.empty()).when(userRepository).getUserByUsername(anyString());
+        assertThrows(EntityNotFoundException.class, () -> userSD.getByUsername("jani"));
+    }
+
+    @Test
+    void testGetAllByRole() {
+        assertTrue(userSD.getAllByRole(null).isEmpty());
+        assertTrue(userSD.getAllByRole("").isEmpty());
+
+        List<User> mockList = new LinkedList<>();
+        mockList.add(new User());
+        mockList.add(new User());
+        mockList.add(new User());
+        doReturn(mockList).when(userRepository).findAllUserByRoleName(anyString());
+        List<UserDto> res = userSD.getAllByRole("ADMIN");
+
+        assertNotNull(res);
+        assertFalse(res.isEmpty());
+        assertEquals(3, res.size());
+    }
+
+    @Test
+    void testSetNewPassword() {
+        // good
+        userSD.setNewPassword("newPassword", 12L);
+
+        // check null
+        userSD.setNewPassword(null, 12L);
+        userSD.setNewPassword("", 12L);
+        userSD.setNewPassword("newPassword", null);
+
+        // user not found by id
+        userSD.setNewPassword("newPassword", 12L);
+
+        
     }
 }
