@@ -117,7 +117,7 @@ pipeline {
       steps {
         script {
           sh 'mvn javadoc:javadoc'
-          sh 'git subtree push --prefix target/site/apidocs https://$GIT_CREDS_USR:$GIT_CREDS_PSW@github.com/AgroCorp/spring_rest.git gh-pages'
+          sh('git subtree push --prefix target/site/apidocs https://$GIT_CREDS_USR:$GIT_CREDS_PSW@github.com/AgroCorp/spring_rest.git gh-pages')
         }
       }
     }
