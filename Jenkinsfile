@@ -6,6 +6,12 @@ pipeline {
       maven "M3"
       nodejs "NodeJS"
   }
+
+  environment {
+    GIT_CREDS = credentials('github_access_token')
+  }
+
+
   stages {
     stage('Checkout Scm') {
       steps {
@@ -104,6 +110,14 @@ pipeline {
             FAILED_STAGE = env.STAGE_NAME
             sh "docker run -d -rm --restart unless-stopped -p 8102:80 -m 72m --name wedding-page gaborka98/rest-fe:latest"
             sh "docker run -d -rm --restart unless-stopped -p 8103:3001 --name wedding-be gaborka98/rest-be:latest"
+        }
+      }
+    }
+    stage('JavaDoc') {
+      steps {
+        script {
+          sh 'mvn javadoc:javadoc'
+          sh 'git subtree push --prefix target/site/apidocs https://$GIT_CREDS_USR:$GIT_CREDS_PSW@github.com/AgroCorp/spring_rest.git gh-pages'
         }
       }
     }

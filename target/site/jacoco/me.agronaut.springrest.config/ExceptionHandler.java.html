@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="hu"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">springRest</a> &gt; <a href="index.source.html" class="el_package">me.agronaut.springrest.config</a> &gt; <span class="el_source">ExceptionHandler.java</span></div><h1>ExceptionHandler.java</h1><pre class="source lang-java linenums">package me.agronaut.springrest.config;
+
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import me.agronaut.springrest.exception.ApiError;
+import me.agronaut.springrest.service.UserService;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import javax.persistence.EntityNotFoundException;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
+
+@Order(Ordered.HIGHEST_PRECEDENCE)
+@ControllerAdvice
+<span class="fc" id="L29">public class ExceptionHandler extends ResponseEntityExceptionHandler {</span>
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(EntityNotFoundException.class)
+    protected ResponseEntity&lt;Object&gt; handleEntityNotFound(EntityNotFoundException ex, WebRequest request)
+    {
+<span class="nc" id="L34">        ApiError error = new ApiError(HttpStatus.NOT_FOUND, LocalDateTime.now(), ex.getMessage(), &quot;Cannot find requested entity&quot;);</span>
+
+<span class="nc" id="L36">        return handleExceptionInternal(ex,error,new HttpHeaders(), error.getStatus(), request);</span>
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(NoSuchElementException.class)
+    protected ResponseEntity&lt;Object&gt; handleNoSuchException(NoSuchElementException ex, WebRequest request) {
+<span class="nc" id="L41">        ApiError error = new ApiError(HttpStatus.NOT_FOUND, LocalDateTime.now(), ex.getMessage(), &quot;cannot find requested entity with given id&quot;);</span>
+
+<span class="nc" id="L43">        return handleExceptionInternal(ex, error, new HttpHeaders(),  error.getStatus(), request);</span>
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(ExpiredJwtException.class)
+    protected ResponseEntity&lt;Object&gt; handleExpired(ExpiredJwtException ex, WebRequest request) {
+<span class="nc" id="L48">        ApiError error = new ApiError(HttpStatus.FORBIDDEN, LocalDateTime.now(), ex.getMessage(), &quot;Token expired please login again for new token&quot;);</span>
+
+<span class="nc" id="L50">        return handleExceptionInternal(ex,error,new HttpHeaders(), error.getStatus(), request);</span>
+    }
+    @org.springframework.web.bind.annotation.ExceptionHandler(UnsupportedJwtException.class)
+    protected ResponseEntity&lt;Object&gt; handleExpired(UnsupportedJwtException ex, WebRequest request) {
+<span class="nc" id="L54">        ApiError error = new ApiError(HttpStatus.FORBIDDEN, LocalDateTime.now(), ex.getMessage(), &quot;Token is unsupported&quot;);</span>
+
+<span class="nc" id="L56">        return handleExceptionInternal(ex,error,new HttpHeaders(), error.getStatus(), request);</span>
+    }
+    @org.springframework.web.bind.annotation.ExceptionHandler(MalformedJwtException.class)
+    protected ResponseEntity&lt;Object&gt; handleExpired(MalformedJwtException ex, WebRequest request) {
+<span class="nc" id="L60">        ApiError error = new ApiError(HttpStatus.FORBIDDEN, LocalDateTime.now(), ex.getMessage(), &quot;Token is malformed&quot;);</span>
+
+<span class="nc" id="L62">        return handleExceptionInternal(ex,error,new HttpHeaders(), error.getStatus(), request);</span>
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(UserService.NotActiveUserException.class)
+    protected ResponseEntity&lt;Object&gt; handleNotActivated(UserService.NotActiveUserException ex, WebRequest request) {
+<span class="nc" id="L67">        ApiError error = new ApiError(HttpStatus.FORBIDDEN, LocalDateTime.now(), ex.getMessage(), &quot;User is not activated. Please click the link in the e-mail&quot;);</span>
+
+<span class="nc" id="L69">        return handleExceptionInternal(ex, error, new HttpHeaders(), error.getStatus(), request);</span>
+    }
+    @org.springframework.web.bind.annotation.ExceptionHandler(UserService.UserExistByEmailException.class)
+    protected ResponseEntity&lt;Object&gt; handleNotActivated(UserService.UserExistByEmailException ex, WebRequest request) {
+<span class="nc" id="L73">        ApiError error = new ApiError(HttpStatus.BAD_REQUEST,LocalDateTime.now(),ex.getMessage(), &quot;This e-mail address is taken. Please select other!&quot;);</span>
+<span class="nc" id="L74">        return handleExceptionInternal(ex, error, new HttpHeaders(), error.getStatus(), request);</span>
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(ConstraintViolationException.class)
+    protected ResponseEntity&lt;Object&gt; handleValidationException(ConstraintViolationException ex, WebRequest request) {
+<span class="nc" id="L79">        ApiError error = new ApiError(HttpStatus.BAD_REQUEST, LocalDateTime.now(), ex.getConstraintViolations().stream().map(ConstraintViolation::getMessage).collect(Collectors.joining(&quot;;&quot;)), &quot;&quot;);</span>
+<span class="nc" id="L80">        return handleExceptionInternal(ex, error, new HttpHeaders(), error.getStatus(), request);</span>
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(AccessDeniedException.class)
+    protected ResponseEntity&lt;Object&gt; handleAccessDenied(AccessDeniedException ex, WebRequest request) {
+<span class="nc" id="L85">        ApiError error = new ApiError(HttpStatus.FORBIDDEN, LocalDateTime.now(), ex.getMessage(), &quot;You dont have permission to this site, or you need to log in.&quot;);</span>
+
+<span class="nc" id="L87">        return handleExceptionInternal(ex, error, new HttpHeaders(), error.getStatus(), request);</span>
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(Exception.class)
+    protected ResponseEntity&lt;Object&gt; handleBaseExecption(Exception ex, WebRequest request) {
+<span class="nc" id="L92">        ApiError error = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, LocalDateTime.now(), ex.getMessage(), &quot;Unknown exception&quot;);</span>
+
+<span class="nc" id="L94">        return handleExceptionInternal(ex, error, new HttpHeaders(), error.getStatus(), request);</span>
+    }
+
+    @Override
+    protected ResponseEntity&lt;Object&gt; handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+<span class="nc" id="L99">        ApiError error = new ApiError(HttpStatus.BAD_REQUEST,LocalDateTime.now(), ex.getBindingResult().getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(&quot;;&quot;)),</span>
+                &quot;You have invalid data. Please read error messages for more details&quot;);
+
+<span class="nc" id="L102">        return handleExceptionInternal(ex, error, new HttpHeaders(), error.getStatus(), request);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

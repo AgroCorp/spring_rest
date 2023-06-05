@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="hu"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JWTAuthorizationFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">springRest</a> &gt; <a href="index.source.html" class="el_package">me.agronaut.springrest.config</a> &gt; <span class="el_source">JWTAuthorizationFilter.java</span></div><h1>JWTAuthorizationFilter.java</h1><pre class="source lang-java linenums">package me.agronaut.springrest.config;
+
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+
+<span class="fc" id="L23">@Log4j2</span>
+<span class="fc" id="L24">public class JWTAuthorizationFilter extends OncePerRequestFilter {</span>
+
+    private static final String HEADER = &quot;Authorization&quot;;
+    private static final String PREFIX = &quot;Bearer &quot;;
+    @Value(&quot;${ADMIN_TOKEN}&quot;)
+    private String ADMIN_TOKEN;
+
+    public JWTAuthorizationFilter setSECRET(String secret) {
+<span class="fc" id="L32">        this.SECRET = secret;</span>
+<span class="fc" id="L33">        return this;</span>
+    }
+
+
+    private String SECRET;
+
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
+        try {
+<span class="nc bnc" id="L43" title="All 2 branches missed.">            if (checkJWTToken(request)) {</span>
+<span class="nc" id="L44">                Claims claims = validateToken(request);</span>
+<span class="nc bnc" id="L45" title="All 2 branches missed.">                if (claims.get(&quot;authorities&quot;) != null) {</span>
+<span class="nc" id="L46">                    setUpSpringAuthentication(claims);</span>
+                } else {
+<span class="nc" id="L48">                    SecurityContextHolder.clearContext();</span>
+                }
+<span class="nc" id="L50">            }else {</span>
+<span class="nc" id="L51">                SecurityContextHolder.clearContext();</span>
+            }
+<span class="nc" id="L53">            chain.doFilter(request, response);</span>
+<span class="nc" id="L54">        } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException e) {</span>
+<span class="nc" id="L55">            log.warn(&quot;JWT token error&quot;);</span>
+<span class="nc" id="L56">            throw e;</span>
+<span class="nc" id="L57">        }</span>
+<span class="nc" id="L58">    }</span>
+
+    private Claims validateToken(HttpServletRequest request) {
+<span class="nc" id="L61">        String jwtToken = request.getHeader(HEADER).replace(PREFIX, &quot;&quot;);</span>
+
+<span class="nc" id="L63">        return Jwts.parser().setSigningKey(SECRET.getBytes()).parseClaimsJws(jwtToken).getBody();</span>
+    }
+
+    /**
+     * Authentication method in Spring flow
+     *
+     */
+    private void setUpSpringAuthentication(Claims claims) {
+<span class="nc" id="L71">        List&lt;String&gt; authorities = (List&lt;String&gt;) claims.get(&quot;authorities&quot;);</span>
+
+<span class="nc" id="L73">        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(claims.getSubject(), null,</span>
+<span class="nc" id="L74">                authorities.stream().map(SimpleGrantedAuthority::new).toList());</span>
+<span class="nc" id="L75">        SecurityContextHolder.getContext().setAuthentication(auth);</span>
+
+<span class="nc" id="L77">    }</span>
+
+    private boolean checkJWTToken(HttpServletRequest request) {
+<span class="nc" id="L80">        String authenticationHeader = request.getHeader(HEADER);</span>
+<span class="nc bnc" id="L81" title="All 4 branches missed.">        if (authenticationHeader != null &amp;&amp; authenticationHeader.contains(ADMIN_TOKEN)) {</span>
+<span class="nc" id="L82">            return true;</span>
+        }
+<span class="nc bnc" id="L84" title="All 4 branches missed.">        return authenticationHeader != null &amp;&amp; authenticationHeader.startsWith(PREFIX);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

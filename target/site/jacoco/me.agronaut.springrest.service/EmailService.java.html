@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="hu"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmailService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">springRest</a> &gt; <a href="index.source.html" class="el_package">me.agronaut.springrest.service</a> &gt; <span class="el_source">EmailService.java</span></div><h1>EmailService.java</h1><pre class="source lang-java linenums">package me.agronaut.springrest.service;
+
+import me.agronaut.springrest.exception.EmailException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
+@Service
+<span class="fc" id="L14">public class EmailService{</span>
+
+    @Autowired private JavaMailSender sender;
+
+    @Value(&quot;${email.noreply}&quot;)
+    public String noReplyAddress;
+
+    public void sendEmail(String from, String to, String subject, String msg) {
+        try {
+<span class="nc" id="L23">            MimeMessage message = sender.createMimeMessage();</span>
+<span class="nc" id="L24">            MimeMessageHelper helper = new MimeMessageHelper(message, &quot;utf-8&quot;);</span>
+
+<span class="nc bnc" id="L26" title="All 2 branches missed.">            helper.setFrom((from == null ? noReplyAddress : from));</span>
+<span class="nc" id="L27">            helper.setTo(to);</span>
+<span class="nc" id="L28">            helper.setSubject(subject);</span>
+<span class="nc" id="L29">            helper.setText(msg ,true);</span>
+
+<span class="nc" id="L31">            sender.send(message);</span>
+<span class="nc" id="L32">        } catch (MessagingException e) {</span>
+<span class="nc" id="L33">            throw new EmailException(&quot;Failed to send email&quot;);</span>
+<span class="nc" id="L34">        }</span>
+
+<span class="nc" id="L36">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
