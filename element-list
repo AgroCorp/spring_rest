@@ -1,0 +1,8 @@
+me.agronaut.springrest
+me.agronaut.springrest.config
+me.agronaut.springrest.controller
+me.agronaut.springrest.exception
+me.agronaut.springrest.model
+me.agronaut.springrest.repository
+me.agronaut.springrest.service
+me.agronaut.springrest.util
