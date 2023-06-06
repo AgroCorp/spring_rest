@@ -50,7 +50,7 @@ pipeline {
           "Unit tests": {
             script {
               FAILED_STAGE = env.STAGE_NAME
-              sh "mvn -B --file pom.xml -Dmaven.test.failure.ignore=true test"
+              sh "mvn -B --file pom.xml -Dmaven.test.failure.ignore=true -Dspring.profiles.active=junit test"
             }
           },
           "Jacoco test": {
@@ -85,7 +85,6 @@ pipeline {
             script {
               FAILED_STAGE = "build-frontend"
               echo env.GIT_BRANCH
-              sh 'printenv'
               dockerImage = docker.build("gaborka98/rest-fe:latest", "-f Dockerfile-react .")
             }
           },
