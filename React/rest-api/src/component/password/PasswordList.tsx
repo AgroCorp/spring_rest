@@ -1,7 +1,4 @@
 import * as React from "react";
-import { BaseSite, showNotification } from "../baseSite.js";
-import FinanceService from "./FinanceService.ts";
-import { Pageable } from "../../model/Pageable.d.ts";
 import {
   Button,
   ButtonGroup,
@@ -14,54 +11,47 @@ import {
   Row,
   Table,
 } from "react-bootstrap";
+import { BaseSite, showNotification } from "../baseSite";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
-import { Category, Finance } from "../../model/Finance.d.ts";
-import CategoryService from "../../Service/CategoryService.ts";
+import PasswordService from "./PasswordService.ts";
+import { Password } from "../../model/Password.d.ts";
+import { Pageable } from "../../model/Pageable.d.ts";
 
 type State = {
   loading: boolean;
   error: string;
   data: Pageable | Record<string, never>;
-  pageNumbers: number[];
-  addCategoryShow: boolean;
+  pageNumbers: any[];
   addShow: boolean;
   addError: string;
   editShow: boolean;
   deleteShow: boolean;
-  selectedFinance: Finance | Record<string, never>;
-  updatedFinance: Finance | Record<string, never>;
-  selectedCategory: Category | Record<string, never>;
+  selectedPassword: Password;
+  updatedPassword: Password;
   page: number;
   size: number;
   isMobile: boolean;
-  categories: Category[];
 };
 
-class FinanceList extends React.Component<any, State> {
-  financeService: FinanceService = new FinanceService();
-  categoryService: CategoryService = new CategoryService();
-
+export class PasswordList extends React.Component<any, State> {
+  passwordService: PasswordService = new PasswordService();
   constructor(props) {
     super(props);
-
     this.state = {
       loading: false,
       error: "",
       data: {},
       pageNumbers: [],
       addShow: false,
-      addCategoryShow: false,
       addError: "",
       editShow: false,
       deleteShow: false,
-      selectedFinance: {},
-      updatedFinance: {},
+      selectedPassword: {},
+      updatedPassword: {},
       page: 0,
       size: 10,
       isMobile: false,
-      categories: [],
-      selectedCategory: {},
     };
 
     this.addOpen = this.addOpen.bind(this);
@@ -70,14 +60,12 @@ class FinanceList extends React.Component<any, State> {
     this.editClose = this.editClose.bind(this);
     this.deleteClose = this.deleteClose.bind(this);
     this.deleteOpen = this.deleteOpen.bind(this);
+    this.handleView = this.handleView.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.handleEdit = this.handleEdit.bind(this);
-    this.addNewFinance = this.addNewFinance.bind(this);
+    this.addNewPassword = this.addNewPassword.bind(this);
     this.handleResize = this.handleResize.bind(this);
-    this.fetchAllCategory = this.fetchAllCategory.bind(this);
-    this.addCategoryClose = this.addCategoryClose.bind(this);
-    this.addCategoryOpen = this.addCategoryOpen.bind(this);
-    this.addNewCategory = this.addNewCategory.bind(this);
+    this.search = this.search.bind(this);
   }
 
   componentDidMount() {
@@ -93,56 +81,24 @@ class FinanceList extends React.Component<any, State> {
     this.setState({ isMobile: window.innerWidth < 500 });
   }
 
-  search(page: number, size: number) {
-    this.setState({ loading: true });
-    this.financeService
-      .getAllByUser(page, size)
-      .then((r) => {
-        this.setState({ loading: false });
-        let lowerPage = r.data.totalPages - 5;
-        let upperPage = r.data.totalPages + 5;
+  handleView(event) {
+    const selectedText = event.target.closest("tr").childNodes;
+    const selectedItem =
+      this.state.data.content[event.target.closest("tr").rowIndex - 1];
 
-        lowerPage = lowerPage < 0 ? 1 : lowerPage;
-        upperPage =
-          upperPage > r.data.totalPages ? r.data.totalPages : upperPage;
-
-        upperPage = upperPage === 0 ? 1 : upperPage;
-
-        let list = [];
-        for (let i = lowerPage; i <= upperPage; i++) {
-          list.push(i);
-        }
-
-        console.log("data:", r.data);
-        this.setState({
-          data: r.data,
-          pageNumbers: list,
-          page: r.data.pageable.pageNumber,
-        });
-        console.log("alma");
-        this.fetchAllCategory();
-        console.log("korte");
-      })
-      .catch((e) => {
-        console.log(e);
-        showNotification("error", e?.message);
-      });
-  }
-
-  fetchAllCategory(): void {
-    this.categoryService
-      .getAll()
-      .then((value) => {
-        this.setState({ categories: value.data });
-      })
-      .catch((err) => {
-        this.setState({ categories: [] });
-        showNotification("error", err);
-      });
+    if (selectedItem.show === true) {
+      selectedText[3].innerText = selectedItem.value;
+      selectedItem.show = false;
+    } else {
+      selectedText[3].innerText = this.passwordService.decode(
+        selectedText[3].innerText
+      );
+      selectedItem.show = true;
+    }
   }
 
   async handleDelete() {
-    await this.financeService.delete();
+    await this.passwordService.delete(this.state.selectedPassword);
 
     await this.search(this.state.page, this.state.size);
 
@@ -157,11 +113,41 @@ class FinanceList extends React.Component<any, State> {
       event.stopPropagation();
     }
 
-    await this.financeService.edit();
+    await this.passwordService.edit(this.state.selectedPassword);
 
     await this.search(this.state.page, this.state.size);
 
     await this.editClose();
+  }
+
+  search(page: number, size: number) {
+    this.setState({ loading: true });
+    this.passwordService
+      .getAllByUser(page, size)
+      .then((r) => {
+        this.setState({ loading: false });
+        let lowerPage = r.data.totalPages - 5;
+        let upperPage = r.data.totalPages + 5;
+
+        lowerPage = lowerPage < 0 ? 1 : lowerPage;
+        upperPage =
+          upperPage > r.data.totalPages ? r.data.totalPages : upperPage;
+
+        let list = [];
+        for (let i = lowerPage; i <= upperPage; i++) {
+          list.push(i);
+        }
+        console.log(r.data);
+        this.setState({
+          data: r.data,
+          pageNumbers: list,
+          page: r.data.pageable.pageNumber,
+        });
+      })
+      .catch((e) => {
+        console.log(e);
+        showNotification("error", e?.message);
+      });
   }
 
   addOpen() {
@@ -172,20 +158,19 @@ class FinanceList extends React.Component<any, State> {
     this.setState({ addShow: false });
   }
 
-  addCategoryOpen() {
-    this.setState({ addCategoryShow: true });
-  }
-
-  addCategoryClose() {
-    this.setState({ addCategoryShow: false });
-  }
-
   editOpen(event) {
     this.setState({
-      selectedFinance: Object.assign(
+      selectedPassword: Object.assign(
         {},
-        this.state.data[event.target.closest("tr").rowIndex - 1]
+        this.state.data.content[event.target.closest("tr").rowIndex - 1]
       ),
+    });
+    this.setState((prevState) => {
+      let selectedPassword: Password = prevState.selectedPassword;
+      selectedPassword.value = this.passwordService.decode(
+        selectedPassword.value
+      );
+      return selectedPassword;
     });
     this.setState({ editShow: true });
   }
@@ -196,9 +181,9 @@ class FinanceList extends React.Component<any, State> {
 
   deleteOpen(event) {
     this.setState({
-      selectedFinance: Object.assign(
+      selectedPassword: Object.assign(
         {},
-        this.state.data[event.target.closest("tr").rowIndex - 1]
+        this.state.data.content[event.target.closest("tr").rowIndex - 1]
       ),
     });
     this.setState({ deleteShow: true });
@@ -208,7 +193,7 @@ class FinanceList extends React.Component<any, State> {
     this.setState({ deleteShow: false });
   }
 
-  async addNewFinance(event) {
+  async addNewPassword(event) {
     event.preventDefault();
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
@@ -216,46 +201,19 @@ class FinanceList extends React.Component<any, State> {
       event.stopPropagation();
     }
 
-    await this.setState((prevState) => {
-      prevState.selectedFinance.income = form.income.checked;
-      prevState.selectedFinance.category = {
-        id: parseInt(form.category.value),
-      };
-      return prevState;
-    });
-
-    await this.financeService.add(this.state.selectedFinance);
+    await this.passwordService.add(this.state.selectedPassword);
     await this.search(this.state.page, this.state.size);
     await this.addClose();
-  }
-
-  async addNewCategory(event) {
-    event.preventDefault();
-    const form = event.currentTarget;
-    if (form.checkValidity() === false) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-
-    console.log(this.state.selectedCategory);
-    let res = await this.categoryService.add(this.state.selectedCategory);
-    this.setState((prevState) => {
-      console.log("asdasd:", prevState.categories);
-      prevState.categories.push(res.data);
-      console.log("asdasd123123:", prevState.categories);
-      return prevState;
-    });
-    await this.addCategoryClose();
-  }
-
-  setSize(size: string): void {
-    this.setState({ size: parseInt(size) });
-    this.search(this.state.page, parseInt(size));
   }
 
   setPage(page: number): void {
     this.setState({ page: page });
     this.search(page, this.state.size);
+  }
+
+  setSize(size: string): void {
+    this.setState({ size: parseInt(size) });
+    this.search(this.state.page, parseInt(size));
   }
 
   render() {
@@ -315,14 +273,23 @@ class FinanceList extends React.Component<any, State> {
             </Col>
           </Row>
           <Row>
-            <Table responsive={true} variant={"light"}>
+            <Table responsive variant={"light"}>
               <thead>
                 <tr>
-                  <th hidden={this.state.isMobile}>#</th>
-                  <th>Name</th>
-                  <th>Amount</th>
-                  <th hidden={this.state.isMobile}>Category</th>
-                  <th colSpan={3}>Actions</th>
+                  <th style={{ width: "5%" }} hidden={this.state.isMobile}>
+                    #
+                  </th>
+                  <th style={{ width: "20" }}>Web page</th>
+                  <th style={{ width: "10%" }} hidden={this.state.isMobile}>
+                    User name
+                  </th>
+                  <th style={{ width: "50%" }}>Password</th>
+                  <th style={{ width: "10%" }} hidden={this.state.isMobile}>
+                    Image
+                  </th>
+                  <th style={{ width: "5%" }} colSpan={3}>
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -332,7 +299,7 @@ class FinanceList extends React.Component<any, State> {
                   </tr>
                 )}
                 {this.state.data.content != null &&
-                  this.state.data.content.map((row: Finance) => {
+                  this.state.data.content.map((row) => {
                     return (
                       <tr key={row.id}>
                         <td
@@ -341,22 +308,27 @@ class FinanceList extends React.Component<any, State> {
                         >
                           {row.id}
                         </td>
+                        <td>{row.webPage}</td>
                         <td onDoubleClick={this.editOpen}>{row.name}</td>
                         <td
+                          onClick={this.handleView}
                           style={{ whiteSpace: "pre" }}
                           onDoubleClick={this.editOpen}
                         >
-                          {row.amount}
+                          {row.value}
                         </td>
                         <td
                           hidden={this.state.isMobile}
                           onDoubleClick={this.editOpen}
                         >
-                          {row.category.name}
+                          {row.image}
                         </td>
                         <td>
                           <ButtonGroup>
-                            <Button variant={"primary"}>
+                            <Button
+                              variant={"primary"}
+                              onClick={this.handleView}
+                            >
                               <FontAwesomeIcon icon={solid("eye")} />
                             </Button>
                             <Button variant={"warning"} onClick={this.editOpen}>
@@ -380,18 +352,18 @@ class FinanceList extends React.Component<any, State> {
 
         <Modal show={this.state.addShow} id={"add"} onHide={this.addClose}>
           <Modal.Header>
-            <h1>Add new finance</h1>
+            <h1>Add new password</h1>
           </Modal.Header>
-          <Form onSubmit={this.addNewFinance}>
+          <Form onSubmit={this.addNewPassword}>
             <Modal.Body>
               <FormGroup>
-                <Form.Label>Name *</Form.Label>
+                <Form.Label>User name *</Form.Label>
                 <Form.Control
                   type={"text"}
                   id={"name"}
                   onChange={(e) => {
                     this.setState((prevState) => {
-                      prevState.selectedFinance.name = e.target.value;
+                      prevState.selectedPassword.name = e.target.value;
                       return prevState;
                     });
                   }}
@@ -399,13 +371,13 @@ class FinanceList extends React.Component<any, State> {
                 />
               </FormGroup>
               <FormGroup>
-                <Form.Label>Amount *</Form.Label>
+                <Form.Label>Password *</Form.Label>
                 <Form.Control
-                  type={"number"}
-                  id={"amount"}
+                  type={"password"}
+                  id={"password"}
                   onChange={(e) => {
                     this.setState((prevState) => {
-                      prevState.selectedFinance.amount = 123;
+                      prevState.selectedPassword.value = e.target.value;
                       return prevState;
                     });
                   }}
@@ -413,37 +385,27 @@ class FinanceList extends React.Component<any, State> {
                 />
               </FormGroup>
               <FormGroup>
-                <Form.Label>Category *</Form.Label>
-                <Form.Select
-                  id={"category"}
-                  required
-                  onChange={(event) => {
-                    let temp = new Category();
-                    temp.id = event.target.value;
-                    console.log(temp);
-                    this.setState({ selectedCategory: temp });
-                  }}
-                >
-                  {this.state.categories !== undefined &&
-                    this.state.categories.map((item) => {
-                      return (
-                        <option key={item.id} value={item.id}>
-                          {item.name}
-                        </option>
-                      );
-                    })}
-                </Form.Select>
-                <Button variant={"success"} onClick={this.addCategoryOpen}>
-                  <FontAwesomeIcon icon={solid("plus")} />
-                </Button>
-              </FormGroup>
-              <FormGroup>
-                <Form.Label>Is income *</Form.Label>
-                <Form.Check
-                  id={"income"}
+                <Form.Label>Web page *</Form.Label>
+                <Form.Control
+                  type={"text"}
+                  id={"webPage"}
                   onChange={(e) => {
                     this.setState((prevState) => {
-                      prevState.selectedFinance.income = e.target.checked;
+                      prevState.selectedPassword.webPage = e.target.value;
+                      return prevState;
+                    });
+                  }}
+                  required
+                />
+              </FormGroup>
+              <FormGroup>
+                <Form.Label>Image URL</Form.Label>
+                <Form.Control
+                  type={"text"}
+                  id={"image"}
+                  onChange={(e) => {
+                    this.setState((prevState) => {
+                      prevState.selectedPassword.image = e.target.value;
                       return prevState;
                     });
                   }}
@@ -452,42 +414,6 @@ class FinanceList extends React.Component<any, State> {
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={this.addClose}>
-                Close
-              </Button>
-              <Button type={"submit"} variant="primary">
-                Save Changes
-              </Button>
-            </Modal.Footer>
-          </Form>
-        </Modal>
-
-        <Modal
-          show={this.state.addCategoryShow}
-          id={"add"}
-          onHide={this.addCategoryClose}
-        >
-          <Modal.Header>
-            <h1>Add new Category</h1>
-          </Modal.Header>
-          <Form onSubmit={this.addNewCategory}>
-            <Modal.Body>
-              <FormGroup>
-                <Form.Label>Name *</Form.Label>
-                <Form.Control
-                  type={"text"}
-                  id={"name"}
-                  onChange={(e) => {
-                    this.setState((prevState) => {
-                      prevState.selectedCategory.name = e.target.value;
-                      return prevState;
-                    });
-                  }}
-                  required
-                />
-              </FormGroup>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={this.addCategoryClose}>
                 Close
               </Button>
               <Button type={"submit"} variant="primary">
@@ -508,7 +434,7 @@ class FinanceList extends React.Component<any, State> {
           <Modal.Body>
             <h5>
               Are you sure to delete password named:{" "}
-              {this.state.selectedFinance.name}?
+              {this.state.selectedPassword.name}?
             </h5>
           </Modal.Body>
           <Modal.Footer>
@@ -532,7 +458,7 @@ class FinanceList extends React.Component<any, State> {
                 <Form.Control
                   type={"text"}
                   id={"name"}
-                  value={this.state.selectedFinance.name}
+                  value={this.state.selectedPassword.name}
                   onChange={(e) => {
                     this.setState((prevState) => {
                       prevState.selectedPassword.name = e.target.value;
@@ -547,7 +473,7 @@ class FinanceList extends React.Component<any, State> {
                 <Form.Control
                   type={"password"}
                   id={"password"}
-                  value={this.state.selectedFinance.password}
+                  value={this.state.selectedPassword.password}
                   onChange={(e) => {
                     this.setState((prevState) => {
                       prevState.selectedPassword.value = e.target.value;
@@ -562,7 +488,7 @@ class FinanceList extends React.Component<any, State> {
                 <Form.Control
                   type={"text"}
                   id={"webPage"}
-                  value={this.state.selectedFinance.webPage}
+                  value={this.state.selectedPassword.webPage}
                   onChange={(e) => {
                     this.setState((prevState) => {
                       prevState.selectedPassword.webPage = e.target.value;
@@ -577,7 +503,7 @@ class FinanceList extends React.Component<any, State> {
                 <Form.Control
                   type={"text"}
                   id={"image"}
-                  value={this.state.selectedFinance.image}
+                  value={this.state.selectedPassword.image}
                   onChange={(e) => {
                     this.setState((prevState) => {
                       prevState.selectedPassword.image = e.target.value;
@@ -601,5 +527,3 @@ class FinanceList extends React.Component<any, State> {
     );
   }
 }
-
-export default FinanceList;

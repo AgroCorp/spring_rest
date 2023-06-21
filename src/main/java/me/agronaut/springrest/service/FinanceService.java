@@ -57,7 +57,7 @@ public class FinanceService {
         financeRepository.deleteById(id);
     }
 
-    public FinanceDto getById(Long id) {
+    public FinanceDto  getById(Long id) {
         logger.debug("FinanceService.getById - START");
         return modelMapper.map(financeRepository.getById(id).orElseThrow(NoSuchElementException::new), FinanceDto.class);
     }

@@ -1,6 +1,5 @@
 package me.agronaut.springrest.controller;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import me.agronaut.springrest.model.FinanceDto;
 import me.agronaut.springrest.model.User;
 import me.agronaut.springrest.service.FinanceService;
@@ -51,7 +50,7 @@ public class FinanceController {
     /**
      * Get list of all {@link me.agronaut.springrest.model.Finance} by currently logged in user
      *
-     * @param request  request object from endpoint
+     * @param request request object from endpoint
      * @param pageable pageable object from endpoint
      * @return {@link Page} object with data
      */
@@ -69,7 +68,7 @@ public class FinanceController {
      * @param pageable pageable object from endpoint
      * @return {@link Page} object with data
      */
-    @GetMapping("/user/{userId}")
+    @GetMapping("/get/user/{userId}")
     public Page<FinanceDto> getAllByUSerWithParameter(@PathVariable Long userId, Pageable pageable) {
         User current = userSD.getById(userId);
 
