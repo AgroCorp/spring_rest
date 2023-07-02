@@ -36,6 +36,7 @@ type State = {
   size: number;
   isMobile: boolean;
   categories: Category[];
+  readOnly: boolean;
 };
 
 class FinanceList extends React.Component<any, State> {
@@ -62,6 +63,7 @@ class FinanceList extends React.Component<any, State> {
       isMobile: false,
       categories: [],
       selectedCategory: {},
+      readOnly: false,
     };
 
     this.addOpen = this.addOpen.bind(this);
@@ -119,9 +121,7 @@ class FinanceList extends React.Component<any, State> {
           pageNumbers: list,
           page: r.data.pageable.pageNumber,
         });
-        console.log("alma");
         this.fetchAllCategory();
-        console.log("korte");
       })
       .catch((e) => {
         console.log(e);
@@ -142,7 +142,7 @@ class FinanceList extends React.Component<any, State> {
   }
 
   async handleDelete() {
-    await this.financeService.delete();
+    await this.financeService.delete(this.state.selectedFinance.id);
 
     await this.search(this.state.page, this.state.size);
 
@@ -157,7 +157,11 @@ class FinanceList extends React.Component<any, State> {
       event.stopPropagation();
     }
 
-    await this.financeService.edit();
+    this.state.selectedFinance.category = this.state.selectedCategory;
+
+    console.log("alma", this.state.selectedFinance);
+
+    await this.financeService.edit(this.state.selectedFinance);
 
     await this.search(this.state.page, this.state.size);
 
@@ -173,21 +177,28 @@ class FinanceList extends React.Component<any, State> {
   }
 
   addCategoryOpen() {
+    this.setState({ addShow: false });
     this.setState({ addCategoryShow: true });
   }
 
   addCategoryClose() {
     this.setState({ addCategoryShow: false });
+    this.setState({ addShow: true });
   }
 
-  editOpen(event) {
+  editOpen(event, readOnly: boolean = false) {
     this.setState({
       selectedFinance: Object.assign(
         {},
-        this.state.data[event.target.closest("tr").rowIndex - 1]
+        this.state.data.content[event.target.closest("tr").rowIndex - 1]
       ),
     });
-    this.setState({ editShow: true });
+    this.setState({
+      selectedCategory:
+        this.state.data.content[event.target.closest("tr").rowIndex - 1]
+          .category,
+    });
+    this.setState({ editShow: true, readOnly: readOnly });
   }
 
   editClose() {
@@ -198,7 +209,7 @@ class FinanceList extends React.Component<any, State> {
     this.setState({
       selectedFinance: Object.assign(
         {},
-        this.state.data[event.target.closest("tr").rowIndex - 1]
+        this.state.data.content[event.target.closest("tr").rowIndex - 1]
       ),
     });
     this.setState({ deleteShow: true });
@@ -237,12 +248,9 @@ class FinanceList extends React.Component<any, State> {
       event.stopPropagation();
     }
 
-    console.log(this.state.selectedCategory);
     let res = await this.categoryService.add(this.state.selectedCategory);
     this.setState((prevState) => {
-      console.log("asdasd:", prevState.categories);
-      prevState.categories.push(res.data);
-      console.log("asdasd123123:", prevState.categories);
+      prevState.categories.unshift(res.data);
       return prevState;
     });
     await this.addCategoryClose();
@@ -322,6 +330,7 @@ class FinanceList extends React.Component<any, State> {
                   <th>Name</th>
                   <th>Amount</th>
                   <th hidden={this.state.isMobile}>Category</th>
+                  <th>Income</th>
                   <th colSpan={3}>Actions</th>
                 </tr>
               </thead>
@@ -355,8 +364,26 @@ class FinanceList extends React.Component<any, State> {
                           {row.category.name}
                         </td>
                         <td>
+                          {row.income ? (
+                            <FontAwesomeIcon
+                              style={{ color: "green" }}
+                              icon={solid("download")}
+                            />
+                          ) : (
+                            <FontAwesomeIcon
+                              style={{ color: "red" }}
+                              icon={solid("upload")}
+                            />
+                          )}
+                        </td>
+                        <td>
                           <ButtonGroup>
-                            <Button variant={"primary"}>
+                            <Button
+                              variant={"primary"}
+                              onClick={(e) => {
+                                this.editOpen(e, true);
+                              }}
+                            >
                               <FontAwesomeIcon icon={solid("eye")} />
                             </Button>
                             <Button variant={"warning"} onClick={this.editOpen}>
@@ -405,7 +432,7 @@ class FinanceList extends React.Component<any, State> {
                   id={"amount"}
                   onChange={(e) => {
                     this.setState((prevState) => {
-                      prevState.selectedFinance.amount = 123;
+                      prevState.selectedFinance.amount = e.target.value;
                       return prevState;
                     });
                   }}
@@ -418,9 +445,8 @@ class FinanceList extends React.Component<any, State> {
                   id={"category"}
                   required
                   onChange={(event) => {
-                    let temp = new Category();
+                    let temp: Category = {};
                     temp.id = event.target.value;
-                    console.log(temp);
                     this.setState({ selectedCategory: temp });
                   }}
                 >
@@ -438,7 +464,7 @@ class FinanceList extends React.Component<any, State> {
                 </Button>
               </FormGroup>
               <FormGroup>
-                <Form.Label>Is income *</Form.Label>
+                <Form.Label>Is income</Form.Label>
                 <Form.Check
                   id={"income"}
                   onChange={(e) => {
@@ -503,11 +529,11 @@ class FinanceList extends React.Component<any, State> {
           onHide={this.deleteClose}
         >
           <Modal.Header>
-            <h1>Delete password</h1>
+            <h1>Delete Finance</h1>
           </Modal.Header>
           <Modal.Body>
             <h5>
-              Are you sure to delete password named:{" "}
+              Are you sure to delete finance named:{" "}
               {this.state.selectedFinance.name}?
             </h5>
           </Modal.Body>
@@ -524,7 +550,7 @@ class FinanceList extends React.Component<any, State> {
         <Modal show={this.state.editShow} id={"edit"} onHide={this.editClose}>
           <Form onSubmit={this.handleEdit}>
             <Modal.Header>
-              <h1>Edit password</h1>
+              <h1>{this.state.readOnly ? "View" : "Edit"} Finance</h1>
             </Modal.Header>
             <Modal.Body>
               <FormGroup>
@@ -532,10 +558,11 @@ class FinanceList extends React.Component<any, State> {
                 <Form.Control
                   type={"text"}
                   id={"name"}
+                  readOnly={this.state.readOnly}
                   value={this.state.selectedFinance.name}
                   onChange={(e) => {
                     this.setState((prevState) => {
-                      prevState.selectedPassword.name = e.target.value;
+                      prevState.selectedFinance.name = e.target.value;
                       return prevState;
                     });
                   }}
@@ -543,14 +570,15 @@ class FinanceList extends React.Component<any, State> {
                 />
               </FormGroup>
               <FormGroup>
-                <Form.Label>Password *</Form.Label>
+                <Form.Label>Amount *</Form.Label>
                 <Form.Control
-                  type={"password"}
-                  id={"password"}
-                  value={this.state.selectedFinance.password}
+                  type={"number"}
+                  id={"amount"}
+                  readOnly={this.state.readOnly}
+                  value={this.state.selectedFinance.amount}
                   onChange={(e) => {
                     this.setState((prevState) => {
-                      prevState.selectedPassword.value = e.target.value;
+                      prevState.selectedFinance.amount = e.target.value;
                       return prevState;
                     });
                   }}
@@ -558,29 +586,44 @@ class FinanceList extends React.Component<any, State> {
                 />
               </FormGroup>
               <FormGroup>
-                <Form.Label>Web Page *</Form.Label>
-                <Form.Control
-                  type={"text"}
-                  id={"webPage"}
-                  value={this.state.selectedFinance.webPage}
-                  onChange={(e) => {
-                    this.setState((prevState) => {
-                      prevState.selectedPassword.webPage = e.target.value;
-                      return prevState;
-                    });
-                  }}
+                <Form.Label>Category *</Form.Label>
+                <Form.Select
+                  id={"category"}
                   required
-                />
+                  disabled={this.state.readOnly}
+                  value={this.state.selectedCategory.id}
+                  onChange={(event) => {
+                    let temp: Category = {};
+                    temp.id = event.target.value;
+                    this.setState({ selectedCategory: temp });
+                  }}
+                >
+                  {this.state.categories !== undefined &&
+                    this.state.categories.map((item) => {
+                      return (
+                        <option key={item.id} value={item.id}>
+                          {item.name}
+                        </option>
+                      );
+                    })}
+                </Form.Select>
+                <Button
+                  disabled={this.state.readOnly}
+                  variant={"success"}
+                  onClick={this.addCategoryOpen}
+                >
+                  <FontAwesomeIcon icon={solid("plus")} />
+                </Button>
               </FormGroup>
               <FormGroup>
-                <Form.Label>Image url</Form.Label>
-                <Form.Control
-                  type={"text"}
-                  id={"image"}
-                  value={this.state.selectedFinance.image}
+                <Form.Label>Is income</Form.Label>
+                <Form.Check
+                  id={"income"}
+                  disabled={this.state.readOnly}
+                  checked={this.state.selectedFinance.income}
                   onChange={(e) => {
                     this.setState((prevState) => {
-                      prevState.selectedPassword.image = e.target.value;
+                      prevState.selectedFinance.income = e.target.checked;
                       return prevState;
                     });
                   }}
@@ -591,7 +634,12 @@ class FinanceList extends React.Component<any, State> {
               <Button variant="secondary" onClick={this.editClose}>
                 Close
               </Button>
-              <Button type={"submit"} variant="primary">
+              <Button
+                type={"submit"}
+                onClick={this.handleEdit}
+                variant="primary"
+                disabled={this.state.readOnly}
+              >
                 Save Changes
               </Button>
             </Modal.Footer>

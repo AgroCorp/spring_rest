@@ -13,7 +13,11 @@ export default class FinanceService {
     return axios.post("/finance/add", newFinance);
   }
 
-  edit() {}
+  async edit(updatedFinance: Finance): Finance {
+    return await axios.put("/finance/update", updatedFinance);
+  }
 
-  delete() {}
+  async delete(financeId: number) {
+    return await axios.delete(`/finance/delete/${financeId}`);
+  }
 }
