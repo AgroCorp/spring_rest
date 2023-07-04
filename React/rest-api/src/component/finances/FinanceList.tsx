@@ -37,6 +37,7 @@ type State = {
   isMobile: boolean;
   categories: Category[];
   readOnly: boolean;
+  byUser: boolean;
 };
 
 class FinanceList extends React.Component<any, State> {
@@ -64,6 +65,7 @@ class FinanceList extends React.Component<any, State> {
       categories: [],
       selectedCategory: {},
       readOnly: false,
+      byUser: false,
     };
 
     this.addOpen = this.addOpen.bind(this);
@@ -76,6 +78,7 @@ class FinanceList extends React.Component<any, State> {
     this.handleEdit = this.handleEdit.bind(this);
     this.addNewFinance = this.addNewFinance.bind(this);
     this.handleResize = this.handleResize.bind(this);
+    this.handleByUser = this.handleByUser.bind(this);
     this.fetchAllCategory = this.fetchAllCategory.bind(this);
     this.addCategoryClose = this.addCategoryClose.bind(this);
     this.addCategoryOpen = this.addCategoryOpen.bind(this);
@@ -219,6 +222,11 @@ class FinanceList extends React.Component<any, State> {
     this.setState({ deleteShow: false });
   }
 
+  handleByUser(e) {
+    this.setState({ byUser: e.target.checked });
+    this.search(this.state.page, this.state.size);
+  }
+
   async addNewFinance(event) {
     event.preventDefault();
     const form = event.currentTarget;
@@ -270,6 +278,17 @@ class FinanceList extends React.Component<any, State> {
     return (
       <BaseSite>
         <Container>
+          <Row xs={4} lg={6} style={{ marginBottom: 10 }}>
+            <Col>
+              <FormGroup>
+                <Form.Check
+                  id={"byUser"}
+                  onChange={this.handleByUser}
+                  label={"Search by User"}
+                />
+              </FormGroup>
+            </Col>
+          </Row>
           <Row xs={4} lg={6} style={{ marginBottom: 10 }}>
             <Col>
               <Button variant={"success"} onClick={this.addOpen}>
@@ -331,6 +350,7 @@ class FinanceList extends React.Component<any, State> {
                   <th>Amount</th>
                   <th hidden={this.state.isMobile}>Category</th>
                   <th>Income</th>
+                  <th hidden={!this.state.byUser}>User</th>
                   <th colSpan={3}>Actions</th>
                 </tr>
               </thead>
@@ -376,6 +396,7 @@ class FinanceList extends React.Component<any, State> {
                             />
                           )}
                         </td>
+                        <td hidden={!this.state.byUser}>{row.user.username}</td>
                         <td>
                           <ButtonGroup>
                             <Button
@@ -464,9 +485,9 @@ class FinanceList extends React.Component<any, State> {
                 </Button>
               </FormGroup>
               <FormGroup>
-                <Form.Label>Is income</Form.Label>
                 <Form.Check
                   id={"income"}
+                  label={"Is income"}
                   onChange={(e) => {
                     this.setState((prevState) => {
                       prevState.selectedFinance.income = e.target.checked;
