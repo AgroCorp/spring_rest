@@ -31,6 +31,7 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(new JWTAuthorizationFilter().setSECRET(secret), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/auth/**").permitAll()
+                .antMatchers("/actuator/**").permitAll()
                 .anyRequest().authenticated();
     }
 
