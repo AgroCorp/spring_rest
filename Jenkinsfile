@@ -113,6 +113,12 @@ pipeline {
       }
     }
     stage('JavaDoc') {
+      when {
+        expression {
+          env.GIT_BRANCH == "origin/master"
+        }
+        triggeredBy cause: "UserIdCause"
+      }
       steps {
         script {
           sh 'mvn javadoc:javadoc'
