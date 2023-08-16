@@ -29,8 +29,11 @@
     <description>springRest</description>
     <packaging>jar</packaging>
     <properties>
+        <maven.build.timestamp.format>yy-MM-dd_HH-mm</maven.build.timestamp.format>
+        <changelogDate>${maven.build.timestamp}</changelogDate>
         <java.version>17</java.version>
-        <changelog-file>/db/changelog/db.changelog-master.xml</changelog-file>
+        <outputChangeLogFile>src/main/resources/db/changelog/${changelogDate}_changelog.xml</outputChangeLogFile>
+        <changeLogFile>src/main/resources/db/changelog/db.changelog-master.xml</changeLogFile>
         <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
         <jdbc.url>jdbc:mariadb://192.168.2.55:3306/java</jdbc.url>
         <jdbc.username>admin</jdbc.username>
@@ -170,7 +173,13 @@
                 <artifactId>liquibase-maven-plugin</artifactId>
                 <version>4.8.0</version>
                 <configuration>
-                    <changeLogFile>/db/changelog/db.changelog-master.xml</changeLogFile>
+                    <changeLogFile>${changeLogFile}</changeLogFile>
+                    <outputChangeLogFile>${outputChangeLogFile}</outputChangeLogFile>
+                    <diffChangeLogFile>${outputChangeLogFile}</diffChangeLogFile>
+                    <referenceUrl>${jdbc.url}</referenceUrl>
+                    <referenceDriver>${jdbc.driver}</referenceDriver>
+                    <referenceUsername>${jdbc.username}</referenceUsername>
+                    <referencePassword>${jdbc.password}</referencePassword>
                     <driver>${jdbc.driver}</driver>
                     <url>${jdbc.url}</url>
                     <username>${jdbc.username}</username>
@@ -246,6 +255,7 @@
                                 </goals>
                                 <phase>validate</phase>
                                 <configuration>
+                                    <!--suppress UnresolvedMavenProperty -->
                                     <newVersion>
                                         ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.nextIncrementalVersion}-SNAPSHOT
                                     </newVersion>
@@ -276,6 +286,7 @@
                                 </goals>
                                 <phase>validate</phase>
                                 <configuration>
+                                    <!--suppress UnresolvedMavenProperty -->
                                     <newVersion>
                                         ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.IncrementalVersion}
                                     </newVersion>

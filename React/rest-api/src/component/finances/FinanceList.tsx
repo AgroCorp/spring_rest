@@ -224,7 +224,7 @@ class FinanceList extends React.Component<any, State> {
 
   handleByUser(e) {
     this.setState({ byUser: e.target.checked });
-    this.search(this.state.page, this.state.size);
+    //this.search(this.state.page, this.state.size);
   }
 
   async addNewFinance(event) {
@@ -284,7 +284,7 @@ class FinanceList extends React.Component<any, State> {
                 <Form.Check
                   id={"byUser"}
                   onChange={this.handleByUser}
-                  label={"Search by User"}
+                  label={"Show User"}
                 />
               </FormGroup>
             </Col>
@@ -360,67 +360,63 @@ class FinanceList extends React.Component<any, State> {
                     <td colSpan={7}>Nincs Talalat</td>
                   </tr>
                 )}
-                {this.state.data.content != null &&
-                  this.state.data.content.map((row: Finance) => {
-                    return (
-                      <tr key={row.id}>
-                        <td
-                          hidden={this.state.isMobile}
-                          onDoubleClick={this.editOpen}
-                        >
-                          {row.id}
-                        </td>
-                        <td onDoubleClick={this.editOpen}>{row.name}</td>
-                        <td
-                          style={{ whiteSpace: "pre" }}
-                          onDoubleClick={this.editOpen}
-                        >
-                          {row.amount}
-                        </td>
-                        <td
-                          hidden={this.state.isMobile}
-                          onDoubleClick={this.editOpen}
-                        >
-                          {row.category.name}
-                        </td>
-                        <td>
-                          {row.income ? (
-                            <FontAwesomeIcon
-                              style={{ color: "green" }}
-                              icon={solid("download")}
-                            />
-                          ) : (
-                            <FontAwesomeIcon
-                              style={{ color: "red" }}
-                              icon={solid("upload")}
-                            />
-                          )}
-                        </td>
-                        <td hidden={!this.state.byUser}>{row.user.username}</td>
-                        <td>
-                          <ButtonGroup>
-                            <Button
-                              variant={"primary"}
-                              onClick={(e) => {
-                                this.editOpen(e, true);
-                              }}
-                            >
-                              <FontAwesomeIcon icon={solid("eye")} />
-                            </Button>
-                            <Button variant={"warning"} onClick={this.editOpen}>
-                              <FontAwesomeIcon icon={solid("pencil")} />
-                            </Button>
-                            <Button
-                              variant={"danger"}
-                              onClick={this.deleteOpen}
-                            >
-                              <FontAwesomeIcon icon={solid("xmark")} />
-                            </Button>
-                          </ButtonGroup>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                {this.state.data.content?.map((row: Finance) => {
+                  return (
+                    <tr key={row.id}>
+                      <td
+                        hidden={this.state.isMobile}
+                        onDoubleClick={this.editOpen}
+                      >
+                        {row.id}
+                      </td>
+                      <td onDoubleClick={this.editOpen}>{row.name}</td>
+                      <td
+                        style={{ whiteSpace: "pre" }}
+                        onDoubleClick={this.editOpen}
+                      >
+                        {row.amount}
+                      </td>
+                      <td
+                        hidden={this.state.isMobile}
+                        onDoubleClick={this.editOpen}
+                      >
+                        {row.category.name}
+                      </td>
+                      <td>
+                        {row.income ? (
+                          <FontAwesomeIcon
+                            style={{ color: "green" }}
+                            icon={solid("download")}
+                          />
+                        ) : (
+                          <FontAwesomeIcon
+                            style={{ color: "red" }}
+                            icon={solid("upload")}
+                          />
+                        )}
+                      </td>
+                      <td hidden={!this.state.byUser}>{row.user.username}</td>
+                      <td>
+                        <ButtonGroup>
+                          <Button
+                            variant={"primary"}
+                            onClick={(e) => {
+                              this.editOpen(e, true);
+                            }}
+                          >
+                            <FontAwesomeIcon icon={solid("eye")} />
+                          </Button>
+                          <Button variant={"warning"} onClick={this.editOpen}>
+                            <FontAwesomeIcon icon={solid("pencil")} />
+                          </Button>
+                          <Button variant={"danger"} onClick={this.deleteOpen}>
+                            <FontAwesomeIcon icon={solid("xmark")} />
+                          </Button>
+                        </ButtonGroup>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </Table>
           </Row>
@@ -471,17 +467,24 @@ class FinanceList extends React.Component<any, State> {
                     this.setState({ selectedCategory: temp });
                   }}
                 >
-                  {this.state.categories !== undefined &&
-                    this.state.categories.map((item) => {
-                      return (
-                        <option key={item.id} value={item.id}>
-                          {item.name}
-                        </option>
-                      );
-                    })}
+                  {this.state.categories?.map((item) => {
+                    return (
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
+                    );
+                  })}
                 </Form.Select>
                 <Button variant={"success"} onClick={this.addCategoryOpen}>
                   <FontAwesomeIcon icon={solid("plus")} />
+                </Button>
+                <Button
+                  variant={"primary"}
+                  onClick={() =>
+                    this.search(this.state.page, this.state.size, this)
+                  }
+                >
+                  <FontAwesomeIcon icon={solid("magnifying-glass")} />
                 </Button>
               </FormGroup>
               <FormGroup>
@@ -495,6 +498,34 @@ class FinanceList extends React.Component<any, State> {
                     });
                   }}
                 />
+                <Form.Check
+                  id={"repeatable"}
+                  label={"Is repeatable"}
+                  onChange={(e) => {
+                    this.setState((prevState) => {
+                      prevState.selectedFinance.repeatable = e.target.checked;
+                      return prevState;
+                    });
+                  }}
+                />
+                {this.state.selectedFinance.repeatable ? (
+                  <>
+                    <Form.Label>Repeat date *</Form.Label>
+                    <Form.Control
+                      type={"date"}
+                      id={"date"}
+                      onChange={(e) => {
+                        this.setState((prevState) => {
+                          prevState.selectedFinance.amount = e.target.value;
+                          return prevState;
+                        });
+                      }}
+                      required
+                    />
+                  </>
+                ) : (
+                  ""
+                )}
               </FormGroup>
             </Modal.Body>
             <Modal.Footer>
@@ -619,14 +650,13 @@ class FinanceList extends React.Component<any, State> {
                     this.setState({ selectedCategory: temp });
                   }}
                 >
-                  {this.state.categories !== undefined &&
-                    this.state.categories.map((item) => {
-                      return (
-                        <option key={item.id} value={item.id}>
-                          {item.name}
-                        </option>
-                      );
-                    })}
+                  {this.state.categories?.map((item) => {
+                    return (
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
+                    );
+                  })}
                 </Form.Select>
                 <Button
                   disabled={this.state.readOnly}

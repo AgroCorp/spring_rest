@@ -25,6 +25,8 @@ public class FinanceDto implements Serializable {
     private UserDto user;
     @NotNull(message = "Income field is required!")
     private Boolean income;
+    @NotNull(message = "Repeatable is required!")
+    private Boolean repeatable;
 
     private LocalDateTime crd;
 }
