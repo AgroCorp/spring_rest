@@ -4,11 +4,13 @@ import me.agronaut.springrest.model.Category;
 import me.agronaut.springrest.model.CategoryDto;
 import me.agronaut.springrest.repository.CategoryRepository;
 import me.agronaut.springrest.util.LogUtil;
+import me.agronaut.springrest.util.Statics;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class CategoryService {
@@ -32,12 +34,18 @@ public class CategoryService {
     }
     public CategoryDto save(CategoryDto cat) {
         log.debug("save - START");
+        if (cat == null) {
+            throw new NoSuchElementException(Statics.NULL_OBJECT);
+        }
         Category saved = categoryRepository.save(modelMapper.map(cat, Category.class));
         return modelMapper.map(saved,CategoryDto.class);
     }
 
     public void delete(CategoryDto cat) {
         log.debug("delete - START");
+        if (cat == null || cat.getId() == null) {
+            throw new NoSuchElementException(Statics.NULL_OBJECT);
+        }
         categoryRepository.delete(modelMapper.map(cat, Category.class));
     }
 }

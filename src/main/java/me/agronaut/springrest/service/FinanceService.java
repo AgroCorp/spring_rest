@@ -51,6 +51,10 @@ public class FinanceService {
         return modelMapper.map(casted, FinanceDto.class);
     }
 
+    public Long getSumOfMonthCurrentUser(User user) {
+        return financeRepository.getSumOfCurrentMonth(user);
+    }
+
     public void delete(Long id) {
         logger.debug("FinanceService.delete - START");
 

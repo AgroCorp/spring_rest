@@ -93,4 +93,10 @@ public class FinanceController {
         }
         return financeSD.getById(parsedId);
     }
+
+    @GetMapping("/get/sum_month")
+    public Long getSumOfMonth(HttpServletRequest request) {
+        User current = userSD.getByUsername(request.getUserPrincipal().getName());
+        return financeSD.getSumOfMonthCurrentUser(current);
+    }
 }
