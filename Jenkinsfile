@@ -9,6 +9,7 @@ pipeline {
 
   environment {
     GIT_CREDS = credentials('github_access_token')
+    ADMIN_TOKEN = credentials('admin_token')
   }
 
 
@@ -64,8 +65,8 @@ pipeline {
     }
 
     stage('SonarQube scan') {
-      steps {
-        script {
+      steps{
+        withSonarQubeEnv(credentialsId: 'sonarqube global', installationName: 'sonarQube') { // You can override the credential to be used
           sh "mvn -B --file pom.xml -Dmaven.test.skip=true sonar:sonar"
           sh 'node React/rest-api/sonarqube-scanner.js'
         }
