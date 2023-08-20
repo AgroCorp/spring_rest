@@ -17,7 +17,7 @@ pipeline {
     stage('Prepare') {
       steps {
         script {
-          sh 'echo "ADMIN_TOKEN=${ADMIN_TOKEN}" >> src/main/resources/application-junit.properties'
+          sh 'echo "\nADMIN_TOKEN=${ADMIN_TOKEN}" >> src/main/resources/application-junit.properties'
         }
       }
     }
