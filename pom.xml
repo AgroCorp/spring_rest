@@ -39,7 +39,7 @@
         <jdbc.username>admin</jdbc.username>
         <jdbc.password>Gaborka11</jdbc.password>
         <sonar.host.url>http://192.168.2.55:9002</sonar.host.url>
-        <sonar.token>sqa_6a74116866376a11e1a91e49069ab7f8f46cfa95</sonar.token>
+        <sonar.token>sqa_56e90bb26a71c833ced6d7eea8b424be1c87e49e</sonar.token>
         <sonar.java.binaries>target</sonar.java.binaries>
         <sonar.tests>src/test</sonar.tests>
         <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>

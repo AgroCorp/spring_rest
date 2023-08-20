@@ -7,6 +7,8 @@ import me.agronaut.springrest.model.User;
 import me.agronaut.springrest.model.UserDto;
 import me.agronaut.springrest.repository.UserRepository;
 import me.agronaut.springrest.util.LogUtil;
+import me.agronaut.springrest.util.Statics;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,10 +28,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -100,7 +99,7 @@ public class UserService {
 
         Optional<User> login = userRepo.getUserByUsername(loginUser.getUsername());
         if (login.isPresent()) {
-            logger.debug("getted user", "User", login.isPresent());
+            logger.debug("getted user", "User", login.get());
             User casted = login.get();
             if (casted.getActive() != null && !casted.getActive()) {
                 throw new NotActiveUserException("user is not activated");
@@ -190,7 +189,15 @@ public class UserService {
     }
 
     public User setNewPassword(String newPassword, Long userId) {
+        if(StringUtils.isEmpty(newPassword) || userId == null) {
+            throw new NoSuchElementException(Statics.NULL_OBJECT);
+        }
+
         User user = userRepo.getUserById(userId);
+
+        if (user == null) {
+            throw new NoSuchElementException(Statics.NULL_OBJECT);
+        }
 
         user.setPassword(encoder.encode(newPassword));
 

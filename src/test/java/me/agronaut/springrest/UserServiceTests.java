@@ -15,7 +15,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -63,9 +66,7 @@ class UserServiceTests {
         doReturn(testUser).when(userRepository).getUserById(anyLong());
 
         userSD.activate(testUser.getId());
-        assertThrows(EntityNotFoundException.class, () -> {
-            userSD.activate(null);
-        });
+        assertThrows(EntityNotFoundException.class, () -> userSD.activate(null));
 
 
         verify(userRepository, times(1)).save(nullable(User.class));
@@ -102,9 +103,7 @@ class UserServiceTests {
 
         // user not presented
         doReturn(Optional.empty()).when(userRepository).getUserByUsername(anyString());
-        assertThrows(EntityNotFoundException.class, () -> {
-            userSD.login(new User());
-        });
+        assertThrows(EntityNotFoundException.class, () -> userSD.login(new User()));
     }
 
     @Test
@@ -154,17 +153,23 @@ class UserServiceTests {
 
     @Test
     void testSetNewPassword() {
+        User mockUser = new User();
+        mockUser.setId(12L);
+        doReturn(mockUser).when(userRepository).getUserById(anyLong());
+
         // good
         userSD.setNewPassword("newPassword", 12L);
 
-        // check null
-        userSD.setNewPassword(null, 12L);
-        userSD.setNewPassword("", 12L);
-        userSD.setNewPassword("newPassword", null);
 
-        // user not found by id
-        userSD.setNewPassword("newPassword", 12L);
+        assertThrows(NoSuchElementException.class, () -> {
+            // check null
+            userSD.setNewPassword(null, 12L);
+            userSD.setNewPassword("", 12L);
+            userSD.setNewPassword("newPassword", null);
 
-        
+            doReturn(null).when(userRepository).getUserById(anyLong());
+            // user not found by id
+            userSD.setNewPassword("newPassword", 12L);
+        });
     }
 }

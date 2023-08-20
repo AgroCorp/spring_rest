@@ -14,15 +14,6 @@ pipeline {
 
 
   stages {
-    stage('Checkout Scm') {
-      steps {
-        script {
-          FAILED_STAGE = env.STAGE_NAME
-          git 'https://github.com/AgroCorp/spring_rest.git'
-        }
-      }
-    }
-
     stage('Build project') {
       steps {
         parallel (
@@ -129,6 +120,9 @@ pipeline {
     }
 }
   post {
+    always{
+      cleanWs()
+    }
     success {
         junit '**/target/surefire-reports/TEST-*.xml'
         archiveArtifacts 'target/*.jar'
