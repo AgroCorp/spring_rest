@@ -14,6 +14,14 @@ pipeline {
 
 
   stages {
+    stage('Prepare') {
+      steps {
+        script {
+          sh 'echo "ADMIN_TOKEN=${ADMIN_TOKEN}" >> src/main/java/resources/application-junit.properties'
+        }
+      }
+    }
+
     stage('Build project') {
       steps {
         parallel (
@@ -29,7 +37,7 @@ pipeline {
               sh 'CI=false npm --prefix ./React/rest-api install'
               sh 'CI=false npm --prefix ./React/rest-api run build'
               sh 'cp -r ./React/rest-api/build ./'
-              sh 'find ./build/ -printf "%P\n" -type f -o -type l -o -type d | tar -czf build.tar.gz --no-recursion -C ./build/ -T -'
+              sh 'tar -czvf build.tar.gz -C ./build .'
             }
           }
         )
@@ -48,7 +56,7 @@ pipeline {
           "Jacoco test": {
             script{
               FAILED_STAGE = env.STAGE_NAME
-              sh 'mvn clean org.jacoco:jacoco-maven-plugin:0.8.10:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.10:report'
+              sh 'mvn clean org.jacoco:jacoco-maven-plugin:0.8.10:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.10:report -Dspring.profiles.active=junit'
             }
           }
         )
@@ -118,30 +126,39 @@ pipeline {
         }
       }
     }
+    stage('Store artifacts') {
+      steps {
+        script {
+          junit '**/target/surefire-reports/TEST-*.xml'
+          jacoco(
+              execPattern: '**/target/*.exec',
+              classPattern: '**/target/classes',
+              sourcePattern: '**/src/main'
+          )
+          archiveArtifacts 'target/*.jar'
+          archiveArtifacts 'build.tar.gz'
+        }
+      }
+    }
 }
   post {
+    failure {
+        emailext body: "<b>Error in build</b><br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br>Stage: ${FAILED_STAGE} <br> URL to build: ${env.BUILD_URL}",
+        from: 'jenkins@sativus.space',
+        subject: "ERROR CI: Project name -> ${env.JOB_NAME}", to: "gaborka812@gmail.com", attachLog: true;
+    }
     always{
       cleanWs(cleanWhenNotBuilt: false,
                       deleteDirs: true,
                       disableDeferredWipeout: true,
                       notFailBuild: true,
-                      patterns: [[pattern: '**/target/surefire-reports/*', type: 'EXCLUDE'],
-                      [pattern:'**/target/jacoco.exec']])
-    }
-    success {
-        junit '**/target/surefire-reports/TEST-*.xml'
-        jacoco(
-            execPattern: '**/target/*.exec',
-            classPattern: '**/target/classes',
-            sourcePattern: '**/src/main'
-        )
-        archiveArtifacts 'target/*.jar'
-        archiveArtifacts 'build.tar.gz'
-  }
-    failure {
-        emailext body: "<b>Error in build</b><br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br>Stage: ${FAILED_STAGE} <br> URL to build: ${env.BUILD_URL}",
-        from: 'jenkins@sativus.space',
-        subject: "ERROR CI: Project name -> ${env.JOB_NAME}", to: "gaborka812@gmail.com", attachLog: true;
+                      patterns: [
+                      [pattern: 'target/surefire-reports/TEST-*', type: 'EXCLUDE'],
+                      [pattern: 'target/jacoco.exec', type: 'EXCLUDE'],
+                      [pattern: 'target/*.jar', type: 'EXCLUDE'],
+                      [pattern: 'build.tar.gz', type: 'EXCLUDE']
+                      ]
+      )
     }
   }
 }
