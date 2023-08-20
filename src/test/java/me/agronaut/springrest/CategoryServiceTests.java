@@ -77,12 +77,19 @@ class CategoryServiceTests {
 
     @Test
     void testDelete() {
+        CategoryDto empty = new CategoryDto();
+        CategoryDto nullId = new CategoryDto(null, "asdasd");
+
         doNothing().when(repository).delete(any(Category.class));
 
         assertThrows(NoSuchElementException.class, () -> {
             categoryService.delete(null);
-            categoryService.delete(new CategoryDto());
-            categoryService.delete(new CategoryDto(null, "asdasd"));
+        });
+        assertThrows(NoSuchElementException.class, () -> {
+            categoryService.delete(empty);
+        });
+        assertThrows(NoSuchElementException.class, () -> {
+            categoryService.delete(nullId);
         });
         categoryService.delete(new CategoryDto(1L, null));
         categoryService.delete(new CategoryDto(2L, "asdasd"));

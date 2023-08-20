@@ -121,10 +121,20 @@ pipeline {
 }
   post {
     always{
-      cleanWs()
+      cleanWs(cleanWhenNotBuilt: false,
+                      deleteDirs: true,
+                      disableDeferredWipeout: true,
+                      notFailBuild: true,
+                      patterns: [[pattern: '**/target/surefire-reports/*', type: 'EXCLUDE'],
+                      [pattern:'**/target/jacoco.exec']])
     }
     success {
         junit '**/target/surefire-reports/TEST-*.xml'
+        jacoco(
+            execPattern: '**/target/*.exec',
+            classPattern: '**/target/classes',
+            sourcePattern: '**/src/main'
+        )
         archiveArtifacts 'target/*.jar'
         archiveArtifacts 'build.tar.gz'
   }
