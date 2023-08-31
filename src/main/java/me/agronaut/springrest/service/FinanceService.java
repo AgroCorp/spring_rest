@@ -12,8 +12,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @Service
 public class FinanceService {
@@ -60,5 +59,29 @@ public class FinanceService {
     public FinanceDto  getById(Long id) {
         logger.debug("FinanceService.getById - START");
         return modelMapper.map(financeRepository.getById(id).orElseThrow(NoSuchElementException::new), FinanceDto.class);
+    }
+
+    public Page<FinanceDto> getAllActualMonth(Pageable pageable) {
+        logger.debug("getAllActualMonth - START");
+        // set first and last date for between
+        Calendar now = Calendar.getInstance();
+        now.set(Calendar.DAY_OF_MONTH, 1);
+        Date firstDay = now.getTime();
+        now.set(Calendar.DAY_OF_MONTH, Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH));
+        Date lastDay = now.getTime();
+
+        List<FinanceDto> res = new LinkedList<>();
+
+        // get all repeatable finance
+        res.addAll(getAllRepeatable().stream().map((element) -> modelMapper.map(element, FinanceDto.class)).toList());
+
+        // get all by actual month
+        res.addAll(financeRepository.findAllByRepeatDateBetween(firstDay, lastDay).stream().map((element) -> modelMapper.map(element, FinanceDto.class)).toList());
+
+        return new PageImpl<>(res, pageable, res.size());
+    }
+
+    public List<Finance> getAllRepeatable() {
+        return financeRepository.findAllByRepeatableIsTrue();
     }
 }
