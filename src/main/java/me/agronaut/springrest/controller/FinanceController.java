@@ -93,4 +93,17 @@ public class FinanceController {
         }
         return financeSD.getById(parsedId);
     }
+
+    @GetMapping("/get/actual-month")
+    public Page<FinanceDto> getActualMonth(HttpServletRequest request, Pageable pageable) {
+        User current = userSD.getByUsername(request.getUserPrincipal().getName());
+
+        return financeSD.getAllActualMonth(current, pageable);
+
+    }
+
+    @PostMapping("/get/by-form")
+    public Page<FinanceDto> getAllByForm(@RequestBody FinanceDto searchForm, Pageable pageable) {
+        return financeSD.getAllByForm(searchForm, pageable);
+    }
 }

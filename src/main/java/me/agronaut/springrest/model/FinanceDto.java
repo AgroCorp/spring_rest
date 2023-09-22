@@ -1,5 +1,6 @@
 package me.agronaut.springrest.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@EqualsAndHashCode
 public class FinanceDto implements Serializable {
     private Long id;
     @NotNull(message = "Name field is required!")
@@ -27,6 +29,7 @@ public class FinanceDto implements Serializable {
     private Boolean income;
     @NotNull(message = "Repeatable is required!")
     private Boolean repeatable;
+    private LocalDateTime repeatDate;
 
     private LocalDateTime crd;
 }

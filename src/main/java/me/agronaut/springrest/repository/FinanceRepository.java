@@ -5,7 +5,7 @@ import me.agronaut.springrest.model.User;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,5 +16,5 @@ public interface FinanceRepository extends PagingAndSortingRepository<Finance, L
 
     List<Finance> findAllByRepeatableIsTrue();
 
-    List<Finance> findAllByRepeatDateBetween(Date from, Date to);
+    List<Finance> findAllByRepeatDateBetweenAndUser(LocalDateTime repeatDate, LocalDateTime repeatDate2, User user);
 }
