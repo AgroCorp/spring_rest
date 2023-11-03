@@ -1,0 +1,128 @@
+stages:
+  - build
+  - test
+  - visualize
+  - deploy
+
+default:
+  tags:
+    - docker-runner
+
+cache:
+  paths:
+    - .m2/repository
+
+
+build-BE:
+  stage: build
+  image: maven:3-openjdk-17
+  variables:
+    MAVEN_OPTS: >-
+      -Dmaven.test.skip=true
+    MAVEN_CLI_OPTS: >-
+      --batch-mode
+      -f pom.xml
+      -s .mvn/settings.xml
+  script:
+    - mvn $MAVEN_CLI_OPTS clean package
+  artifacts:
+    expire_in: 3 days
+    paths:
+      - target/*.jar
+build-FE:
+  stage: build
+  image: node:16.17.0-alpine
+  before_script:
+    - apk update
+    - apk --no-cache add findutils tar && rm -rf /var/cache/apk/*
+    - npm config set //192.168.2.55:8101/repository/npm-group/:_auth $NEXUS_TOKEN
+  script:
+    - CI=false npm --prefix ./React/rest-api install
+    - CI=false npm --prefix ./React/rest-api run build
+    - cp -r ./React/rest-api/build ./
+    - find ./build/ -printf "%P\n" -type f -o -type l -o -type d | tar -czf build.tar.gz --no-recursion -C ./build/ -T -
+  artifacts:
+    expire_in: 3 days
+    paths:
+      - build.tar.gz
+
+unit-test:
+  stage: test
+  image: maven:3-openjdk-17
+  variables:
+    MAVEN_OPTS: >-
+      -Dmaven.test.failure.ignore=true
+      -Dspring.profiles.active=junit
+    MAVEN_CLI_OPTS: >-
+      --batch-mode
+      -f pom.xml
+      -s .mvn/settings.xml
+  script:
+    - mvn $MAVEN_CLI_OPTS test
+  artifacts:
+    expire_in: 3 days
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
+        - target/failsafe-reports/TEST-*.xml
+jacoco-coverage:
+  stage: test
+  image: maven:3-openjdk-17
+  script:
+    mvn -s .mvn/settings.xml clean org.jacoco:jacoco-maven-plugin:0.8.10:prepare-agent test org.jacoco:jacoco-maven-plugin:0.8.10:report
+  artifacts:
+    expire_in: 3 days
+    paths:
+      - target/site/jacoco/jacoco.xml
+sonarqube:
+  stage: test
+  image: arm64v8/maven:3.9-eclipse-temurin-21-alpine
+  dependencies:
+    - jacoco-coverage
+  needs: ["jacoco-coverage"]
+  variables:
+    MAVEN_CLI_OPTS: >-
+      -B
+      -f pom.xml
+      -s .mvn/settings.xml
+    MAVEN_OPTS: >-
+      -Dmaven.test.skip=true
+  before_script:
+    - SONAR_SCANNER_VERSION=5.0.1.3006
+    - apk add --no-cache ca-certificates curl nodejs npm
+    - mkdir -p /opt
+    - curl -fSL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}.zip -o /opt/sonar-scanner.zip
+    - unzip /opt/sonar-scanner.zip -d /opt
+    - rm /opt/sonar-scanner.zip
+    - ln -s /opt/sonar-scanner-${SONAR_SCANNER_VERSION}/bin/sonar-scanner /usr/bin/sonar-scanner
+
+    - sed -i -e "s|SONAR_URL|$SONAR_URL|g" .mvn/settings.xml
+    - sed -i -e "s|SONAR_TOKEN|$SONAR_TOKEN|g" .mvn/settings.xml
+  script:
+    - mvn $MAVEN_CLI_OPTS sonar:sonar
+    - echo ${SONAR_URL}
+    - sonar-scanner -X -Dsonar.host.url=${SONAR_URL} -Dsonar.token=${SONAR_TOKEN}
+
+javadoc:
+  only:
+    - main
+  stage: deploy
+  image: maven:3-openjdk-17
+  script:
+    - mvn -s .mvn/settings.xml javadoc:javadoc
+    - git subtree push --prefix target/site/apidocs https://$GIT_USER:$GIT_PW@github.com/AgroCorp/spring_rest.git gh-pages
+
+coverage-convert:
+  stage: visualize
+  image: haynes/jacoco2cobertura:arm64-latest
+  script:
+    - python /opt/cover2cover.py target/site/jacoco/jacoco.xml $CI_PROJECT_DIR/src/main/java/ > target/site/cobertura.xml
+  needs: ["jacoco-coverage"]
+  dependencies:
+    - jacoco-coverage
+  artifacts:
+    expire_in: 3 days
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: target/site/cobertura.xml

@@ -8,7 +8,7 @@ export default function ActivateRegistration(){
 
     useEffect(()=> {
         console.log(params.token);
-        axios.get("http://localhost:8081/auth/activate/" + params.token).then(r=>{
+        axios.get("http://localhost:3001/auth/activate/" + params.token).then(r=>{
             console.log(r);
         }).catch(error => {
                 console.log(error.message);

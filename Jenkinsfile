@@ -107,8 +107,8 @@ pipeline {
       steps {
         script {
             FAILED_STAGE = env.STAGE_NAME
-            sh "docker run -d --restart unless-stopped -p 8102:80 -m 72m --name rest-page gaborka98/rest-fe:latest"
-            sh "docker run -d --restart unless-stopped -p 8103:8080 --name rest-be gaborka98/rest-be:latest"
+            sh "docker run -d --restart unless-stopped -p 8102:80 --name rest-page gaborka98/rest-fe:latest"
+            sh "docker run -d --restart unless-stopped -p 8103:8080 --name rest-be -m 75m gaborka98/rest-be:latest"
         }
       }
     }

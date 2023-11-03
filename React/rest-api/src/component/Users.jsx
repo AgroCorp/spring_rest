@@ -1,9 +1,9 @@
 import axios from "axios";
-import {Button, Container, Row, Col, Pagination, Table} from "react-bootstrap";
+import {Button, Col, Container, Pagination, Row, Table} from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import BaseSite, {showNotification} from "./baseSite";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {solid} from '@fortawesome/fontawesome-svg-core/import.macro';
 import React from "react";
 
 class Users extends React.Component {
@@ -23,6 +23,7 @@ class Users extends React.Component {
         }
 
         this.search = this.search.bind(this);
+        this.searchButton = this.searchButton.bind(this);
         this.setPage = this.setPage.bind(this);
         this.setSize = this.setSize.bind(this);
     }
@@ -31,9 +32,13 @@ class Users extends React.Component {
         this.search(this.state.page, this.state.size);
     }
 
-    search(page:number, size:number) {
+    searchButton() {
+        this.search(this.state.page, this.state.size);
+    }
+
+    search(page, size) {
         this.setState({loading: true});
-        console.log(this.state.page);
+        console.log(this.searchForm);
         axios.post(`/auth/list_all_user?page=${page}&size=${size}`, {user: this.searchForm})
             .then(r=>{
                 this.setState({loading:false});
@@ -64,12 +69,12 @@ class Users extends React.Component {
         this.searchForm['active'] = true;
     }
 
-    setPage(page:number): void {
+    setPage(page) {
         this.setState({page: page});
         this.search(page, this.state.size);
     }
 
-    setSize(size: number): void {
+    setSize(size) {
         this.setState({size: size});
         this.search(this.state.page, size);
     }
@@ -117,7 +122,7 @@ class Users extends React.Component {
                     </Row>
                     <Row xs={2} lg={6}>
                         <Col>
-                            <Button variant={"primary"} onClick={this.search}><FontAwesomeIcon icon={solid('magnifying-glass')}/></Button>
+                            <Button variant={"primary"} onClick={this.searchButton}><FontAwesomeIcon icon={solid('magnifying-glass')}/></Button>
                         </Col>
                         <Col>
                             <Form.Select onChange={event => this.setSize(event.target.value)}>
@@ -170,7 +175,7 @@ class Users extends React.Component {
                                         :
                                         this.state.data.content?.map(row => {
                                             return (
-                                                <tr key={row.id} onDoubleClick={node => {this.handleDoubleClick(row)}}>
+                                                <tr key={row.id}>
                                                     <td>{row.id}</td>
                                                     <td>{row.firstName}</td>
                                                     <td>{row.lastName}</td>

@@ -2,13 +2,13 @@
 <settings xmlns="http://maven.apache.org/SETTINGS/1.1.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
-  <localRepository>/usr/share/maven/ref/repository</localRepository>
+  <localRepository>/Users/gaborka98/.m2/repository</localRepository>
   <mirrors>
     <mirror>
-      <id>google-maven-central</id>
-      <name>Google Maven Central</name>
-      <url>https://maven-central.storage.googleapis.com/maven2/</url>
-      <mirrorOf>central</mirrorOf>
+      <id>nexus</id>
+      <name>Nexus Repository Manager</name>
+      <url>http://192.168.2.55:8101/repository/maven-public</url>
+      <mirrorOf>*</mirrorOf>
     </mirror>
   </mirrors>
 
@@ -22,16 +22,11 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <sonar.host.url>
-          http://192.168.2.55:9002
-        </sonar.host.url>
-        <sonar.organization>
-          Agro_corp
-        </sonar.organization>
-        <sonar.login>
-          sqp_53bd2acaa91dea9de2d6073b2ea26a8f2fd87c8c
-        </sonar.login>
-        <sonar.debug>true</sonar.debug>
+        <sonar.host.url>SONAR_URL</sonar.host.url>
+        <sonar.token>SONAR_TOKEN</sonar.token>
+        <sonar.java.binaries>target</sonar.java.binaries>
+        <sonar.tests>src/test</sonar.tests>
+        <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
       </properties>
     </profile>
   </profiles>

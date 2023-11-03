@@ -11,7 +11,7 @@ import LoginForm from "./component/loginForm.js";
 import RegisterForm from "./component/RegisterForm.js";
 import Users from "./component/Users.jsx";
 import PrivateRoute from "./component/PrivateRoute.js";
-import {PasswordList} from "./component/password/PasswordList.js";
+import {PasswordList} from "./component/password/PasswordList.tsx";
 import ActivateRegistration from "./component/ActivateRegistration.js";
 import PasswordReset from "./component/PasswordReset.js";
 import {GetPasswordReset} from "./component/getPasswordReset.js";
@@ -38,7 +38,7 @@ axios.interceptors.response.use(response => response, error => {
         if (error.response.status === 403 || error.response.status === 401){
             // redirect to 403 page
             sessionStorage.removeItem("user");
-            window.location = '/403';
+            //window.location = '/403';
         }
     }
 
