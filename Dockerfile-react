@@ -1,7 +1,7 @@
 FROM node:16.17.0-alpine as build
 WORKDIR /app
 
-COPY React/rest-api/package.json React/rest-api/package-lock.json ./
+COPY React/rest-api/package.json ./
 RUN npm install
 
 COPY React/rest-api/ ./

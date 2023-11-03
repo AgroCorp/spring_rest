@@ -1,5 +1,6 @@
 package me.agronaut.springrest.config;
 
+import io.jsonwebtoken.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,12 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
 
 @Log4j2
 public class JWTAuthorizationFilter extends OncePerRequestFilter {
@@ -78,9 +73,6 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
     private boolean checkJWTToken(HttpServletRequest request) {
         String authenticationHeader = request.getHeader(HEADER);
-        if (authenticationHeader != null && authenticationHeader.contains(ADMIN_TOKEN)) {
-            return true;
-        }
         return authenticationHeader != null && authenticationHeader.startsWith(PREFIX);
     }
 

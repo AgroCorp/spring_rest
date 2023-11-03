@@ -29,17 +29,15 @@
     <description>springRest</description>
     <packaging>jar</packaging>
     <properties>
+        <maven.build.timestamp.format>yy-MM-dd_HH-mm</maven.build.timestamp.format>
+        <changelogDate>${maven.build.timestamp}</changelogDate>
         <java.version>17</java.version>
-        <changelog-file>/db/changelog/db.changelog-master.xml</changelog-file>
+        <outputChangeLogFile>src/main/resources/db/changelog/${changelogDate}_changelog.xml</outputChangeLogFile>
+        <changeLogFile>src/main/resources/db/changelog/db.changelog-master.xml</changeLogFile>
         <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
         <jdbc.url>jdbc:mariadb://192.168.2.55:3306/java</jdbc.url>
         <jdbc.username>admin</jdbc.username>
         <jdbc.password>Gaborka11</jdbc.password>
-        <sonar.host.url>http://192.168.2.55:9002</sonar.host.url>
-        <sonar.token>sqa_6a74116866376a11e1a91e49069ab7f8f46cfa95</sonar.token>
-        <sonar.java.binaries>target</sonar.java.binaries>
-        <sonar.tests>src/test</sonar.tests>
-        <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <scm>
@@ -100,7 +98,8 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>1.18.30</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -159,7 +158,7 @@
                 <configuration>
                     <excludes>
                         <exclude>
-                            <groupId>org.projectlombok</groupId>
+                            <groupId>org.project-lombok</groupId>
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
@@ -170,7 +169,13 @@
                 <artifactId>liquibase-maven-plugin</artifactId>
                 <version>4.8.0</version>
                 <configuration>
-                    <changeLogFile>/db/changelog/db.changelog-master.xml</changeLogFile>
+                    <changeLogFile>${changeLogFile}</changeLogFile>
+                    <outputChangeLogFile>${outputChangeLogFile}</outputChangeLogFile>
+                    <diffChangeLogFile>${outputChangeLogFile}</diffChangeLogFile>
+                    <referenceUrl>${jdbc.url}</referenceUrl>
+                    <referenceDriver>${jdbc.driver}</referenceDriver>
+                    <referenceUsername>${jdbc.username}</referenceUsername>
+                    <referencePassword>${jdbc.password}</referencePassword>
                     <driver>${jdbc.driver}</driver>
                     <url>${jdbc.url}</url>
                     <username>${jdbc.username}</username>
@@ -246,6 +251,7 @@
                                 </goals>
                                 <phase>validate</phase>
                                 <configuration>
+                                    <!--suppress UnresolvedMavenProperty -->
                                     <newVersion>
                                         ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.nextIncrementalVersion}-SNAPSHOT
                                     </newVersion>
@@ -276,6 +282,7 @@
                                 </goals>
                                 <phase>validate</phase>
                                 <configuration>
+                                    <!--suppress UnresolvedMavenProperty -->
                                     <newVersion>
                                         ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.IncrementalVersion}
                                     </newVersion>

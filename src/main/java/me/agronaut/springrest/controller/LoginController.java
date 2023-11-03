@@ -3,6 +3,7 @@ package me.agronaut.springrest.controller;
 import me.agronaut.springrest.model.User;
 import me.agronaut.springrest.model.UserDto;
 import me.agronaut.springrest.service.UserService;
+import me.agronaut.springrest.util.LogUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,10 +20,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin
 public class LoginController {
     @Qualifier("UserService")
     private final UserService service;
     private final ModelMapper modelMapper;
+
+    private final LogUtil log = new LogUtil(getClass());
 
     @Autowired
     public LoginController(UserService service, ModelMapper mapper) {
@@ -51,21 +55,22 @@ public class LoginController {
         return service.login(modelMapper.map(loginUser, User.class));
     }
 
-    @PostMapping("/forgot_password")
+    @PostMapping("/forgot-password")
     public ResponseEntity<HttpStatus> forgotPassword(@RequestBody String email) {
         service.resetPassword(email);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping ("/set_new_password")
+    @PostMapping ("/set-new-password")
     public User setNewPassword(@RequestBody Map<String,String> jsonData) {
         Long userId = Long.valueOf(new String(Base64Utils.decodeFromUrlSafeString(jsonData.get("token"))));
         return service.setNewPassword(jsonData.get("password"), userId);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping(value = "/list_all_user", consumes = "application/json", produces = "application/json")
+    @PostMapping(value = "/list-all-user", consumes = "application/json", produces = "application/json")
     public Page<User> getAll(@RequestBody UserDto user, Pageable pageable) {
+        log.debug("get-all-user endpoint data", "user", user);
         return service.getAll( modelMapper.map(user, User.class), pageable);
     }
 

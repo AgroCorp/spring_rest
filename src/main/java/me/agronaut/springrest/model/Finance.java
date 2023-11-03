@@ -3,6 +3,7 @@ package me.agronaut.springrest.model;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Check;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @Table(name="FINANCE")
+@Check(constraints = "(REPEATABLE = TRUE AND REPEAT_DATE IS NOT NULL) OR (REPEATABLE = FALSE AND REPEAT_DATE IS NULL)")
 public class Finance {
 
     @Id
@@ -31,6 +33,10 @@ public class Finance {
     private User user;
     @Column(name = "IS_INCOME", nullable = false)
     private Boolean income;
+    @Column(name = "REPEATABLE", nullable = false)
+    private Boolean repeatable = false;
+    @Column(name = "REPEAT_DATE")
+    private LocalDateTime repeatDate;
 
     @CreatedDate
     private LocalDateTime crd;

@@ -12,5 +12,15 @@
     <exclude-change idName="SPRING_SESSION" tagName="dropTable" />
     <exclude-change idName="SPRING_SESSION_ATTRIBUTES" tagName="dropTable" />
     <exclude-change idName="SPRING_SESSION_ATTRIBUTES_FK" tagName="dropForeignKeyConstraint" />
+    <exclude-change idName="wedding" tagName="dropTable" />
+  </component>
+  <component name="PersistenceUnitSettings">
+    <persistence-units>
+      <persistence-unit name="Default" defaultIncludeChangeLogFile="src/main/resources/db/changelog/db.changelog-master.xml">
+        <packages>
+          <package value="me.agronaut.springrest" />
+        </packages>
+      </persistence-unit>
+    </persistence-units>
   </component>
 </project>
