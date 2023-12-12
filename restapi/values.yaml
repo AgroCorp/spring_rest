@@ -5,10 +5,10 @@
 #replicaCount: 3
 
 image:
-  repository: 192.168.2.55:8888/rest-be:latest
+  repository: 192.168.2.55:8888/rest-be
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  tag: 0.0.3
 
 imagePullSecrets:
   - name: regcred
@@ -43,15 +43,21 @@ service:
   port: 3001
 
 ingress:
-  enabled: false
+  enabled: true
   className: "nginx"
   annotations:
      kubernetes.io/ingress.class: nginx
+     nginx.ingress.kubernetes.io/rewrite-target: /$1
+#     nginx.ingress.kubernetes.io/enable-cors: "true"
+#     nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+#     nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS, DELETE"
+     nginx.ingress.kubernetes.io/configuration-snippet: |
+       more_set_headers "Host: backend.192.168.2.8.nip.io";
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: restapi.local
+    - host: backend.192.168.2.8.nip.io
       paths:
-        - path: /backend
+        - path: /?(.*)
           pathType: ImplementationSpecific
   tls: []
   #  - secretName: chart-example-tls
