@@ -100,7 +100,7 @@ public class UserService {
 
         Optional<User> login = userRepo.getUserByUsername(loginUser.getUsername());
         if (login.isPresent()) {
-            logger.debug("getted user", "User", login.isPresent());
+            logger.debug("got result user", "User", login.get().toString());
             User casted = login.get();
             if (casted.getActive() != null && !casted.getActive()) {
                 throw new NotActiveUserException("user is not activated");
