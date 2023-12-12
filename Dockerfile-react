@@ -6,12 +6,10 @@ RUN npm install
 
 COPY React/rest-api/ ./
 
-# Arguments
-ARG REACT_APP_API_BASE_URL
-ENV REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}
+ARG BASE_URL=development
 
 # Build the application
-RUN npm run build
+RUN REACT_APP_API_URL=${BASE_URL} npm run build
 
 #### Stage 2: Serve the React application from Nginx
 FROM nginx:1.17.0-alpine

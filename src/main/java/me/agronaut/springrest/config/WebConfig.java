@@ -21,6 +21,8 @@ import java.util.List;
 public class WebConfig extends WebSecurityConfigurerAdapter {
     @Value("${jwt.secret}")
     private String secret;
+    @Value("${allowed-origins}")
+    private List<String> allowedOrigins;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -36,8 +38,8 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
-        configuration.setAllowedMethods(List.of("GET","POST", "PUT", "DELETE", "OPTION"));
+        configuration.setAllowedOrigins(allowedOrigins);
+        configuration.setAllowedMethods(List.of("GET","POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
