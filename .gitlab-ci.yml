@@ -7,7 +7,7 @@ stages:
 variables:
   MAJOR: 0
   MINOR: 0
-  PATCH: 1
+  PATCH: 4
   VERSION: ${MAJOR}.${MINOR}.${PATCH}
   NEXUS_URL: 192.168.2.55:8888
 
@@ -18,7 +18,7 @@ default:
 
 release-tag:
   rules:
-    - if: $CI_COMMIT_REF_NAME == "master"
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   stage: deploy
   script:
     - apk update && apk add curl
@@ -188,4 +188,4 @@ kubernetes-deploy:
     - kubectl config get-contexts
     - kubectl config use-context gaborka98/spring_rest:gabor-pc
     - kubectl get pods
-    - helm install restapi restapi/
+    - helm upgrade --install restapi restapi/ -n restapi --create-namespace
