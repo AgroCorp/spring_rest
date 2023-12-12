@@ -19,6 +19,7 @@ default:
 release-tag:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: manual
   stage: deploy
   script:
     - apk update && apk add curl
